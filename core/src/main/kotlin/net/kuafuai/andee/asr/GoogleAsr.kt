@@ -236,7 +236,7 @@ class GoogleAsr(
 
     private fun connect() {
         if (config.googleApiKey.isBlank()) {
-            throw IllegalStateException("Google API key 未填写 (⚙ → 后端 → 本机)")
+            throw IllegalStateException("Gemini API key 未填写 (⚙ → 后端 → 本机)")
         }
 
         val socket = http.newWebSocket(
@@ -277,7 +277,7 @@ class GoogleAsr(
         ws = socket
 
         if (!setup.await(SETUP_TIMEOUT_S, TimeUnit.SECONDS)) {
-            throw IllegalStateException("ASR setup 超时 (检查 project number / location / 模型名)")
+            throw IllegalStateException("ASR setup 超时 (检查 API key / 模型名)")
         }
         // The latch is also counted down by a failure, so reaching here is not
         // proof of success — the error path has already said its piece.
@@ -603,30 +603,19 @@ class GoogleAsr(
         .toString()
 
     /**
-     * The full resource path, or the bare name when no project is configured.
-     *
-     * Bare is not a working configuration — the gateway's note is that it comes
-     * back as a permission error naming a project nobody asked for — but
-     * inventing a path around an empty field would replace a clear upstream
-     * error with a confusing local one.
+     * The Gemini model resource name used by the Live API setup message.
      */
-    private fun modelPath(): String {
-        val project = config.googleProject
-        if (project.isBlank()) return config.googleAsrModel
-        return "projects/$project/locations/${config.googleLocation}" +
-            "/publishers/google/models/${config.googleAsrModel}"
-    }
+    private fun modelPath(): String = "models/${config.googleAsrModel}"
 
     companion object {
         private const val TAG = "GoogleAsr"
 
         /**
-         * The Live API endpoint. `v1beta1` is not a typo and not a preference:
-         * it is the version that serves `BidiGenerateContent`.
+         * The Gemini Live API endpoint, keyed with a plain `?key=` API key.
          */
         private const val LIVE_URL =
-            "wss://aiplatform.googleapis.com/ws/" +
-                "google.cloud.aiplatform.v1beta1.LlmBidiService/BidiGenerateContent"
+            "wss://generativelanguage.googleapis.com/ws/" +
+                "google.ai.generativelanguage.v1beta.GenerativeService/BidiGenerateContent"
 
         private const val SAMPLE_RATE = 16_000
 

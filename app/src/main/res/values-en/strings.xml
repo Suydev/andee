@@ -313,17 +313,17 @@
     <string name="settings_voice_speak_provider">Speaking</string>
     <string name="settings_voice_provider_system">System</string>
     <string name="settings_google_api_key">Google API key</string>
-    <string name="settings_google_api_key_hint">Vertex Express key — hearing and Google speaking both use it</string>
+    <string name="settings_google_api_key_hint">Gemini API key (AI Studio) — hearing and speaking both use it</string>
     <string name="settings_google_key_builtin">Built in at package time — leave blank to use it</string>
-    <string name="settings_google_project">Project number</string>
-    <string name="settings_google_project_hint">The GCP project *number* (not its id); recognition needs it</string>
+    <string name="settings_google_project">Project number (optional, Vertex only)</string>
+    <string name="settings_google_project_hint">Not needed for the Gemini API — leave blank</string>
     <string name="settings_google_location">Location</string>
     <string name="settings_google_asr_model">Recognition model</string>
     <string name="settings_google_tts_model">Synthesis model</string>
     <string name="settings_google_base_url">Endpoint</string>
     <string name="settings_google_language">Language</string>
     <string name="settings_google_language_hint">blank = detect automatically</string>
-    <string name="settings_voice_google_note">Recognition runs on Gemini Live (so it needs the project number and location); synthesis is plain HTTP. The key stays on this device.</string>
+    <string name="settings_voice_google_note">Recognition runs on Gemini Live and synthesis over HTTP, both with your Gemini API key. The key stays on this device.</string>
     <string name="settings_section_diagnostics">Diagnostics</string>
     <string name="settings_section_advanced">Advanced</string>
     <string name="settings_max_steps">Max steps per task</string>

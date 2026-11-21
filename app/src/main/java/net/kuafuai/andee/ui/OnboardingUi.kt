@@ -876,13 +876,12 @@ class OnboardingUi(
     /**
      * Mirrors [SelfCheck]'s voice row against the drafts, before they are
      * saved: every provider in use needs its key. A build packaged with a
-     * Google key/project needs neither typed.
+     * Google key needs none typed.
      */
     private fun voiceDraftComplete(): Boolean {
         if (usesHuoshan() && draftVolcKey.isBlank()) return false
         if (usesGoogle()) {
             if (draftGoogleKey.isBlank() && VoiceConfig.googleApiKeyDefault().isBlank()) return false
-            if (draftGoogleProject.isBlank() && VoiceConfig.googleProjectDefault().isBlank()) return false
         }
         return true
     }

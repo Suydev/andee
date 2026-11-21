@@ -811,19 +811,18 @@ class SettingsUi(
             numeric = true,
         )
 
-        // ---- Google: one Vertex Express key, two protocols ----
+        // ---- Google: one Gemini API key, two protocols ----
         //
         // Every hint here is the value a blank row resolves to, from the same
         // constants [VoiceConfig.load] reads — the same rule the LLM rows
         // follow, for the same reason: a card that advertises a model but
         // silently calls another is lying where the user goes to decide.
         // A blank row means "use whatever the build carries", which for a
-        // packaged-for-Google APK is a real key and a real project number. So
-        // the hint has to say that, or the user reads an empty box as "not set
-        // up" while the device is happily talking to Google with a credential
-        // they never typed. The key's *value* is never shown — a settings card
-        // is not a place to print a secret — but the project number is not one,
-        // and printing it is how the row can be checked at a glance.
+        // packaged-for-Google APK is a real key. The hint has to say that, or
+        // the user reads an empty box as "not set up" while the device is
+        // happily talking to Google with a credential they never typed. The
+        // key's *value* is never shown — a settings card is not a place to
+        // print a secret.
         val builtInKey = VoiceConfig.googleApiKeyDefault()
         val builtInProject = VoiceConfig.googleProjectDefault()
 

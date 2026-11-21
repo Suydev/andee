@@ -81,13 +81,12 @@ object VoiceConfig {
         const val VOICE_SYSTEM = "system"
 
         /**
-         * The Vertex endpoint, its Express-keyed surface.
+         * The Gemini API endpoint, keyed with a plain API key.
          *
-         * Not a region-scoped host: Express mode takes an API key and no
-         * project or location, which is what makes the Google path a single
-         * settings row instead of the five the reference gateway needs.
+         * Not a region-scoped host: the key is enough for both voice halves,
+         * which is what makes the Google path a single settings row.
          */
-        const val DEFAULT_GOOGLE_BASE_URL = "https://aiplatform.googleapis.com/v1"
+        const val DEFAULT_GOOGLE_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
 
         /**
          * The region the Live API session is opened in.
@@ -110,18 +109,16 @@ object VoiceConfig {
          * could decide otherwise, on a transcript the meeting recorder writes
          * to disk as the record of what was said.
          *
-         * The `-preview` suffix is not optional either: without it the name is
-         * a 404. Both facts are the reference gateway's, measured.
+         * On the Gemini API the id has no `-preview` suffix; that suffix is a
+         * Vertex-only name and is a 404 here.
          */
-        const val DEFAULT_GOOGLE_ASR_MODEL = "gemini-3.5-transcribe-live-preview"
+        const val DEFAULT_GOOGLE_ASR_MODEL = "gemini-3.5-transcribe-live"
 
         /**
          * The speaking model.
          *
-         * The reference gateway records why this exact id and not the newer
-         * one: `3.8-flash-tts` exists on Gemini's own developer API but not on
-         * Vertex, where the speech models are 3.1 Flash TTS and below, and
-         * asking for 3.8 is a plain "model not found".
+         * `gemini-3.1-flash-tts-preview` is served by the Gemini API and was
+         * verified to stream speech with a plain API key.
          */
         const val DEFAULT_GOOGLE_TTS_MODEL = "gemini-3.1-flash-tts-preview"
 
