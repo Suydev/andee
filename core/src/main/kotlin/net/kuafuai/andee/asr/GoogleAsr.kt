@@ -615,7 +615,7 @@ class GoogleAsr(
          */
         private const val LIVE_URL =
             "wss://generativelanguage.googleapis.com/ws/" +
-                "google.ai.generativelanguage.v1beta.GenerativeService/BidiGenerateContent"
+                "google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent"
 
         private const val SAMPLE_RATE = 16_000
 
