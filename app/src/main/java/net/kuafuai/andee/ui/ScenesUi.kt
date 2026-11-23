@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import net.kuafuai.andee.R
 import net.kuafuai.andee.config.Notebook
 import net.kuafuai.andee.config.ScenePresets
@@ -223,15 +224,18 @@ class ScenesUi(
                 val pkg = pkgInput.text.toString().trim()
                 if (pkg.isEmpty()) return@action
                 fun split(s: String) = s.split(',').map { it.trim() }.filter { it.isNotEmpty() }
-                Notebook.savePlaybook(
-                    context = context,
-                    pkg = pkg,
-                    label = labelInput.text.toString().trim().ifEmpty { pkg },
-                    habits = split(habitsInput.text.toString()),
-                    shortcuts = split(shortcutsInput.text.toString()),
-                    anchors = emptyList(),
-                )
-                rebuild()
+                runCatching {
+                    Notebook.savePlaybook(
+                        context = context,
+                        pkg = pkg,
+                        label = labelInput.text.toString().trim().ifEmpty { pkg },
+                        habits = split(habitsInput.text.toString()),
+                        shortcuts = split(shortcutsInput.text.toString()),
+                        anchors = emptyList(),
+                    )
+                }.onFailure {
+                    Toast.makeText(context, it.message ?: "Could not save playbook", Toast.LENGTH_SHORT).show()
+                }.onSuccess { rebuild() }
             },
         )
     }
@@ -269,9 +273,14 @@ class ScenesUi(
                 if (armed) Glass.WARN else Glass.ACCENT,
             ) {
                 if (armed) {
-                    Notebook.deletePlaybook(context, pkg)
-                    armingPlaybook = null
-                    rebuild()
+                    runCatching { Notebook.deletePlaybook(context, pkg) }
+                        .onFailure {
+                            Toast.makeText(context, it.message ?: "Could not delete playbook", Toast.LENGTH_SHORT).show()
+                        }
+                        .onSuccess {
+                            armingPlaybook = null
+                            rebuild()
+                        }
                 } else {
                     armingPlaybook = pkg
                     rebuild()

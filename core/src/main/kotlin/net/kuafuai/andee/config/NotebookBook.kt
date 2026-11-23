@@ -877,8 +877,9 @@ class NotebookBook(private val store: NotebookStore) {
         }
     }.trim()
 
-    /** Seed a few useful app playbooks on a fresh notebook; never overwrite learned ones. */
+    /** Seed a few useful app playbooks on a fresh notebook; never overwrite learned ones or resurrect deletions. */
     fun seedPlaybooks() {
+        if (book().optBoolean("playbooks_seeded", false)) return
         val presets = listOf(
             Triple("com.whatsapp", "WhatsApp", listOf("read and reply to chats", "check mentions first")),
             Triple("com.termux", "Termux", listOf("run shell commands", "check output before acting")),
@@ -899,6 +900,9 @@ class NotebookBook(private val store: NotebookStore) {
                 )
             }
         }
+        val seeded = book().let { JSONObject(it.toString()) }
+        seeded.put("playbooks_seeded", true)
+        write(seeded)
     }
 
     // ------------------------------------------------------------------
