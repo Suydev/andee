@@ -24,7 +24,7 @@ import net.kuafuai.andee.device.AndroidGear
 import net.kuafuai.andee.i18n.AppLocale
 
 /**
- * 装备: what is installed and what Andee has learned each thing is for — the user's own view of exactly what
+ * Gear: what is installed and what Andee has learned each thing is for — the user's own view of exactly what
  * the model is told, and the place to correct it.
  *
  * The device reads the facts (installed, last used, how often); the brain writes the meaning after really

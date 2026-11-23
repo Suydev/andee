@@ -125,7 +125,7 @@ class ExpressionsUi(
         val ball = EmotionBallTextureView(context)
         preview = ball
         stage.addView(ball, FrameLayout.LayoutParams(side, side, Gravity.CENTER))
-        // The pet, drawn by the same view the folded body uses; shown instead of the ball when 桌宠 is picked.
+        // The pet, drawn by the same view the folded body uses; shown instead of the ball when desk pet is picked.
         val pv = PhonePetView(context).apply { visibility = View.GONE }
         petPreview = pv
         stage.addView(pv, FrameLayout.LayoutParams(side, side, Gravity.CENTER))
@@ -149,7 +149,7 @@ class ExpressionsUi(
         petBody = VoiceConfig.petOn(context)
         card.addView(heading(if (zh) "Body" else "Body"))
         card.addView(chipRow {
-            // 小球 leftmost: it is what an unset preference reads as.
+            // ball leftmost: it is what an unset preference reads as.
             for ((on, label) in listOf(false to (if (zh) "Little ball" else "Ball"), true to (if (zh) "Desktop pet" else "Desk pet"))) {
                 val chip = chip(label) { pickBody(on) }
                 chip.tag = on
@@ -195,7 +195,7 @@ class ExpressionsUi(
         }
         grid.addView(wrap)
         // As tall as the chips need, so all nineteen are on screen and nobody has to
-        // scroll to find 睡着 — it was a fixed 190 dp, five rows do not fit in that,
+        // scroll to find asleep — it was a fixed 190 dp, five rows do not fit in that,
         // and the top row came up half cut off. Capped at a third of the screen so a
         // landscape phone still gets a card it can see the footer of; only there does
         // it scroll.

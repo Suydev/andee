@@ -3,7 +3,7 @@ package net.kuafuai.andee.config
 import android.content.Context
 
 /**
- * Ready-made scenes the user can adopt — from the 情景 card, or from a bubble
+ * Ready-made scenes the user can adopt — from the Scenes card, or from a bubble
  * on a card with no history.
  *
  * **A preset is not a scene until the user says yes.** Scenes are learned with
@@ -12,14 +12,14 @@ import android.content.Context
  * rule holds with a tap standing in for the sentence. From then on it is an
  * ordinary scene that the user and the model can edit or delete like any other.
  *
- * The two taps are the same yes. 采用 on the 情景 card says it out loud; a
+ * The two taps are the same yes. Adopt on the Scenes card says it out loud; a
  * bubble on an empty card *is* the user choosing the scene, so picking it is the
  * answer itself. The bubble goes through [adoptIfMissing] rather than [adopt]
  * only because it can be tapped again in a later session, by which time the
  * scene may have been edited.
  *
  * Neither door *enters* the scene. Writing it down is what makes it findable;
- * whether to step into it stays the model's call, made from the 「进入…情景」 it
+ * whether to step into it stays the model's call, made from the enter …Scenes' it
  * reads. A bubble that skipped the writing step sent the model looking for a
  * scene nobody had saved, and it answered — correctly, and in front of the
  * user — that it had never seen one.
@@ -29,7 +29,7 @@ import android.content.Context
  * picked once, at adoption, from the interface setting. And with no Android
  * types in the table, `ScenePresetsTest` can check every prompt against
  * [Notebook.MAX_SCENE_PROMPT] on the JVM — a prompt over the limit would
- * otherwise only fail when someone tapped 采用.
+ * otherwise only fail when someone tapped Adopt.
  *
  * Every tool a prompt names is a real one in `ToolSchemas`. A scene that tells
  * the model to call something that does not exist teaches it to claim work it

@@ -48,16 +48,16 @@ import java.util.concurrent.atomic.AtomicInteger
  * rotation free: if the replacement cannot connect, the old segment is still
  * receiving and the meeting carries on.
  *
- * **Why the recogniser is not 火山-specific.** The three properties this class
+ * **Why the recogniser is not Volcengine-specific.** The three properties this class
  * needs are the three [AsrEngine] already promises: audio goes in as it
  * arrives, listening continues while it does, and one final comes back when
- * the caller says the segment is over. 火山 and the Google Live API both have
+ * the caller says the segment is over. Volcengine and the Google Live API both have
  * them, so a segment is built from [VoiceConfig.voiceProvider] like every
  * other listener on this device. A meeting is not a different kind of
  * listening, and a device configured only for Google can take minutes.
  *
  * The wait in [retire] is provider-dependent, and that is why it is asked of
- * the engine rather than named here: 火山 answers a retiring segment in about
+ * the engine rather than named here: Volcengine answers a retiring segment in about
  * half a second, while the Google engine pushes trailing silence and waits for
  * the reply. A single constant in this file could only ever suit one of them.
  */
@@ -342,7 +342,7 @@ class MeetingRecorder(
 
     private fun retire(seg: Segment, waitForFinal: Boolean = true) {
         runCatching { seg.asr.sendAudio(ByteArray(0), isLast = true) }
-        // The deadline is the engine's own: 火山 answers a retiring segment in
+        // The deadline is the engine's own: Volcengine answers a retiring segment in
         // about half a second, while the Google engine pushes trailing silence
         // and waits for the reply. One shared number could only be right for
         // one of them — see [AsrEngine.finalWaitMs].
@@ -555,7 +555,7 @@ class MeetingRecorder(
         /**
          * How long a retiring segment waits for its final.
          *
-         * 火山 answers in about half a second; the Google engine holds the
+         * Volcengine answers in about half a second; the Google engine holds the
          * segment's text for its own grace first (`GoogleAsr.EMIT_GRACE_MS`)
          * and that has to fit inside this. A caller that has already given up
          * is one nobody can hand a transcript to.

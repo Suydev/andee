@@ -48,7 +48,7 @@ import java.util.Date
  *
  * ## The fade
  *
- * "上下渐渐隐藏" is Android's own fading edge, not a pair of gradient views
+ * "gradually hidden above and below" is Android's own fading edge, not a pair of gradient views
  * laid over the top and bottom. The platform one fades the *content* to
  * transparent and — the part a hand-rolled overlay always gets wrong — only on
  * the sides that actually have more content to scroll to, so the list doesn't
@@ -59,7 +59,7 @@ class HistoryListView(private val context: Context) : ScrollView(context) {
     /** Tapping a page row. Only ever fired for entries that still have a file. */
     var onPageClick: ((ChatHistory.Entry) -> Unit)? = null
 
-    /** A job card under a reply: its 工作文件 ›, and the card itself (the task page). Set by the window. */
+    /** A job card under a reply: its Work files ›, and the card itself (the task page). Set by the window. */
     var onWorkerFiles: ((worker: String, title: String) -> Unit)? = null
     var onOpenTask: ((taskId: String) -> Unit)? = null
 
@@ -113,18 +113,18 @@ class HistoryListView(private val context: Context) : ScrollView(context) {
     var onSuggestionClick: ((name: String, title: String, example: String) -> Unit)? = null
 
     /**
-     * 继续话题 on a topic card. A turn — so, like a suggestion, it is handed out:
+     * Continue on a topic card. A turn — so, like a suggestion, it is handed out:
      * only the service starts turns. See `BodyCoreService.beginTopicContinue`.
      */
     var onTopicContinue: ((ChatHistory.Topic) -> Unit)? = null
 
-    /** 对话记录 on a topic card — a fullscreen page, so the card folds first. */
+    /** conversation record on a topic card — a fullscreen page, so the card folds first. */
     var onTopicTranscript: ((ChatHistory.Topic) -> Unit)? = null
 
     /**
      * The rows themselves.
      *
-     * It used to end with a permanent dim line — "点击小球跟我对话" — as a hint
+     * It used to end with a permanent dim line — "tap the ball to talk to me" — as a hint
      * at the bottom of every conversation. It reads well and it scrolls away,
      * which is the one thing a hint about *how to ask* must not do: the moment
      * the user wants it is the moment they have scrolled up looking for what
@@ -202,7 +202,7 @@ class HistoryListView(private val context: Context) : ScrollView(context) {
      * **The one moment this app can be proactive without being early.** With no
      * history there is nothing to be helpful *about*, and a ball in the corner
      * has taught the user nothing about what it does — so instead of the dead
-     * "还没有对话" line, the card names a few things it is good at and sends one
+     * "no conversation yet" line, the card names a few things it is good at and sends one
      * when tapped.
      *
      * Only when the log is empty, and that is the whole safety story: the
@@ -296,7 +296,7 @@ class HistoryListView(private val context: Context) : ScrollView(context) {
             }
         )
         live.visibility = View.VISIBLE
-        // FINAL is an announcement nothing will supersede — "已停止", a tool's
+        // FINAL is an announcement nothing will supersede — "Stopped", a tool's
         // result. PARTIAL and SPEAKING are always followed by something that
         // replaces or clears them, but a FINAL left alone would sit at the foot
         // of the scrollback forever, under the hint, reading as the newest thing
@@ -395,12 +395,12 @@ class HistoryListView(private val context: Context) : ScrollView(context) {
      * scratch.
      *
      * Rows carry their language in their own text — there is nothing to
-     * translate in place, because the row that says 我 · 15:31 has to become
+     * translate in place, because the row that says I · 15:31 has to become
      * its English twin, not just swap a label. So forget which rows are laid
      * out and rebuild them, which is the same path an eviction takes.
      *
      * The scroll position goes with them. Acceptable: the only way to get here
-     * is changing the language in 设置, which is opened over this list, and the
+     * is changing the language in Settings, which is opened over this list, and the
      * bottom of the conversation is where the user was heading anyway.
      *
      * Main thread only.
@@ -514,7 +514,7 @@ class HistoryListView(private val context: Context) : ScrollView(context) {
      * Name over summary, which is `ScenesUi.addPresets`' own pairing — at
      * [Glass.Type.BODY]/[Glass.TITLE] and [Glass.Type.CAPTION]/[Glass.SECONDARY],
      * four dp apart. A bare name was the first version and it asked the user to
-     * already know what "开会记录" means before tapping it, which is the opposite
+     * already know what "start a meeting" means before tapping it, which is the opposite
      * of helping someone in. The name is still the brightest thing in the row
      * because the name is what they are choosing between; the sentence is what
      * tells them which one they want.
@@ -737,18 +737,18 @@ class HistoryListView(private val context: Context) : ScrollView(context) {
     }
 
     /**
-     * Whether event rows ([ChatHistory.Role.EVENT]) are drawn: 全部 / 只看对话, toggled from the key beside the
+     * Whether event rows ([ChatHistory.Role.EVENT]) are drawn: Everything / Chat only, toggled from the key beside the
      * ball and remembered in `timeline_events`. Main thread.
      */
     var showEvents: Boolean = true
         set(v) { if (field != v) { field = v; relayoutAll() } }
 
-    /** Opens a wiki article an event row points at (`wiki_show` / 写进维基). */
+    /** Opens a wiki article an event row points at (`wiki_show` / write intoWiki). */
     var onWikiOpen: ((String) -> Unit)? = null
 
     /**
      * Something that happened, not something said: one quiet centered line with the time and the words. A row with
-     * a detail opens on tap; a wiki row carries 打开 ›. Small, so a day of events does not drown the conversation.
+     * a detail opens on tap; a wiki row carries Open ›. Small, so a day of events does not drown the conversation.
      */
     private fun buildEventRow(e: ChatHistory.Entry): View {
         val col = LinearLayout(context).apply {
@@ -1202,7 +1202,7 @@ class HistoryListView(private val context: Context) : ScrollView(context) {
         //
         // There used to be three here, one per row kind, and they were tried in both
         // directions: a dark 1 dp line on the light card, a white one on the dark card.
-        // **Both read as a drawn box**, which is what "看着比较 low" was about — an
+        // **Both read as a drawn box**, which is what "looks rather low" was about — an
         // outline round every row makes a table cell out of a message, and once the page
         // became a photograph the light one looked like a rectangle drawn on the picture.
         //

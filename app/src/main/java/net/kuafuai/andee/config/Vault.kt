@@ -16,7 +16,7 @@ import javax.crypto.spec.GCMParameterSpec
 /**
  * The user's own credentials, so the ball can log in as them.
  *
- * One entry per account — a label the brain can search for ("飞书"), the
+ * One entry per account — a label the brain can search for ("Lark"), the
  * identifiers it may read, and the secrets it may only *use*. The split is the
  * whole design: a secret never crosses the WebSocket. The brain asks the
  * device to type it (`device.vault.fill`) and gets back a length, not a value.
@@ -162,7 +162,7 @@ object Vault {
 
     /**
      * Find by id or by label. The brain only ever holds the word the user
-     * used ("飞书"), so matching on the label is the primary path; case and
+     * used ("Lark"), so matching on the label is the primary path; case and
      * surrounding space are ignored because that word arrives via an LLM.
      */
     fun find(context: Context, needle: String): Entry? {
@@ -195,7 +195,7 @@ object Vault {
 
     /**
      * Erase every credential. The one caller allowed to lose this on purpose
-     * (恢复出厂设置).
+     * (Factory reset).
      *
      * No cache to invalidate, unlike [Notebook]: [entries] reads straight from
      * prefs every time. `commit()` rather than `apply()` because the caller

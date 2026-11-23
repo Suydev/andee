@@ -16,13 +16,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 /**
- * 产物: the pages the assistant has made, newest first — open, hand back to the
+ * Artifacts: the pages the assistant has made, newest first — open, hand back to the
  * assistant for changes, or delete.
  *
  * The list is [ChatHistory.artifacts], not a store of its own: a page is
  * archived once, by `ui.show_html`, and the scrollback row and this row are
  * two views of the same file. Deleting here leaves the scrollback row behind
- * as 已清理, the same end state the 12-page cap produces.
+ * as Cleaned, the same end state the 12-page cap produces.
  *
  * What the buttons *do* is the service's business — opening has to fold the
  * card, editing has to reach whichever brain is running — so this class only
@@ -44,7 +44,7 @@ class ArtifactsUi(
     private var frosted = false
     private var lctx: Context = context
 
-    /** The row whose 删除 has been tapped once and now reads 确认删除. */
+    /** The row whose Delete has been tapped once and now reads Confirm delete. */
     private var arming: Long? = null
 
     /** The artifact whose version list is open, by group id; null = none. */
@@ -205,7 +205,7 @@ class ArtifactsUi(
             maxLines = 2
             ellipsize = android.text.TextUtils.TruncateAt.END
         }, LinearLayout.LayoutParams(0, WRAP, 1f))
-        // Only when it actually has been revised: a 「v1」 on every page is
+        // Only when it actually has been revised: a 'v1' on every page is
         // noise that makes the ones with a v2 harder to pick out.
         if (e.version > 1 || versions.size > 1) {
             titleRow.addView(versionBadge(e.version), LinearLayout.LayoutParams(WRAP, WRAP))
@@ -216,7 +216,7 @@ class ArtifactsUi(
             append(SimpleDateFormat("yyyy-MM-dd HH:mm", AppLocale.localeOf(context)).format(Date(e.ts)))
             val bytes = e.page?.length() ?: 0L
             if (bytes > 0) append(" · ${(bytes + 1023) / 1024} KB")
-            // How much history is behind this page, so the 版本 entry has a
+            // How much history is behind this page, so the version entry has a
             // reason to be pressed before it is pressed.
             if (versions.size > 1) append(" · ${lctx.getString(R.string.artifacts_versions_count, versions.size)}")
         }
@@ -270,7 +270,7 @@ class ArtifactsUi(
         return row
     }
 
-    /** The 「v3」 chip. Small, muted, and never the thing you tap. */
+    /** The 'v3' chip. Small, muted, and never the thing you tap. */
     @SuppressLint("SetTextI18n")
     private fun versionBadge(version: Int): TextView = TextView(context).apply {
         text = "v$version"
@@ -284,7 +284,7 @@ class ArtifactsUi(
      * Every revision of this artifact, newest first — open it, or make it the
      * current one again.
      *
-     * 回退 files the old bytes as a *new* version rather than editing history
+     * Go back files the old bytes as a *new* version rather than editing history
      * (see [ChatHistory.restoreVersion]), so this list never loses the version
      * you rolled back from. The row that is current says so and offers no
      * action; a version whose file is gone says that instead of pretending to

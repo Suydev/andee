@@ -209,7 +209,7 @@ class DogMotion(
     /**
      * Run several legs in order, on its own thread, and return at once.
      *
-     * This is the tool for anything with more than one beat — "转一圈再往前走"
+     * This is the tool for anything with more than one beat — "turn around and go forward"
      * — because [move] supersedes rather than queues. It is also the only way to
      * run a script longer than the hub's request timeout, since nobody waits for
      * it here. The last step is followed by "J" no matter how the run ends,
@@ -840,8 +840,8 @@ class DogMotion(
      * Motion name (and whether the legs are used) → the dongle's character.
      *
      * The wheel and gait characters are different sets, and the gait *turns*
-     * are the trap: the dog's own firmware comments label `E` as 左转 and `D`
-     * as 右转, and measured behaviour is the opposite (E turns right, D turns
+     * are the trap: the dog's own firmware comments label `E` as turn left and `D`
+     * as turn right, and measured behaviour is the opposite (E turns right, D turns
      * left). The mapping below follows the measurement — the same correction
      * the dog's `NRF24_Dongle/README.md` and its `/dog` skill both carry.
      */

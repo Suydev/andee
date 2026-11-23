@@ -22,18 +22,18 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 /**
- * 它记得的事: what the device remembers, browsable and deletable per item.
+ * what it remembers: what the device remembers, browsable and deletable per item.
  *
- * The header's 复制全部 copies [Notebook.dumpText] — every field, untruncated,
+ * The header's Copy all copies [Notebook.dumpText] — every field, untruncated,
  * export-shaped. That is the only route to the raw text; the rows here answer
  * a different question: "what is it allowed to remember about me".
  *
- * Eight tabs, the same eight and in the same order as the Mac's 小本本:
- * **自己** (its self-description), **在意** (its cares, most overdue first),
- * **日记** (the last week of diary pages), **打算** (today's plan), **人** (who it
- * knows), **维基** (its articles — tap one to read it from the file, now),
- * **记忆** ([net.kuafuai.andee.config.Memory] by type, tap to read the content),
- * **在办** (what it took on and has not finished — [net.kuafuai.andee.config.Tasks] — then the timed
+ * Eight tabs, the same eight and in the same order as the Mac's Notebook:
+ * **itself** (its self-description), **Care about** (its cares, most overdue first),
+ * **Diary** (the last week of diary pages), **plan** (today's plan), **person** (who it
+ * knows), **Wiki** (its articles — tap one to read it from the file, now),
+ * **memory** ([net.kuafuai.andee.config.Memory] by type, tap to read the content),
+ * **In Progress** (what it took on and has not finished — [net.kuafuai.andee.config.Tasks] — then the timed
  * [net.kuafuai.andee.config.Todo]s, soonest first).
  * What the model wrote is Markdown and is drawn as such ([MarkdownView]).
  *
@@ -50,11 +50,11 @@ class NotebookUi(
     private val context: Context,
     private val onDismiss: () -> Unit = {},
     /**
-     * The user typed a line to it from 打算 → 告诉它一句 («今天别提喝水了»). Wired to the service's own user-turn path;
+     * The user typed a line to it from plan → tell it («don't mention water today»). Wired to the service's own user-turn path;
      * null hides the box, because a box that sends nowhere is worse than none.
      */
     private val onTellBrain: ((String) -> Unit)? = null,
-    /** Open straight on this wiki article (`wiki_show`) rather than on 守卫. */
+    /** Open straight on this wiki article (`wiki_show`) rather than on Guard. */
     private val startWiki: String? = null,
 ) {
 
@@ -66,7 +66,7 @@ class NotebookUi(
     /** Index into [TABS]. */
     private var tab = 0
 
-    /** The wiki article being read in the 维基 tab, or null for the list. */
+    /** The wiki article being read in the Wiki tab, or null for the list. */
     private var wikiOpen: String? = null
 
     /** The person the user is merging away: the list then asks which record they are the same person as. */
@@ -102,7 +102,7 @@ class NotebookUi(
             PixelFormat.TRANSLUCENT,
         ).apply {
             gravity = Gravity.CENTER
-            // 守卫 has a text box; the card shrinks for the keyboard rather than sitting under it, as SettingsUi does.
+            // Guard has a text box; the card shrinks for the keyboard rather than sitting under it, as SettingsUi does.
             softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
         }
         frosted = Glass.frost(context, wm, p)
@@ -253,7 +253,7 @@ class NotebookUi(
         TABS.forEachIndexed { i, t ->
             if (i > 0) bar.addView(View(context), LinearLayout.LayoutParams(dp(4), 1))
             val button = tabButton(i, lctx.getString(t.label))
-            // 守卫 unwritten: a red dot on the tab, as on the top bar's 小本本 key.
+            // Guard unwritten: a red dot on the tab, as on the top bar's Notebook key.
             val v = if (t == Tab.GUARD) withDot(button) else button
             // The view in the row, not the button inside the dot's frame — its left is 0 within that frame.
             if (i == tab) selected = v
@@ -262,11 +262,11 @@ class NotebookUi(
         return android.widget.HorizontalScrollView(context).apply {
             isHorizontalScrollBarEnabled = false
             addView(bar)
-            // Picking a tab rebuilds the card, and a new scroll view starts at 0 — which left 记忆 and 待办 cut off at
+            // Picking a tab rebuilds the card, and a new scroll view starts at 0 — which left memory and Todo cut off at
             // the edge right after they were tapped. Bring the selected one fully into view once it is laid out.
             val reveal = { selected?.let { v -> if (v.right > scrollX + width || v.left < scrollX) scrollTo((v.right - width + dp(8)).coerceAtLeast(0), 0) } }
             post { reveal() }
-            // And again when the card is resized (the keyboard coming up for 守卫's box), which put the row back at 0.
+            // And again when the card is resized (the keyboard coming up for Guard's box), which put the row back at 0.
             addOnLayoutChangeListener { _, l, t, r, b, ol, ot, or, ob -> if (r - l != or - ol || b - t != ob - ot) post { reveal() } }
         }
     }
@@ -309,13 +309,13 @@ class NotebookUi(
         }
     }
 
-    /** The red dot on the 守卫 tab; shown while nothing is written. */
+    /** The red dot on the Guard tab; shown while nothing is written. */
     private var guardDot: View? = null
 
-    // ---- 守卫 ----
+    // ---- Guard ----
 
     /**
-     * 守卫: one paragraph the user writes, above everything in Andee's prompt ([net.kuafuai.andee.config.Guard]).
+     * Guard: one paragraph the user writes, above everything in Andee's prompt ([net.kuafuai.andee.config.Guard]).
      * Only written here — no tool reaches it. The card guides and gives one example; what goes in is the user's,
      * and it says plainly that this is a request made in the prompt, not a guarantee.
      */
@@ -403,7 +403,7 @@ class NotebookUi(
         addRow(body, note)
     }
 
-    // ---- 自己 · 在意 · 日记 · 打算 · 人 · 维基 ----
+    // ---- itself · Care about · Diary · plan · person · Wiki ----
 
     private fun md(text: String, color: String = Glass.LABEL, size: Float = Glass.Type.BODY): View =
         MarkdownView.build(context, text, color, size, onLink = ::openLink)
@@ -496,7 +496,7 @@ class NotebookUi(
         p.addView(label(lctx.getString(R.string.notebook_own_heading), Glass.Type.CAPTION, Glass.SECONDARY), matchWrap())
         if (last != null) {
             val did = lctx.getString(when (last.effect) { "acted" -> R.string.notebook_own_acted; "looked" -> R.string.notebook_own_looked; else -> R.string.notebook_own_thought })
-            p.addView(label("${stamp(last.at)} · $did「${last.what}」", Glass.Type.BODY, Glass.LABEL, top = 8), matchWrap())
+            p.addView(label("${stamp(last.at)} · $did'${last.what}'", Glass.Type.BODY, Glass.LABEL, top = 8), matchWrap())
             if (last.summary.isNotBlank()) p.addView(md(last.summary, Glass.PHOTO_INK, Glass.Type.CAPTION), matchWrap().apply { topMargin = dp(4) })
         }
         if (thoughts.isNotEmpty()) {
@@ -507,8 +507,8 @@ class NotebookUi(
     }
 
     /**
-     * 打算: today's plan with each item's state and ✕ while it is still to come, what it leaves alone today, the
-     * long-term directions (pause / remove), and 告诉它一句. This is the only place the plan is shown — Settings
+     * plan: today's plan with each item's state and ✕ while it is still to come, what it leaves alone today, the
+     * long-term directions (pause / remove), and tell it. This is the only place the plan is shown — Settings
      * used to carry the same thing, differently. Removing and pausing are done by the device at once
      * (`Plans.dropItemByUser`, `setDirectionByUser`), and the model may not undo them.
      */
@@ -536,7 +536,7 @@ class NotebookUi(
                 p.addView(row, matchWrap().apply { topMargin = dp(6) })
             }
             if (day.quiet.isNotEmpty()) {
-                p.addView(label(lctx.getString(R.string.settings_plan_quiet, day.quiet.joinToString("；") { it.trim().trimEnd('。', '.', '；', ';') }), Glass.Type.CAPTION, Glass.MUTED, top = 8), matchWrap())
+                p.addView(label(lctx.getString(R.string.settings_plan_quiet, day.quiet.joinToString("\uFF1B") { it.trim().trimEnd('\u3002', '.', '\uFF1B', ';') }), Glass.Type.CAPTION, Glass.MUTED, top = 8), matchWrap())
             }
         }
         p.addView(label(lctx.getString(R.string.settings_plan_directions), Glass.Type.CAPTION, Glass.SECONDARY, top = 14), matchWrap())
@@ -618,8 +618,8 @@ class NotebookUi(
 
     /**
      * Unconfirmed records are listed too, marked: the device writes them, and a record the user cannot see is one
-     * they cannot merge, confirm or delete. Merging is two taps — 合并 on the record that goes, then the one it is —
-     * with no confirmation, because 撤销 under 最近合并 takes it back for [People.UNDO_MS].
+     * they cannot merge, confirm or delete. Merging is two taps — merge on the record that goes, then the one it is —
+     * with no confirmation, because Undo under recently merged takes it back for [People.UNDO_MS].
      */
     private fun buildPeople(body: LinearLayout) {
         val book = Notebook.people(context)
@@ -883,11 +883,11 @@ class NotebookUi(
 
     @SuppressLint("SetTextI18n")
     /**
-     * 在办: the tasks first (a thing with an end), then 定时 (an alarm clock). One tab because the user asks one
+     * In Progress: the tasks first (a thing with an end), then Scheduled (an alarm clock). One tab because the user asks one
      * question of it — "what is it still going to do?" — and the alarms a task sets for itself show up in both.
      */
     private fun buildTodos(body: LinearLayout) {
-        // 定时: the alarms only. The 事 have a card of their own (在办 on the top bar, [TasksUi]); this tab used to list
+        // Scheduled: the alarms only. The task have a card of their own (In Progress on the top bar, [TasksUi]); this tab used to list
         // them too, which made two places for one thing.
         val active = Notebook.todos(context, "active")
         body.addView(label(lctx.getString(R.string.notebook_timed_head), Glass.Type.CAPTION, Glass.MUTED), matchWrap().apply { bottomMargin = dp(6) })
@@ -1000,7 +1000,7 @@ class NotebookUi(
 
     private fun matchWrap() = LinearLayout.LayoutParams(MATCH, WRAP)
 
-    /** 守卫 first, on both bodies: it is the one the user writes, and the card opens on it. */
+    /** Guard first, on both bodies: it is the one the user writes, and the card opens on it. */
     private enum class Tab(@androidx.annotation.StringRes val label: Int) {
         GUARD(R.string.notebook_tab_guard),
         SELF(R.string.notebook_tab_self), CARES(R.string.notebook_tab_cares), DIARY(R.string.notebook_tab_diary),

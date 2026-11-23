@@ -15,7 +15,7 @@ import android.util.Log
  * `MiuiEnhanceTBService` (the "TalkBack enhance" helper) is enabled — then the
  * same screen dumps 219 nodes. MIUI also flips that service on or off by
  * itself whenever Andee is re-bound (reinstall, crash, toggle), which is the
- * "有时候可以有时候不行" the user saw.
+ * "sometimes works, sometimes not" the user saw.
  *
  * Only ever *adds* to the enabled list, never removes, and only when the
  * component exists on this device and `WRITE_SECURE_SETTINGS` was granted —

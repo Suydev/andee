@@ -19,24 +19,24 @@ import net.kuafuai.andee.config.Tasks
 import net.kuafuai.andee.config.VoiceConfig
 
 /**
- * 在办 on the phone: the 「事」 Andee has in hand, as its own card from the top bar — the same split as the Mac's
- * sidebar (`desktop/TasksUi.kt`): 动态 says what happened, 在办 what is in hand, 小本本 who Andee is (its last tab is
- * now 定时, the alarms).
+ * In Progress on the phone: the 'task' Andee has in hand, as its own card from the top bar — the same split as the Mac's
+ * sidebar (`desktop/TasksUi.kt`): dynamic says what happened, In Progress what is in hand, Notebook who Andee is (its last tab is
+ * now Scheduled, the alarms).
  *
  * The list puts first what wants the user — delivered (Andee says it is done; only the user closes it) and answered
- * — then the rest, newest-touched first. A row opens the 事 in the same card: its state, its record, and what to do —
- * 接着办 (a turn now, the task named by the device), 说点要求再办 (the next words are about it), 办完了, 放下; for a
- * delivered one ✓ 办完了 / 还没完. Finished ones of the last seven days are at the foot, and can be reopened.
+ * — then the rest, newest-touched first. A row opens the task in the same card: its state, its record, and what to do —
+ * Carry on (a turn now, the task named by the device), Say what to do, then do it (the next words are about it), done, put down; for a
+ * delivered one ✓ done / not finished yet. Finished ones of the last seven days are at the foot, and can be reopened.
  *
  * Plain [t] strings rather than resources, like [SettingsUi]: one card, both languages, nothing to look up.
  */
 class TasksUi(
     private val context: Context,
-    /** 接着办: a turn about [Tasks.Task], started now. */
+    /** Carry on: a turn about [Tasks.Task], started now. */
     private val onContinue: (Tasks.Task) -> Unit,
-    /** 说点要求再办: the next words the user types or says are about this task. */
+    /** Say what to do, then do it: the next words the user types or says are about this task. */
     private val onTalk: (Tasks.Task) -> Unit,
-    /** 工作文件 ›: what worker [id] made, on the computer, as a drive. Null hides the entry. */
+    /** Work files ›: what worker [id] made, on the computer, as a drive. Null hides the entry. */
     private val onFiles: ((worker: String, title: String) -> Unit)? = null,
     /**
      * Stop worker [id] on the computer (the protocol's only way to abandon a job is to end its process). Blocks on the link, so
@@ -53,7 +53,7 @@ class TasksUi(
     private var root: View? = null
     private var frosted = false
 
-    /** The 事 open in the card; null shows the list. */
+    /** The task open in the card; null shows the list. */
     private var open: String? = openTask
 
     private fun zh() = VoiceConfig.uiLanguage(context) == "zh"
@@ -192,7 +192,7 @@ class TasksUi(
         }
     }
 
-    // ---- one 事 ----
+    // ---- one task ----
 
     private fun buildTask(body: LinearLayout, task: Tasks.Task) {
     val now = System.currentTimeMillis()
@@ -234,7 +234,7 @@ class TasksUi(
         }
         val from = panel()
         from.addView(label(t("Came from: ", "From: ") + TaskRows.whose(task.from, zh()) +
-        task.from.quote.takeIf { it.isNotBlank() }?.let { " — 「${it.take(120)}」" }.orEmpty(), Glass.Type.CAPTION, Glass.TITLE), matchWrap())
+        task.from.quote.takeIf { it.isNotBlank() }?.let { " — '${it.take(120)}'" }.orEmpty(), Glass.Type.CAPTION, Glass.TITLE), matchWrap())
         if (task.deliverTo.kind != "user") from.addView(label(t("Handed off when done: ", "Deliver to: ") + TaskRows.whose(task.deliverTo, zh()), Glass.Type.CAPTION, Glass.TITLE, top = 4), matchWrap())
         if (task.next.isNotBlank()) from.addView(label(t("Next step: ", "Next: ") + task.next, Glass.Type.CAPTION, Glass.TITLE, top = 4), matchWrap())
         body.addView(from, matchWrap().apply { bottomMargin = dp(10) })
@@ -243,7 +243,7 @@ class TasksUi(
             for (w in task.waits) {
                 val p = panel()
                 p.addView(label((if (w.open) "○ " else "● ") + TaskRows.who(w, zh()) + (if (w.asked.isNotBlank()) " · " + w.asked else ""), Glass.Type.CAPTION, Glass.TITLE), matchWrap())
-                if (!w.open) p.addView(label("「" + w.answer + "」", Glass.Type.CAPTION, Glass.SECONDARY, top = 4), matchWrap())
+                if (!w.open) p.addView(label("'" + w.answer + "'", Glass.Type.CAPTION, Glass.SECONDARY, top = 4), matchWrap())
                 body.addView(p, matchWrap().apply { bottomMargin = dp(8) })
             }
         }
@@ -255,7 +255,7 @@ class TasksUi(
     }
 
     /**
-     * 工作文件 ›: the way in to what the worker made, on the computer. Shown for every worker this task has handed work to, open
+     * Work files ›: the way in to what the worker made, on the computer. Shown for every worker this task has handed work to, open
      * or answered, whether it is running or done — a running job already has files in its folder. Only while a computer
      * offers its agent to this phone, since that is what the listing is asked of.
      */
@@ -280,7 +280,7 @@ class TasksUi(
     }
 
     /**
-     * The worker this 事 waits on, while it runs: what it is on, its own checklist and its newest actions — the phone's twin of
+     * The worker this task waits on, while it runs: what it is on, its own checklist and its newest actions — the phone's twin of
      * the Mac's live card. Nothing here when it is not running (the report has not come, or it ended).
      */
     private fun buildLiveCard(body: LinearLayout, task: Tasks.Task) {
@@ -317,19 +317,19 @@ class TasksUi(
         if (s.files > 0) p.addView(label(t("Produced ${s.files} files (on the computer)", "${s.files} files so far (on the computer)"), Glass.Type.CAPTION, Glass.SECONDARY, top = 6), matchWrap())
     }
 
-    /** 放下: close the 事 as dropped and cancel the alarms it had armed. */
+    /** put down: close the task as dropped and cancel the alarms it had armed. */
     private fun letGo(task: Tasks.Task) {
         tasks.close(task.id, "dropped", t("User let go of it in In progress", "let go by the user in In progress"))
             .onSuccess { c -> c.cancel.forEach { Scheduler.cancelTodo(context, it) } }
         open = null; rebuild()
     }
 
-    /** The user is asked about a running worker before the 事 is closed: [asking] is "done" or "dropped", null for the buttons. */
+    /** The user is asked about a running worker before the task is closed: [asking] is "done" or "dropped", null for the buttons. */
     private var asking: String? = null
 
     /**
-     * A worker is running on this 事. Carrying on or adding a requirement would only spend a turn (dsh takes no word mid-run, it
-     * can only be stopped), so the one action is 停止 dsh. Closing the 事 is still allowed but asks about the worker first, so it
+     * A worker is running on this task. Carrying on or adding a requirement would only spend a turn (dsh takes no word mid-run, it
+     * can only be stopped), so the one action is Stop dsh. Closing the task is still allowed but asks about the worker first, so it
      * is not left running on the user's quota with nothing to receive its report.
      */
     private fun buildRunningActions(body: LinearLayout, task: Tasks.Task, worker: String) {
@@ -359,7 +359,7 @@ class TasksUi(
         ), matchWrap().apply { bottomMargin = dp(12) })
     }
 
-    /** 停止 dsh: asked of the computer off the main thread; a row says what happened and the card redraws when it answers. */
+    /** Stop dsh: asked of the computer off the main thread; a row says what happened and the card redraws when it answers. */
     private fun stopWorker(worker: String) {
         val stop = onStopWorker ?: return
         Thread {
@@ -490,7 +490,7 @@ class TasksUi(
     }
 }
 
-/** The words of a 事's row, shared by the card and the top bar's badge: order, state, who. */
+/** The words of a task's row, shared by the card and the top bar's badge: order, state, who. */
 object TaskRows {
     /** What wants the user first (delivered, answered), then the rest, newest-touched first. */
     fun ordered(list: List<Tasks.Task>): List<Tasks.Task> =

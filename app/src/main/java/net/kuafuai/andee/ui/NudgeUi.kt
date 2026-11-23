@@ -11,7 +11,7 @@ import net.kuafuai.andee.brain.Nudge
  * A bubble is something that is fine to miss, so this never makes the user's moment fit the bubble — the
  * bubble waits for the moment. [gate] is asked before every attempt and answers [Gate.WAIT] whenever the
  * user is busy with something else; a waiting bubble is retried every [RETRY_MS] until its TTL runs out,
- * and is then dropped without a word, because 「该喝水啦」 three hours late is noise.
+ * and is then dropped without a word, because 'Time for some water' three hours late is noise.
  *
  * **One held at a time, and the newest wins.** A queue of bubbles is push spam with extra steps — the same
  * reason [CardUi] shows one card at a time.

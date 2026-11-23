@@ -19,7 +19,7 @@ import net.kuafuai.andee.i18n.AppLocale
  * renders here, live. Data in via [show] (file-backed, so huge HTML doesn't
  * ride an Intent), the brain gets "closed" when the user is done.
  *
- * A tiny close affordance floats top-right ("✕ 完成") — the brain's UI
+ * A tiny close affordance floats top-right ("✕ Done") — the brain's UI
  * must never trap the user.
  *
  * In and out are [StageActivity]'s, shared with the two camera screens: the
@@ -45,17 +45,17 @@ class HtmlActivity : StageActivity() {
         @Volatile var titleText: String = ""
 
         /**
-         * 屏幕上是否已经有一页。**在屏**（onCreate 到 onDestroy 之间）为真。
+         * whether a page is already on screen.**on screen**(onCreate to onDestroy  between them) is true.
          *
-         * 放在这里而不是调用方：`showFile` 有两个入口 —— 大脑的 `ui.show_html`
-         * 和用户在对话记录里点一页重看 —— 而"同时只能有一页"是 WebView 这个类
-         * 的事实，不是某一个调用方的约定。那个共享的静态 [htmlFile] 也让它是
-         * 事实：两个实例会读到同一份文件，第二个盖上来以后第一个显示的就是错的
-         * 内容了。
+         * here rather than in the caller:`showFile` there are two entries —— the brain's `ui.show_html`
+         * and the user reopening a page from the conversation record —— and"only one page at a time"is WebView this class
+         * a fact, not the convention of any one caller. That shared static [htmlFile] also makes it
+         * Fact: two instances read the same file; once the second overwrites it, what the first shows is wrong
+         * the content..
          *
-         * 给 `ui.show_html` 读：它现在**不再等用户关页面**（那次改动见
-         * `CommandDispatcher`），所以"屏幕上还有一页"必须靠这个标志判断，否则
-         * 模型连着要两页就会叠出两个 Activity。
+         * give `ui.show_html` Read: it now**no longer waits for the user to close the page**(that change is described in
+         * `CommandDispatcher`), so"there is still a page on screen"must be judged by this flag, otherwise
+         * if the model asks for two pages in a row it will stack up two Activity.
          */
         @Volatile var pageUp = false
 
@@ -84,7 +84,7 @@ class HtmlActivity : StageActivity() {
          * Not a `file://` URL and not null, and both halves of that are bugs
          * this went through. `targetSdk 30` turns `allowFileAccess` off by
          * default, so loading the staged file failed outright with
-         * ERR_ACCESS_DENIED — the "网页无法打开" the user saw. A *null* base URL
+         * ERR_ACCESS_DENIED — the "the page cannot be opened" the user saw. A *null* base URL
          * fixes the load but hands the page an opaque origin, where
          * `localStorage` throws a SecurityException: one `localStorage.getItem`
          * near the top of a script — a high score, a saved setting, exactly what
@@ -165,7 +165,7 @@ class HtmlActivity : StageActivity() {
          *
          * **The reason this exists is that "one page at a time" used to mean
          * "refused".** A user who asked for a change to the page in front of
-         * them — "把标题改短点" — got a model call, a refused `ui.show_html`, and
+         * them — "shorten the title" — got a model call, a refused `ui.show_html`, and
          * a sentence telling them to close the page by hand first: an
          * instruction to do the one thing the assistant was there to do. The
          * limit is real (one [htmlFile], one WebView), but what it forbids is two
@@ -217,7 +217,7 @@ class HtmlActivity : StageActivity() {
      *
      * Not a second Activity and not a `startActivity`: the WebView is already on
      * screen and already sized, so the new render lands in the same window at
-     * the same scroll position of the *chrome*, which is what "改了" should look
+     * the same scroll position of the *chrome*, which is what "changed" should look
      * like. The scroll position of the page itself resets, and that is correct —
      * different bytes are not the same document.
      *
@@ -321,7 +321,7 @@ class HtmlActivity : StageActivity() {
         web?.loadDataWithBaseURL(BASE_URL, html, "text/html", "utf-8", null)
 
         // The title bar: a thin pane of glass across the top with the page's name and a close, and the page
-        // starts under it instead of behind it. It used to be a floating ✕完成 pill, which sat on the page's own
+        // starts under it instead of behind it. It used to be a floating ✕Done pill, which sat on the page's own
         // corner (a score, a button) — the corner is where generated pages put things. The bar runs under the
         // status bar (the window is edge-to-edge) and its content sits below the status inset; it takes on the
         // page's own background once that is known ([tintBar]), the way Safari's toolbar does, so it reads as

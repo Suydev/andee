@@ -307,9 +307,9 @@ object Glass {
      * **The value is bracketed by two measured failures, and both are worth knowing
      * before moving it.** [MUTED] is what these two had, and it is chosen against a
      * card — white in day, near-black at night — so on a photograph it has no ground to
-     * stand on: measured **1.4:1**, reported from the tablet as 看不清. Moving to the
+     * stand on: measured **1.4:1**, reported from the tablet as Didn't catch it. Moving to the
      * other end of the ramp fixed the legibility and overshot it: near-black on the light
-     * page's mid-blue sky measured **6:1** and read as a lump, reported as 太突兀.
+     * page's mid-blue sky measured **6:1** and read as a lump, reported as too abrupt.
      *
      * So this is the middle of the ramp — about **3:1** against either ground, which is
      * the threshold for *graphics* rather than for body text, and these callers are large

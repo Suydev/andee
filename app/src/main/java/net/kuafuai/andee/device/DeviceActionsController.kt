@@ -73,7 +73,7 @@ class DeviceActionsController(private val context: Context) {
         // whole bug this path replaces. Xiaomi's chained-launch guard is a
         // third outcome: it asks THE USER whether to allow the open, but
         // Andee has the user's standing permission to drive the screen — so
-        // tap 允许 on its own dialog and keep waiting, instead of asking the
+        // tap Allow on its own dialog and keep waiting, instead of asking the
         // user or looping.
         var opened = false
         var guardShown = false
@@ -137,7 +137,7 @@ class DeviceActionsController(private val context: Context) {
     }
 
     /**
-     * Tap the 「允许」 button on Xiaomi's chained-launch confirmation dialog.
+     * Tap the 'Allow' button on Xiaomi's chained-launch confirmation dialog.
      * Andee has the user's standing permission to drive the screen, and the
      * dialog is only there because of a launch the user already asked for —
      * clicking its allow button is finishing the user's own request, not a
@@ -449,7 +449,7 @@ class DeviceActionsController(private val context: Context) {
 
         /**
          * Xiaomi's security center, the foreground package while its
-         * "chained-launch" confirmation dialog (打开 TikTok？允许/始终允许)
+         * "chained-launch" confirmation dialog (Open TikTok? Allow/Always allow)
          * is on screen. It is a USER question, not a launch failure — detect
          * it, report it, and never loop on it.
          */

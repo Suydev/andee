@@ -27,7 +27,7 @@ import net.kuafuai.andee.i18n.AppLocale
  *
  * Why cards beat push-interrupts for incoming messages: a notification that
  * wakes the brain every time trains the user to mute everything. A small
- * card that asks "看看吗?" costs one glance and a tap — the brain only
+ * card that asks "Take a look??" costs one glance and a tap — the brain only
  * hears about messages the user actually cares about. The brain gets the
  * SAME power as a tool (ask_user / alert), so it can escalate to a card
  * whenever IT thinks the user should decide something.
@@ -104,7 +104,7 @@ object CardUi {
      * Show a confirm-style card. Callback fires exactly once, on the main
      * thread. Safe to call from any thread.
      *
-     * @param buttons label list, e.g. ["帮我看看", "忽略"]. First button is
+     * @param buttons label list, e.g. ["help meTake a look", "Ignore"]. First button is
      *        rendered as the primary (tinted) one.
      */
     fun ask(
@@ -114,7 +114,7 @@ object CardUi {
         // True only for a question the brain is blocked on (`ui.ask`). Speech
         // that names no button then closes the card and travels back in the tool
         // result for the model to judge. Every other card (a notification's
-        // 看看/忽略, the self-check nudge) has nobody waiting for words, so
+        // Take a look/Ignore, the self-check nudge) has nobody waiting for words, so
         // unmatched speech must stay an ordinary turn and leave the card alone.
         captureSpeech: Boolean = false,
         onDone: (Result) -> Unit,
@@ -198,7 +198,7 @@ object CardUi {
      * options it offered. That is why this never starts a turn of its own: a
      * new turn would queue behind the very tool call this card is blocking.
      *
-     * Matching is deliberately strict. "否则帮我查一下" starts with 否 and is not
+     * Matching is deliberately strict. "otherwise help me look it up" starts with no and is not
      * a no, so a label only counts when it is most of what was said.
      *
      * Blocks the calling thread until the main thread has decided, with no
@@ -225,7 +225,7 @@ object CardUi {
     private fun decideVoice(said: String): VoiceOutcome {
         val handle = current ?: return VoiceOutcome.NOT_HANDLED
         if (handle.finished) return VoiceOutcome.NOT_HANDLED
-        // A bubble was never spoken, so nothing the user says is an answer to it: a 「好」 meant for
+        // A bubble was never spoken, so nothing the user says is an answer to it: a 'OK' meant for
         // something else must not press a button they may not even have read.
         if (handle.bubble) return VoiceOutcome.NOT_HANDLED
         val spoken = normalizeForMatch(said)
@@ -244,7 +244,7 @@ object CardUi {
         return VoiceOutcome.NOT_HANDLED
     }
 
-    /** Lower-cased, with spaces and punctuation dropped, so "好的。" equals "好的". */
+    /** Lower-cased, with spaces and punctuation dropped, so "OK." equals "OK". */
     private fun normalizeForMatch(s: String): String =
         s.lowercase().filter { it.isLetterOrDigit() }
 
@@ -598,7 +598,7 @@ object CardUi {
                 }
                 view.addView(row)
             }
-            // As narrow as the words allow: a card-wide pane for 「该喝水啦」 is a card.
+            // As narrow as the words allow: a card-wide pane for 'Time for some water' is a card.
             view.measure(
                 View.MeasureSpec.makeMeasureSpec(dp(BUBBLE_MAX_WIDTH_DP), View.MeasureSpec.AT_MOST),
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),

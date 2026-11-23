@@ -96,17 +96,17 @@
          AlarmManager alarms, so with the screen off a non-exempt app's reminders
          arrive late. Exempting is done from Settings' per-app request screen
          (`ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`), one dialog —
-         「是否忽略电池优化？」→「忽略」 on a Chinese HONOR, where the
-         affirmative button is 忽略 rather than AOSP's 允许.
+         'Ignore battery optimisations?'→'Ignore' on a Chinese HONOR, where the
+         affirmative button is Ignore rather than AOSP's Allow.
 
          The list page is not an alternative on this device, which is why this
          permission is load-bearing rather than optional. Measured on a HONOR
-         (MagicOS / Android 15): the 「电池优化」 list
+         (MagicOS / Android 15): the 'Battery optimisation' list
          (`ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS`) shows ten preinstalled
          apps and nothing else — this package is absent even while
          `dumpsys deviceidle whitelist` lists it, `am force-stop
          com.android.settings` does not change that, and the page's own search
-         box answers 「没有匹配的结果」 for the package name. So there is no
+         box answers 'No matching results' for the package name. So there is no
          user-reachable screen there that can exempt a third-party app.
 
          And the request screen silently refuses to open without this line:
@@ -193,22 +193,22 @@
             </intent-filter>
         </receiver>
 
-        <!-- 桌面图标。这个 app 曾经刻意没有 LAUNCHER 入口(见 CLAUDE.md),
-             代价是:无障碍没开的时候,用户手里是一个什么都不做的设备,
-             而且没有任何地方能告诉他为什么。自检页就是那个"为什么"。
+        <!-- Launcher icon. This app once deliberately had no LAUNCHER entry(see CLAUDE.md),
+             the cost is: when accessibility isn't on, the user holds a device that does nothing,
+             and there is nowhere to tell them why. The self-check page is that"why".
 
-             但图标首先是"打开 app"的那颗图标。所以这里是两条路,由
-             ui/SelfCheckActivity.onCreate 决定走哪条:服务在跑 → 和长按
-             球球做同一件事,expand() 展开成全屏卡片,然后 finish;服务没跑
-             (无障碍关着、悬浮窗权限缺失、刚重装) → 落到自检页。
+             but the icon is, first of all,"Open app"that icon. So there are two routes here, by
+             ui/SelfCheckActivity.onCreate decide which route to take: the service is running → and the long-press
+             ball does the same thing, expand() expand into a full-screen card, then finish; the service is not running
+             (accessibility off, overlay permission missing, or a fresh reinstall) → lands on the self-check page.
 
-             第一次启动是这两条之前的一次例外:同一个 Activity 承载新手
-             引导,完成后才恢复上面的图标语义。引导末尾有模型和称呼输入,
-             所以这里也必须 adjustResize,不能让键盘盖住底部的继续按钮。
+             The first launch is an exception before those two routes: the same Activity carries the new-user
+             onboarding, only after that does the icon return to its meaning above. The onboarding ends with model and name entry,
+             so here too it must adjustResize, can't let the keyboard cover the bottom Continue button.
 
-             这不是两个功能拼在一起,是同一个入口的两种状态:进得去的时候
-             不需要解释,进不去的时候这一页必须自己解释 —— 见
-             Theme.Body.Stage.NoPreview,它让前者不闪黑。 -->
+             these are not two features stuck together, two states of the same entry: when you can get in
+             no explanation needed, when you can't get in, this page must explain itself —— see
+             Theme.Body.Stage.NoPreview, it keeps the former from flashing black. -->
         <activity
             android:name=".ui.SelfCheckActivity"
             android:autoRemoveFromRecents="true"
@@ -228,11 +228,11 @@
             android:theme="@style/Theme.Body"
             android:exported="false" />
 
-        <!-- 后台启动别的 app 的舞台:HyperOS 会 Abort 从 Service 直接发起的
-             跨应用 startActivity,必须先起自己的 Activity,由它在前台转交。
-             不可见(Theme.Body.Transparent)、不在最近任务、不留历史 ——
-             转交完立刻 finish,目标 app 成为任务根,返回键直接退出它,
-             舞台全程一帧都不画。见 device/LaunchPadActivity。 -->
+        <!-- launching another app stage: HyperOS will Abort from Service launched directly
+             cross-app startActivity, must first start its own Activity, it hands off in the foreground.
+             invisible(Theme.Body.Transparent), not in recent tasks, leave no history ——
+             once handed off, immediately finish, target app become the task root, the Back key exits it directly,
+             The Stage draws no frame at all. See device/LaunchPadActivity. -->
         <activity
             android:name=".device.LaunchPadActivity"
             android:theme="@style/Theme.Body.Transparent"
@@ -240,9 +240,9 @@
             android:excludeFromRecents="true"
             android:noHistory="true" />
 
-        <!-- 三个全屏脸共用 Theme.Body.Stage:纯黑底、无标题栏、无系统转场
-             动画。入场/退场由 ui/Stage.kt 自己画,平台那一项闭嘴 —— 见
-             values/themes.xml 里关于"关闭时闪一下"的说明。 -->
+        <!-- shared by the three full-screen faces Theme.Body.Stage: pure black background, no title bar, no system transition
+             animation.entrance/exit is drawn by ui/Stage.kt draw itself, let the platform keep quiet —— see
+             values/themes.xml in the description of"flash once on close"the description. -->
         <activity
             android:name=".device.ScanActivity"
             android:theme="@style/Theme.Body.Stage"

@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  全屏脸的退场,整个 window 一起走。
+  the exit of the full-screen face, the whole window go together.
 
-  为什么必须是 window 级动画而不是 View 级动画 —— 这是"关闭时闪一下"的
-  真正原因,量过:
+  why it must be window level animation rather than View -level animation —— this is"flash once on close" of
+  real reason, measured:
 
-  之前 StageActivity 用 `stage.animate().alpha(0f)` 收场。stage 是 View
-  树,它透明之后露出来的不是背后那个 app,而是**这个 Activity 自己的
-  windowBackground**(纯黑,见 Theme.Body.Stage)。所以逐帧看下来是:
+  before StageActivity use `stage.animate().alpha(0f)` wind-down.stage is View
+  tree, what shows through once it is transparent is not the one behind app, but**this Activity its own
+  windowBackground**(pure black, see Theme.Body.Stage). Frame by frame, then, it looks like:
 
-      64-72 帧   画面渐暗          ← stage 的 alpha 1→0
-      72-86 帧   整屏纯黑 ~250ms   ← 黑底 windowBackground 露出来了
-      87 帧起    背后内容淡入
+      64-72 frame   the picture dims          ← stage  of alpha 1→0
+      72-86 frame   the whole screen pure black ~250ms   ← black background windowBackground shows through
+      87 frame    the content behind fades in
 
-  中间那 250ms 谁也不是,用户说的"闪一下"就是它。View 级动画够不着
-  windowBackground,因为那层不是 View;只有 window 级动画能把整块 surface
-  (内容 + 黑底)一起淡掉,背后的东西才在动画过程中就露出来。
+  that middle 250ms neither, what the user said"flash once"that is it.View -level animation cannot reach
+  windowBackground, because that layer isn't View; only window -level animation can fade the whole surface
+  (content + black background)fade out together, what is behind shows through during the animation.
 
-  缩放略大于入场(入场 0.94),是为了让"走"有方向感:退到一个比来处更远的
-  位置,读起来像是退出去,而不是原路缩回。
+  scale slightly larger than the entrance(entrance 0.94), is to let"go"a sense of direction: retreat to a point farther than where it came from
+  position, reads like you are going out, rather than shrink back the way it came.
 -->
 <set xmlns:android="http://schemas.android.com/apk/res/android"
     android:interpolator="@android:interpolator/fast_out_linear_in">

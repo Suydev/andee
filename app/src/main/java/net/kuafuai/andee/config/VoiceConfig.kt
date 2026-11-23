@@ -11,8 +11,8 @@ import java.util.UUID
  */
 object VoiceConfig {
         /**
-         * The 火山 (Volcengine Speech) account the voice pipeline runs on when
-         * the user is on the **本机** backend. On [BRAIN_CODEFLYING], the key
+         * The Volcengine (Volcengine Speech) account the voice pipeline runs on when
+         * the user is on the **On-device** backend. On [BRAIN_CODEFLYING], the key
          * is derived from [BuildConfig.CODEFLYING_KEY] and this field is not
          * read.
          *
@@ -30,7 +30,7 @@ object VoiceConfig {
         const val API_KEY = ""
 
         /**
-         * The 火山 speaker the device speaks with when the ball's look has no
+         * The Volcengine speaker the device speaks with when the ball's look has no
          * opinion of its own.
          *
          * Not a settings row anymore: the voice is a property of the character
@@ -141,7 +141,7 @@ object VoiceConfig {
          * own `local.properties`, which `.gitignore` excludes; whoever clones
          * the repository gets empty strings here and the constants below.
          *
-         * A build with [googleApiKeyDefault] non-empty is also what makes 谷歌
+         * A build with [googleApiKeyDefault] non-empty is also what makes Google
          * the default provider — see [voiceProvider].
          */
         fun googleApiKeyDefault(): String = BuildConfig.GOOGLE_VOICE_KEY.trim()
@@ -187,7 +187,7 @@ object VoiceConfig {
         /**
          * The same two defaults for an **English** card, pointing at OpenAI.
          *
-         * The 本机 tab's hint *is* the value a blank row resolves to, so the two
+         * The On-device tab's hint *is* the value a blank row resolves to, so the two
          * cannot be allowed to disagree: a card that advertises an OpenAI `Model`
          * / `Base URL` and then, when the user leaves the boxes empty, quietly
          * calls DeepSeek would be lying in the one place a user reads to decide
@@ -261,7 +261,7 @@ object VoiceConfig {
          * **Day (light) is the default.** A fresh install comes up light, and so does
          * a device that has never touched the setting — which is why the test is
          * "is night" rather than "is not day". The dark palette is one tap away in
-         * 设置 → 外观 and is remembered from then on.
+         * Settings → Appearance and is remembered from then on.
          *
          * The inversion is on purpose and it is the whole content of this function.
          * The test is written against the *non-default* value rather than the default
@@ -299,7 +299,7 @@ object VoiceConfig {
             // explicit choice can never be overruled by a change to the default.
             saved.trim().lowercase() == "night"
 
-        /** Whether to show the 云端 (hub) tab in the backend picker. Default off. */
+        /** Whether to show the Cloud (hub) tab in the backend picker. Default off. */
         fun showHub(context: Context): Boolean =
             context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                 .getString("show_hub", "")?.trim()?.lowercase() == "on"
@@ -349,10 +349,10 @@ object VoiceConfig {
          *
          * Split out because the settings card has to ask about the second
          * kind. The brain picker does not write on tap, so when the user
-         * selects 本机 out of CodeFlying the card is holding a value no pref
+         * selects On-device out of CodeFlying the card is holding a value no pref
          * reflects yet, and asking [brainMode] there answers about the mode
          * being left — which is how the voice block came to stay hidden until
-         * 保存 rebuilt the card.
+         * Save rebuilt the card.
          *
          * **One rule, one place.** A second copy of "is CodeFlying really in
          * play" is how a build that does not enable it ends up hiding the very
@@ -390,7 +390,7 @@ object VoiceConfig {
                 )
             }
             // Language-dependent defaults: the blank-row fallback must be the
-            // value the 本机 tab's hint advertised, or an English card would
+            // value the On-device tab's hint advertised, or an English card would
             // promise OpenAI in the placeholder and then call DeepSeek.
             val defaultBaseUrl = llmBaseUrlDefault(context)
             val defaultModel = llmModelDefault(context)
@@ -466,7 +466,7 @@ object VoiceConfig {
          * entirely: a typo, a downgrade, a setting written by a version that
          * knew a value this one does not. Nothing is known about what it was
          * meant to permit, so it permits nothing. Same fail-closed direction as
-         * [groundingEnabled], and the picker lists 关 leftmost to match — see
+         * [groundingEnabled], and the picker lists Off leftmost to match — see
          * [net.kuafuai.andee.ui.SettingsUi.segmented], whose leftmost option is
          * the fallback for exactly this case.
          *
@@ -490,19 +490,19 @@ object VoiceConfig {
          * side is a separate choice — see [speakProvider] — because a system
          * engine can read aloud but has no recogniser.
          *
-         * **Anything that is not exactly `google` reads as 火山**, which is the
+         * **Anything that is not exactly `google` reads as Volcengine**, which is the
          * same fail-closed direction [groundingEnabled] and [notifyScope] take,
          * and here it is also the backward-compatible one: every device that
-         * predates this setting has no value at all, and 火山 is what they have
+         * predates this setting has no value at all, and Volcengine is what they have
          * been running. A device that upgrades must not change voice because a
          * key it never had is now missing.
          *
-         * **CodeFlying is pinned to 火山, and that is the point of it.**
+         * **CodeFlying is pinned to Volcengine, and that is the point of it.**
          * CodeFlying is the one-tap mode: the APK is packaged by an operator and
          * handed to someone who configures nothing, so [load] takes every
          * endpoint *and* credential from the build and the whole errand is the
          * gateway's. Which means the gateway is also where the choice of
-         * upstream lives — its 火山 support and its Google support are two
+         * upstream lives — its Volcengine support and its Google support are two
          * handlers behind one URL, and a client that second-guessed that by
          * dialling Google itself with a key baked into the APK would be
          * choosing a different vendor and a different bill than the operator
@@ -520,7 +520,7 @@ object VoiceConfig {
                 VOICE_HUOSHAN -> VOICE_HUOSHAN
                 // Never chosen. A build packaged with a Google key is a build
                 // packaged *for* Google, so that is what it reads as; a build
-                // without one reads as 火山, which is what every build did
+                // without one reads as Volcengine, which is what every build did
                 // before this setting existed. Either way the picker is one tap
                 // away, and a user's own choice always outranks this.
                 "" -> if (googleApiKeyDefault().isNotEmpty()) VOICE_GOOGLE else VOICE_HUOSHAN
@@ -532,12 +532,12 @@ object VoiceConfig {
          * Which service speaks: [VOICE_HUOSHAN], [VOICE_GOOGLE] or
          * [VOICE_SYSTEM]. The speaking and hearing sides are now two separate
          * choices, because a system engine reads aloud but cannot hear — so
-         * [voiceProvider] (the hearing side) keeps only 火山 / Google, while
+         * [voiceProvider] (the hearing side) keeps only Volcengine / Google, while
          * this one may add the device's own engine.
          *
          * An unset value falls back to [voiceProvider], so a device that
          * predates this row speaks exactly as it did before; a saved choice
-         * always wins. CodeFlying is pinned to 火山 for the same reason as
+         * always wins. CodeFlying is pinned to Volcengine for the same reason as
          * [voiceProvider] — the hosted gateway owns the upstream choice.
          */
         fun speakProvider(context: Context): String {
@@ -554,7 +554,7 @@ object VoiceConfig {
         }
 
         /**
-         * Is the 火山 account the one saved in settings, or the factory one?
+         * Is the Volcengine account the one saved in settings, or the factory one?
          *
          * Only needed so the answer is *visible*: a setting whose effect cannot
          * be seen is indistinguishable from one that did not take. The settings
@@ -579,8 +579,8 @@ object VoiceConfig {
                 p.edit().putString("uid", uid).apply()
             }
             // On CodeFlying every endpoint and credential is derived from the
-            // build — the user never sees these fields. On 本机 the prefs rule
-            // (user's own 火山 account); 云端 shares the same prefs because
+            // build — the user never sees these fields. On On-device the prefs rule
+            // (user's own Volcengine account); Cloud shares the same prefs because
             // ASR/TTS still run on this device whichever brain answers.
             val codeFlying = brainMode(context) == BRAIN_CODEFLYING
             return VoiceSettings(
@@ -681,7 +681,7 @@ object VoiceConfig {
                 "tts_sample_rate" to p.getInt("tts_sample_rate", DEFAULT_TTS_SAMPLE_RATE).toString(),
                 // Which service hears and speaks, plus its rows. The Google
                 // endpoint/model rows show saved-or-empty for the same reason
-                // the 火山 ones do: an empty box is the only state in which
+                // the Volcengine ones do: an empty box is the only state in which
                 // the hint — which is the value a blank resolves to — can be
                 // seen at all.
                 "voice_provider" to voiceProvider(context),
@@ -701,7 +701,7 @@ object VoiceConfig {
                 // Not bc.mode, which has CodeFlying already resolved away to local.
                 "brain" to p.getString("brain", "").orEmpty().trim().lowercase().ifEmpty { BRAIN_CODEFLYING },
                 "show_hub" to if (showHub(context)) "on" else "off",
-                // llm_api_key / llm_base_url / llm_model are the 本机 tab's rows —
+                // llm_api_key / llm_base_url / llm_model are the On-device tab's rows —
                 // the user's own credentials and the endpoint they point at.
                 // They stay visible no matter which backend is active, because
                 // switching to CodeFlying and back must not look like the
@@ -794,7 +794,7 @@ object VoiceConfig {
          * want and a system language change should not overrule them.
          *
          * Not part of [current] merely for display: [net.kuafuai.andee.ui.SettingsUi]
-         * writes this one the moment it is tapped rather than on 保存, because
+         * writes this one the moment it is tapped rather than on Save, because
          * the card redraws in the new language and that redraw *is* the
          * confirmation. Nothing else on this device is written eagerly.
          */
@@ -824,7 +824,7 @@ object VoiceConfig {
          * name, or blank for the first one.
          *
          * Like [uiLanguage] and unlike everything else here, it is written the
-         * moment the user swipes rather than on 保存, and for the same reason:
+         * moment the user swipes rather than on Save, and for the same reason:
          * the ball changing *is* the confirmation, and there is no card to
          * press a button on. It is also not in [current] — it has no settings
          * row, because the control is the ball itself.
@@ -839,7 +839,7 @@ object VoiceConfig {
 
         /**
          * Whether the desk pet is the folded body instead of the ball. **Off unless the user picked it** — a fresh
-         * install wears the ball, as on the Mac; only an exact `on` shows her. 小球 is the picker's leftmost.
+         * install wears the ball, as on the Mac; only an exact `on` shows her. ball is the picker's leftmost.
          */
         fun petOn(context: Context): Boolean =
             context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("pet", "").orEmpty().trim() == "on"
@@ -918,7 +918,7 @@ object VoiceConfig {
          * On (the default) is the old behaviour: once a phrase is enrolled the listener holds the microphone whenever
          * the screen / [wakeWhileLocked] allows. Off releases the microphone entirely — the status-bar mic dot goes
          * out, nothing is recorded, no battery is spent on it — **while keeping the enrolled templates**, the point
-         * the reporter could not reach (the only off-switch before was 清除, which threw the enrolment away). The
+         * the reporter could not reach (the only off-switch before was Clear, which threw the enrolment away). The
          * gate reads it live like [wakeWhileLocked], so a toggle is seen on the next ~100 ms poll. Unset = on.
          */
         fun wakeListeningOn(context: Context): Boolean =
@@ -982,7 +982,7 @@ object VoiceConfig {
         /**
          * How many bubbles the device may raise by itself: `off` / `few` / `normal`, read through
          * [net.kuafuai.andee.brain.NudgeBook.Level.of]. **Unset is `few` and unrecognised is `off`** — the
-         * split [notifyScope] draws, for its reasons, and the picker lists 关 leftmost to match.
+         * split [notifyScope] draws, for its reasons, and the picker lists Off leftmost to match.
          */
         fun nudgeLevel(context: Context): String =
             net.kuafuai.andee.brain.NudgeBook.Level.of(
@@ -991,11 +991,11 @@ object VoiceConfig {
 
         /**
          * Whether it may get up of its own accord — the heartbeat and the work turns it starts
-         * ([net.kuafuai.andee.brain.Heartbeat]). The design's 「让它歇着」 switch. **Unset is on and unrecognised is
+         * ([net.kuafuai.andee.brain.Heartbeat]). The design's 'let it rest' switch. **Unset is on and unrecognised is
          * off**, the split [nudgeLevel] draws: a device nobody configured gets the behaviour the product is, and a
          * value nobody can read permits nothing. Cheap when on: a beat calls the model only when a care is overdue.
          */
-        /** 全部 / 只看对话 on the scrollback: whether event rows are shown. Unset is shown. */
+        /** Everything / Chat only on the scrollback: whether event rows are shown. Unset is shown. */
         fun timelineEvents(context: Context): Boolean =
             context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("timeline_events", null) != "off"
 
@@ -1068,7 +1068,7 @@ object VoiceConfig {
         // editable too, and is gone: the voice follows the ball's look, not a
         // row — see [characterVoice].)
         private val ALLOWED_KEYS = setOf(
-            // Answers read aloud or not — the card's 朗读 / 静音 key, the Mac header's twin.
+            // Answers read aloud or not — the card's Speak aloud / Mute key, the Mac header's twin.
             "mute",
             // Which palette the UI draws with — see [net.kuafuai.andee.ui.Theme].
             // In this list because [save] drops anything that is not: a key missing

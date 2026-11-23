@@ -18,7 +18,7 @@ import java.util.Date
  *
  * It goes through [HtmlActivity] rather than growing a reader of its own, and
  * that is about mechanics rather than markup: the page path already knows how to
- * fold the card first, hang the ball off the ledge, float a 完成 pill, and report
+ * fold the card first, hang the ball off the ledge, float a Done pill, and report
  * itself closed — none of which is worth implementing twice. The stylesheet below
  * is the house style the `show_html` tool description gives the model, so a
  * message opened this way looks like a page the model composed, not like a
@@ -72,7 +72,7 @@ object TextPage {
     }
 
     /**
-     * A folded topic's conversation as one page — 对话记录 on the topic card.
+     * A folded topic's conversation as one page — conversation record on the topic card.
      *
      * Built from the device's own rows, which are what the user saw and said,
      * rather than from the brain's archived text, which carries tool chatter and

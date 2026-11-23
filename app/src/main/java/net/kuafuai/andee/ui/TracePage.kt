@@ -28,7 +28,7 @@ import java.util.Date
  *
  * It goes through [HtmlActivity] for the same reason [TextPage] does, and that
  * is mechanics rather than markup: folding the card, hanging the ball off the
- * ledge, floating the 完成 pill and reporting itself closed are all already
+ * ledge, floating the Done pill and reporting itself closed are all already
  * solved on that path, and none of them is worth solving twice.
  *
  * **Not everything has a log.** A row written by the hub brain, by a scene

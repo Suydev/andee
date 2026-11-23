@@ -47,7 +47,7 @@ import kotlin.random.Random
  *
  * Layout (FrameLayout, two stacked areas plus a floating control pill):
  *   ┌──── ball area (top 40%) ─────────────────┐
- *   │                          ◈ ✓ ⚙ ✕  │  ← 产物 / self-check / gear / close
+ *   │                          ◈ ✓ ⚙ ✕  │  ← Artifacts / self-check / gear / close
  *   │                                          │
  *   │           [round ball]                   │  ← tap = talk
  *   │                                          │  ← double-tap = type
@@ -56,11 +56,11 @@ import kotlin.random.Random
  *   │                                          │  ← long-press = unfold
  *   │                                          │  ← drag = move (compact only)
  *   ├──── scrollback (the rest) ───────────────┤
- *   │   你    · 15:31  帮我看看今天的天气        │
- *   │   助手  · 15:34  今天多云…                │
+ *   │   you    · 15:31  help meTake a looktoday's weather        │
+ *   │   assistant  · 15:34  cloudy today…                │
  *   │   ▸ live row: what is happening now      │
  *   ├──────────────────────────────────────────┤
- *   │  点小球说话 · 双击打字 · 三连击停止 · 滑动切换性格 │  ← pinned tips
+ *   │  tap the ball to talk · double-tap to type · Triple-tap to stop · swipe to switch character │  ← pinned tips
  *   └──────────────────────────────────────────┘
  *
  * One control, three taps, and that is the whole tap vocabulary the user has
@@ -161,7 +161,7 @@ class FloatingWindowUi(
         fun onSelfCheckClick()
         fun onLongPress()
 
-        /** The 产物 key — the pages the assistant has made. See [ArtifactsUi]. */
+        /** The Artifacts key — the pages the assistant has made. See [ArtifactsUi]. */
         fun onArtifactsClick()
 
             /** The speaker key beside the input pill: answers read aloud or not. */
@@ -184,25 +184,25 @@ class FloatingWindowUi(
         /** The WeChat glyph beside them: Andee's QR code ([WeChatQrUi]). */
         fun onWeChatClick() {}
 
-        /** 打开 › on a timeline row: the wiki article it names. */
+        /** Open › on a timeline row: the wiki article it names. */
         fun onWikiOpen(id: String) {}
 
         /** A button on the stage called `andee.say(text)` from a real tap: the user's words to Andee. */
         fun onStageSay(text: String) {}
 
-        /** 「现在就让它布置」 on an empty stage. */
+        /** 'have it set that up now'' on an empty stage. */
         fun onStageFurnish() {}
 
-        /** The 小本本 key — what it remembers. See [NotebookUi]. */
+        /** The Notebook key — what it remembers. See [NotebookUi]. */
         fun onNotebookClick() {}
 
-        /** The 在办 key — the 「事」 in hand. See [TasksUi]. */
+        /** The In Progress key — the 'task' in hand. See [TasksUi]. */
         fun onTasksClick() {}
 
-        /** The 朋友 key — the other Andees this one knows. See [PeersUi]. */
+        /** The Friends key — the other Andees this one knows. See [PeersUi]. */
         fun onFriendsClick() {}
 
-        /** The 情景 key — the scenes it has learned. See [ScenesUi]. */
+        /** The Scenes key — the scenes it has learned. See [ScenesUi]. */
         fun onScenesClick()
 
         /** ✕ on the scene chip — leave the scene the assistant is in. */
@@ -215,7 +215,7 @@ class FloatingWindowUi(
          * was the only one of them that duplicated a gesture the ball already
          * had: triple-tap fires the same [onStopClick], and has since the taps
          * were reduced to one vocabulary. The tips line at the bottom of the
-         * card has always said so — "三连击停止" — which is what makes deleting
+         * card has always said so — "Triple-tap to stop" — which is what makes deleting
          * the button a simplification rather than a removal: the user loses a
          * control they had two of and keeps the one that works folded as well.
          */
@@ -266,10 +266,10 @@ class FloatingWindowUi(
          */
         fun onHistoryPageClick(entry: ChatHistory.Entry)
 
-        /** 工作文件 › on a job card under a reply: what worker [worker] made, on the computer. */
+        /** Work files › on a job card under a reply: what worker [worker] made, on the computer. */
         fun onWorkerFiles(worker: String, title: String) {}
 
-        /** A job card under a reply, tapped: its task's page in 在办. */
+        /** A job card under a reply, tapped: its task's page in In Progress. */
         fun onOpenTask(taskId: String) {}
 
         /**
@@ -317,13 +317,13 @@ class FloatingWindowUi(
         fun onSuggestionClick(name: String, title: String, example: String)
 
         /**
-         * 继续话题 on a folded topic's card. Handed out because it starts a turn,
+         * Continue on a folded topic's card. Handed out because it starts a turn,
          * and a turn has one way in — see [onSuggestionClick].
          */
         fun onTopicContinue(topic: ChatHistory.Topic)
 
         /**
-         * 对话记录 on a folded topic's card: the conversation, fullscreen. Handed
+         * conversation record on a folded topic's card: the conversation, fullscreen. Handed
          * out for the same reason as [onTextOpen] — the card folds first.
          */
         fun onTopicTranscript(topic: ChatHistory.Topic)
@@ -355,7 +355,7 @@ class FloatingWindowUi(
      * conversation ([onStage], kept in `home_view`). See [StageView].
      */
     private var stageView: StageView? = null
-    /** 舞台 | 对话: both named, the current one lit, so where you are and where else you can go are both on screen. */
+    /** Stage | conversation: both named, the current one lit, so where you are and where else you can go are both on screen. */
     private var viewTabs: LinearLayout? = null
     private var tabStage: TextView? = null
     private var tabChat: TextView? = null
@@ -374,7 +374,7 @@ class FloatingWindowUi(
         }
 
     /**
-     * 「情景 · X ✕」, centred under the ball while a scene is active. Its own
+     * a scene · X ✕', centred under the ball while a scene is active. Its own
      * view rather than a row in the control pill, because the pill's bounds are
      * an input to the card's split ([ballAreaHeight]) and a scene starting
      * should not move the ball.
@@ -397,7 +397,7 @@ class FloatingWindowUi(
 
     private var mutedNow = false
 
-    /** Reflect the 朗读 / 静音 setting on the speaker key. Any thread. */
+    /** Reflect the Speak aloud / Mute setting on the speaker key. Any thread. */
     fun setMuted(on: Boolean) {
         ui.post { mutedNow = on; paintMute() }
     }
@@ -468,11 +468,11 @@ class FloatingWindowUi(
      */
     private val barIcons = mutableListOf<ImageView>()
 
-    /** How many friends to show on the 朋友 key; 0 hides the count. Main thread only once the bar exists. */
+    /** How many friends to show on the Friends key; 0 hides the count. Main thread only once the bar exists. */
     private var friendCount = 0
     private var friendBadge: TextView? = null
 
-    /** The number on the 朋友 key. Safe from any thread; kept for a bar built later. */
+    /** The number on the Friends key. Safe from any thread; kept for a bar built later. */
     fun setFriendCount(n: Int) {
         ui.post {
             friendCount = n
@@ -486,7 +486,7 @@ class FloatingWindowUi(
     }
 
     /**
-     * 朋友 with its count in the corner, so the user can see at a glance how many Andees this one can ask without
+     * Friends with its count in the corner, so the user can see at a glance how many Andees this one can ask without
      * opening anything. The key itself is an ordinary [barButton]; the badge sits on top of it and ignores touches.
      */
     private fun friendsKey(): View {
@@ -520,7 +520,7 @@ class FloatingWindowUi(
         return box
     }
 
-    /** 在办's count and dot: how many are in hand, and whether one wants the user. Null until the bar is built. */
+    /** In Progress's count and dot: how many are in hand, and whether one wants the user. Null until the bar is built. */
     private var tasksBadge: TextView? = null
     private var tasksDot: View? = null
     private var tasksRunDot: View? = null
@@ -531,7 +531,7 @@ class FloatingWindowUi(
             .withEndAction { if (v.tag == "pulse" && v.isAttachedToWindow) pulse(v) }.start()
     }
 
-    /** Re-read the 事 for the 在办 key. Any thread; also run every few seconds while the card is up. */
+    /** Re-read the task for the In Progress key. Any thread; also run every few seconds while the card is up. */
     fun refreshTasksKey() {
         ui.post {
             historyView?.refreshJobCards()
@@ -548,7 +548,7 @@ class FloatingWindowUi(
     }
 
     /**
-     * 在办 on the bar, ahead of 小本本: the count of what is in hand, and a red dot when one wants the user (delivered,
+     * In Progress on the bar, ahead of Notebook: the count of what is in hand, and a red dot when one wants the user (delivered,
      * or an answer came back). The phone's twin of the Mac sidebar's list.
      */
     private fun tasksKey(): View {
@@ -587,7 +587,7 @@ class FloatingWindowUi(
         tasksBadge = badge
         tasksDot = dot
         refreshTasksKey()
-        // A 事 changes while nobody looks (an answer, Andee's own work): look again every few seconds while the bar is up.
+        // A task changes while nobody looks (an answer, Andee's own work): look again every few seconds while the bar is up.
         val tick = object : Runnable {
             override fun run() {
                 if (!box.isAttachedToWindow) return
@@ -602,10 +602,10 @@ class FloatingWindowUi(
         return box
     }
 
-    /** The red dot on 小本本: 守卫 is unwritten. Null until the bar is built. */
+    /** The red dot on Notebook: Guard is unwritten. Null until the bar is built. */
     private var notebookDot: View? = null
 
-    /** 守卫 was saved or the notebook wiped: show or hide the dot on 小本本. Any thread. */
+    /** Guard was saved or the notebook wiped: show or hide the dot on Notebook. Any thread. */
     fun refreshNotebookDot() {
         ui.post {
             notebookDot?.visibility =
@@ -613,7 +613,7 @@ class FloatingWindowUi(
         }
     }
 
-    /** 小本本 with a red dot in the corner while 守卫 is unwritten — the same shape as [friendsKey]. */
+    /** Notebook with a red dot in the corner while Guard is unwritten — the same shape as [friendsKey]. */
     private fun notebookKey(): View {
         val key = barButton(R.drawable.ic_notebook, Glass.PHOTO_INK, "Notebook") { listeners.onNotebookClick() }
         val lp = key.layoutParams as LinearLayout.LayoutParams
@@ -1320,7 +1320,7 @@ class FloatingWindowUi(
     }
 
     /**
-     * The user changed the language in 设置. Re-read everything the window is
+     * The user changed the language in Settings. Re-read everything the window is
      * showing right now.
      *
      * **Why this is needed at all.** The window is a `WindowManager` overlay
@@ -1464,7 +1464,7 @@ class FloatingWindowUi(
      * post to the GL thread and nothing to wait for.
      *
      * Three things happen together on purpose. The pick is written to prefs
-     * immediately rather than on some later 保存 — the ball changing in front
+     * immediately rather than on some later Save — the ball changing in front
      * of the user is the confirmation, and there is no card here to put a
      * button on. The name is announced, because the looks are close enough
      * relatives that a user who swiped past one should be told what they now
@@ -1477,7 +1477,7 @@ class FloatingWindowUi(
      */
     private fun stepBallLook(delta: Int) {
         // One ring across both bodies: the ball's looks, then the pets. Swiping past the last ball look lands on the
-        // first pet and makes the pet the body, and the other way round — the same writes the 形象与表情 card makes.
+        // first pet and makes the pet the body, and the other way round — the same writes the Looks & expressions card makes.
         val balls = BallLooks.ALL
         val pets = net.kuafuai.andee.pet.PetCharacters.PRESETS
         val here = if (petBody) balls.size + pets.indexOfFirst { it.id == petLook }.coerceAtLeast(0)
@@ -1565,7 +1565,7 @@ class FloatingWindowUi(
      * non-touchable overlay still *obscures*. Measured on a Huawei with Alipay
      * (2026-10-09), `dispatchGesture` on the bottom tabs reported
      * `completed:true` for every tap, and the tabs inside the ball window's frame
-     * never switched while the ones outside it did — including 消息, which sits in
+     * never switched while the ones outside it did — including message, which sits in
      * the transparent part of the frame, clear of the drawn sphere. The platform
      * flags a stroke that passes under an untrusted overlay as obscured, and a
      * payment app is entitled to drop such a stroke without saying so.
@@ -1726,7 +1726,7 @@ class FloatingWindowUi(
      *
      * [enterCompact] used to take the measurement in the card's own frame, one
      * line before shrinking to the square, and then spend it on the square's
-     * `p.y`. That is the bug behind "球球悬在底部上面": every value here is
+     * `p.y`. That is the bug behind "the ball floats above the bottom": every value here is
      * subtracted from a screen Y, so a 126 that belonged to the outgoing frame
      * lifted the folded ball 126 px clear of the edge it was meant to sit on.
      *
@@ -2443,7 +2443,7 @@ class FloatingWindowUi(
     }
 
     /**
-     * 舞台 | 对话 beside the ball at its lower left — the mirror of 朗读 — so it takes no height from the
+     * Stage | conversation beside the ball at its lower left — the mirror of Speak aloud — so it takes no height from the
      * middle (a strip of its own between the ball and the stage was in the way on a phone's screen).
      */
     private fun placeTabs(cyBall: Float, r: Float, w: Int) {
@@ -2452,7 +2452,7 @@ class FloatingWindowUi(
         if (v.width == 0) v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
         val vw = if (v.width > 0) v.width else v.measuredWidth
         val vh = if (v.height > 0) v.height else v.measuredHeight
-        // Wider than 朗读, so it is placed by its right edge, just clear of the sphere at 45°, not by its centre.
+        // Wider than Speak aloud, so it is placed by its right edge, just clear of the sphere at 45°, not by its centre.
         val right = w / 2f - r * 0.707f - dp(10)
         val left = maxOf((right - vw).toInt(), dp(8))
         val top = (cyBall - vh / 2f).toInt()
@@ -2851,7 +2851,7 @@ class FloatingWindowUi(
         }
     }
 
-    /** The 全部 / 只看对话 preference changed in Settings: show the conversation that way. */
+    /** The Everything / Chat only preference changed in Settings: show the conversation that way. */
     fun onTimelineSettingChanged() {
         ui.post { historyView?.showEvents = net.kuafuai.andee.config.VoiceConfig.timelineEvents(context) }
     }
@@ -2904,7 +2904,7 @@ class FloatingWindowUi(
             WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
         // Untouchable while a typing field is up, even though the window no
         // longer overlaps it: the field's top edge is *derived* from the
-        // keyboard's height, which changes as the IME animates and as 搜狗's
+        // keyboard's height, which changes as the IME animates and as Sogou's
         // toolbar row comes and goes. Being a few pixels late would put this
         // window over the top row of the field and eat the taps aimed at it —
         // and the card has nothing to offer during a typing session anyway.
@@ -3045,7 +3045,7 @@ class FloatingWindowUi(
         // ---- Backdrop (the bottom of the stack) ----
         //
         // First child, so everything else draws on top of it and nothing has to
-        // know it is there. CENTER_CROP and not FIT_CENTER: the brief was 铺满,
+        // know it is there. CENTER_CROP and not FIT_CENTER: the brief was fill,
         // and letterboxing a photo behind a fullscreen card would leave two
         // bands of whatever the card's fill is at the top and bottom.
         //
@@ -3227,7 +3227,7 @@ class FloatingWindowUi(
         tipsText = tipsLine
         // GitHub and Discord, small glyphs after the gesture line — the project's
         // home, where a person looking for "about this thing" expects it, not a
-        // knob buried in 设置. The bottom padding (clearing the gesture bar, the
+        // knob buried in Settings. The bottom padding (clearing the gesture bar, the
         // same 30 dp the scrollback's last row used to reserve) moves onto this
         // row so the glyphs share the line's edge.
         val communityRow = LinearLayout(context).apply {
@@ -3282,7 +3282,7 @@ class FloatingWindowUi(
             ),
         )
 
-        // ---- 朗读 / 静音, at the ball's lower right ----
+        // ---- Speak aloud / Mute, at the ball's lower right ----
         // Beside the ball because it is about the ball's voice. Placed by [placeMuteKey], like the scene chip.
         val mute = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -3301,7 +3301,7 @@ class FloatingWindowUi(
         paintMute()
         root.addView(mute, FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.START))
 
-        // ---- 话筒 (唤醒监听开关), just right of the speaker ----
+        // ---- mic (wake listening switch), just right of the speaker ----
         // Master switch for wake-phrase listening (issue #45), here because the reporter noticed the microphone,
         // not a settings row. Same bare-glyph style as the speaker; placed by [placeMuteKey] right beside it.
         // Shown only when a phrase is enrolled (see [paintWake]) -- otherwise nothing holds the mic.
@@ -3320,7 +3320,7 @@ class FloatingWindowUi(
         paintWake()
         root.addView(wake, FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.START))
 
-        // ---- 舞台 | 对话: a small segmented pill at the ball's lower left, both names always showing ----
+        // ---- Stage | conversation: a small segmented pill at the ball's lower left, both names always showing ----
         fun tab(toStage: Boolean) = TextView(context).apply {
             textSize = Glass.Type.MICRO
             gravity = Gravity.CENTER
@@ -3435,11 +3435,11 @@ class FloatingWindowUi(
      * outright, not folded somewhere else: every one of those actions is one the
      * brain performs on its own (`screen.*`, all of it reachable by talking),
      * and a hand-driven toolbar sitting over the app being driven was a second,
-     * competing way to operate the same device. What took the slot is 产物 — the
+     * competing way to operate the same device. What took the slot is Artifacts — the
      * pages the assistant has made, which is the one thing in this bar the user
      * cannot get at by talking.
      *
-     * 情景 sits beside it for a weaker version of the same reason: scenes *can*
+     * Scenes sits beside it for a weaker version of the same reason: scenes *can*
      * be managed by talking, but "what has it learned to do with me" is a
      * question a list answers better than a conversation. Five keys now.
      *
@@ -3447,7 +3447,7 @@ class FloatingWindowUi(
      * [Glass.well] over the photograph, which is the same ground the tips sit on, and a
      * colour chosen against a card has no contrast there: [Glass.MUTED] was what they
      * had, and on the light pill it came out around 1.4:1 — reported from the tablet as
-     * "看不清", and it is arithmetic rather than taste.
+     * "Didn't catch it", and it is arithmetic rather than taste.
      */
     @SuppressLint("SetTextI18n")
     private fun buildTopBar(): View {
@@ -3469,24 +3469,24 @@ class FloatingWindowUi(
         keys.addView(
             barButton(R.drawable.ic_artifacts, Glass.PHOTO_INK, "Artifact") { listeners.onArtifactsClick() }
         )
-        // 产物 · 小本本 · 情景 · 朋友 · 自检 · 设置 — the Mac's sidebar has the same doors in the same order.
+        // Artifacts · Notebook · Scenes · Friends · self-check · Settings — the Mac's sidebar has the same doors in the same order.
         keys.addView(tasksKey())
         keys.addView(notebookKey())
         keys.addView(barButton(R.drawable.ic_scene, Glass.PHOTO_INK, "Scene") { listeners.onScenesClick() })
-        // 朋友 moved into Settings (⚙) to make room for the quit key — see SettingsUi and issue #44.
+        // Friends moved into Settings (⚙) to make room for the quit key — see SettingsUi and issue #44.
         // ✓ and not ■: the stop button used to sit here, and stop is the one
         // action in this bar the ball can already perform — see onStopClick.
         keys.addView(barButton(R.drawable.ic_check, Glass.PHOTO_INK, "Self-check") { listeners.onSelfCheckClick() })
         // No ⌨ here. Typing moved onto the ball's double-tap, and the bar is
         // the wrong place for it twice over: it only exists while the card is
         // unfolded (so the way to type vanished with the fold — the same fault
-        // that made "点右上角的 ⌨" a lie in a failure message), and it put a
+        // that made "tap the top-right ⌨" a lie in a failure message), and it put a
         // second meaning on the one control the user already had to learn.
         keys.addView(barButton(R.drawable.ic_settings, Glass.PHOTO_INK, "Settings") { listeners.onSettingsClick() })
             // Reads as close, not as resize: the card is a thing you dismiss, and the
         // corner ball it folds into stays on screen either way.
-        // 彻底退出 Andee (issue #44): a local exit, no voice and no model, so it works with no balance. A power
-        // glyph, not another ✕, so it does not read like 收起; the service pops a confirm before quitting.
+        // completelyExit Andee (issue #44): a local exit, no voice and no model, so it works with no balance. A power
+        // glyph, not another ✕, so it does not read like Collapse; the service pops a confirm before quitting.
         keys.addView(barButton(R.drawable.ic_power, Glass.PHOTO_INK, "Exit") { listeners.onQuitClick() })
         keys.addView(barButton(R.drawable.ic_close, Glass.PHOTO_INK, "Collapse") { listeners.onMinimizeClick() })
 
@@ -4013,7 +4013,7 @@ class FloatingWindowUi(
          */
         private const val COMPACT_DP = 104
 
-        /** How often the 在办 key re-reads the 事 while the bar is up. */
+        /** How often the In Progress key re-reads the task while the bar is up. */
         private const val TASKS_KEY_TICK_MS = 5_000L
         private const val COMPACT_MARGIN_DP = 16
 
@@ -4029,10 +4029,10 @@ class FloatingWindowUi(
          * the area, centred, so the padding above the head is ~18% of the side.
          *
          * Calibrated on device, not by eye: 0.30 measured a 9px overlap with
-         * the head ("戳到脑袋"), 0.14 read as detached. Each 0.01 of the
+         * the head ("pokes her head"), 0.14 read as detached. Each 0.01 of the
          * fraction is ~3.8px on the test phone, so 0.235 targets a ~14px
          * clearance — the tail tip visibly *near* the head without touching,
-         * which is what "举着" reads as.
+         * which is what "holding up" reads as.
          */
         private const val SIGN_OVERLAP_FRACTION = 0.235f
 

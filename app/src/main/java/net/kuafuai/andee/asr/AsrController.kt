@@ -108,7 +108,7 @@ class AsrController(
 
     /**
      * How long a silence ends this turn, as answered by the engine in play —
-     * see [AsrEngine.silenceMs]. Seeded with 火山's value so that the watchdog
+     * see [AsrEngine.silenceMs]. Seeded with Volcengine's value so that the watchdog
      * has something sane to use in the window before an engine is built.
      */
     @Volatile
@@ -147,7 +147,7 @@ class AsrController(
 
     private fun startImpl(userInitiated: Boolean) {
         val cfg = VoiceConfig.load(context)
-        // Set here, not in [armSilenceWatchdog], because 火山 reports
+        // Set here, not in [armSilenceWatchdog], because Volcengine reports
         // [AsrEngine.Listener.onReady] from *inside* its own connect — before
         // the capture starts and before that method runs. Measuring the
         // connection from a timestamp this turn had not set yet produced
@@ -155,7 +155,7 @@ class AsrController(
         // if it were a handshake.
         turnStartedAt = SystemClock.uptimeMillis()
         heardAnything = false
-        // First thing, so the media app has the whole 火山 handshake to actually
+        // First thing, so the media app has the whole Volcengine handshake to actually
         // stop in — asking and then opening the mic in the same breath would
         // still catch the tail of whatever was playing. A phone call takes the
         // floor back: end the turn rather than transcribe one side of a call.
@@ -199,7 +199,7 @@ class AsrController(
             override fun onError(msg: String) {
                 Log.w(TAG, "asr error: $msg")
                 // Same reason as onFinal: the turn is over. The failure is going
-                // up as a card and as a red row, and "听着…" is no longer true.
+                // up as a card and as a red row, and "Listening…" is no longer true.
                 window.clearSubtitle()
                 window.setState(FloatingWindowUi.State.ERROR)
                 // Qualified on purpose: this block overrides the listener's own
@@ -214,7 +214,7 @@ class AsrController(
         }
 
         // Which service hears. The pick is a string and the failure direction
-        // is 火山 — see [VoiceConfig.voiceProvider] — so an unrecognised value
+        // is Volcengine — see [VoiceConfig.voiceProvider] — so an unrecognised value
         // can only ever mean "keep doing what this device already did".
         val client: AsrEngine = when (cfg.voiceProvider) {
             VoiceConfig.VOICE_GOOGLE -> GoogleAsr(cfg, listener)
@@ -226,7 +226,7 @@ class AsrController(
             "engine: silence=${client.silenceMs}ms finalWait=${client.finalWaitMs}ms",
         )
         // **Cleared here, before the engine exists, and not in [armSilenceWatchdog].**
-        // 火山 reports [AsrEngine.Listener.onReady] from inside its own connect —
+        // Volcengine reports [AsrEngine.Listener.onReady] from inside its own connect —
         // its `start` blocks on the handshake and calls it before returning — so
         // clearing this anywhere after that would erase the readiness the engine
         // had just declared, and the silence rule would never fire: the
@@ -234,7 +234,7 @@ class AsrController(
         engineReady = false
 
         // **The microphone and the tap's acknowledgement come first; the
-        // handshake follows them.** 火山's `start` blocks on its own connect —
+        // handshake follows them.** Volcengine's `start` blocks on its own connect —
         // 1.7–2.2 s measured, and it is the CodeFlying path as much as the
         // direct one, since the gateway speaks the same protocol — so under the
         // old order the ball sat unchanged for two seconds after the tap and
@@ -252,7 +252,7 @@ class AsrController(
         audio.startStreaming(sampleRate = 16_000, chunkMs = 100) { chunk ->
             // Logged rather than swallowed: a send that throws every time looks
             // from the outside exactly like a mic that produces nothing — the
-            // session stays open with no packets in it and 火山 ends it after
+            // session stays open with no packets in it and Volcengine ends it after
             // eight seconds, which reads as a network timeout and is not one.
             runCatching { asr?.sendAudio(chunk, isLast = false) }
                 .onFailure { Log.w(TAG, "sendAudio failed", it) }
@@ -326,7 +326,7 @@ class AsrController(
      * path, and finally deleted: every version of it was a threshold that
      * separated the user from their room, and every room is different. The
      * device has a better answer available — the recogniser is already telling
-     * us what it hears, at 火山's few-hundred-millisecond cadence and at
+     * us what it hears, at Volcengine's few-hundred-millisecond cadence and at
      * roughly one result a second from Gemini — so the only thing the window
      * has to exceed is that cadence, not any property of the room.
      *
@@ -394,7 +394,7 @@ class AsrController(
         // that never reach it still leave the microphone's own line on screen.
         // The tap's acknowledgement is now drawn *before* the connect rather
         // than after it, so a handshake that fails would otherwise strand
-        // 「听着…」 on the card for good — the turn is over and there is no
+        // Listening…' on the card for good — the turn is over and there is no
         // engine left to report anything.
         window.clearSubtitle()
         window.setState(FloatingWindowUi.State.IDLE)

@@ -40,7 +40,7 @@ import android.widget.EditText
  * what is typed here. Autofill is not in play on these cards, so nothing else
  * was riding on the variation.
  *
- * One thing improves on the way past. The 显示/隐藏 toggle used to swap the
+ * One thing improves on the way past. The show/hidden toggle used to swap the
  * `inputType` between a hidden and a shown variant, which on the numeric fields
  * meant swapping the keyboard under the user's thumb mid-entry. Only the
  * transformation moves now, so the keyboard the user started typing on is the

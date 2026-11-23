@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * **Two things differ from the other backends.**
  *
  * The sample rate. [TtsEngine]'s contract says [TtsEngine.Listener.onOpen]
- * declares the rate before the driver can push text, because 火山 learns it
+ * declares the rate before the driver can push text, because Volcengine learns it
  * from an open socket and Google declares a constant. A system engine only
  * reveals its rate after the WAV has been written, so this backend opens at an
  * *unknown* rate ([onOpen] with `0`) and reports the real number through

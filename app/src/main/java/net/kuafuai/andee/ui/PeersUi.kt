@@ -21,7 +21,7 @@ import net.kuafuai.andee.peer.PeerStore
 import net.kuafuai.andee.i18n.AppLocale
 
 /**
- * 朋友: the other Andees this one knows, and the way to add one. The phone's twin of the Mac's Friends page.
+ * Friends: the other Andees this one knows, and the way to add one. The phone's twin of the Mac's Friends page.
  * Adding is a QR code either way round — this phone scans one, or shows its own for somebody else's phone to
  * scan (see [net.kuafuai.andee.peer.PeerQr]). Each friend is either **my device** (trusted like the user) or a
  * **friend** (asked about every time unless "always", and run out of sight of the user's memory). There is nothing

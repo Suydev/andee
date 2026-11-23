@@ -62,7 +62,7 @@ import java.util.concurrent.atomic.AtomicReference
  * microphone-typed foreground service), from [BodyCoreService] when
  * accessibility comes up, and from the notification's own action.
  *
- * Tap the ball → AsrController.toggle() → 火山 streaming ASR.
+ * Tap the ball → AsrController.toggle() → Volcengine streaming ASR.
  * Long-press → TTS test (temporary).
  * ⚙       → SettingsUi (voice config).
  *
@@ -98,20 +98,20 @@ class BodyCoreService : Service() {
     private var sceneSuppressedPkg: String? = null
 
     /**
-     * The page entry the user just tapped 继续修改 on, waiting for them to say
+     * The page entry the user just tapped Revise on, waiting for them to say
      * what change they want. Cleared once they speak or type, or on stop.
      */
     private var pendingArtifact: net.kuafuai.andee.ui.ChatHistory.Entry? = null
 
     /**
-     * The folded topic the user just tapped 继续话题 on, waiting for them to say
+     * The folded topic the user just tapped Continue on, waiting for them to say
      * where to take it. Same lifetime as [pendingArtifact], and the two exclude
      * each other: whichever was tapped last is what the next words are about.
      */
     private var pendingTopic: net.kuafuai.andee.ui.ChatHistory.Topic? = null
 
     /**
-     * The 「事」 the user picked in 在办 (说点要求再办, or 接着办 with its own words), waiting for what they say.
+     * The 'task' the user picked in In Progress (Say what to do, then do it, or Carry on with its own words), waiting for what they say.
      * Same lifetime as [pendingTopic], and the three exclude each other: whatever was tapped last is what the next
      * words are about.
      */
@@ -272,8 +272,8 @@ class BodyCoreService : Service() {
                 //
                 // Guarded on the task rather than run unconditionally: on an
                 // idle ball there is nothing to stop, and the call would still
-                // clear a pending 继续修改, tell the hub to stop, and flash
-                // 已停止 ahead of 听着… — three side effects for a tap that
+                // clear a pending Revise, tell the hub to stop, and flash
+                // Stopped ahead of Listening… — three side effects for a tap that
                 // only ever meant "listen".
                 if (dispatcher.isTaskActive()) stopEverything()
                 startTurn()
@@ -379,7 +379,7 @@ class BodyCoreService : Service() {
                 stopFollowUpListening()
                 net.kuafuai.andee.ui.NotebookUi(
                     this@BodyCoreService,
-                    // 打算 → 告诉它一句: an ordinary typed turn, so the model adjusts its own plan.
+                    // plan → tell it: an ordinary typed turn, so the model adjusts its own plan.
                     onTellBrain = { text -> ui.post { submitUserTurn(text, "typed") } },
                 ).show()
             }
@@ -455,7 +455,7 @@ class BodyCoreService : Service() {
              * Double-tapping a message: read it fullscreen ([TextPage]).
              *
              * The message is written out as the same kind of page the model
-             * composes, so it gets the same reader, the same ✕完成, and the same
+             * composes, so it gets the same reader, the same ✕Done, and the same
              * way back.
              */
             override fun onTextOpen(entry: net.kuafuai.andee.ui.ChatHistory.Entry) {
@@ -590,7 +590,7 @@ class BodyCoreService : Service() {
         //  * this window is fullscreen *even when the ball is compact*, and it
         //    swallows the touches it does not use — so a page with a ball in the
         //    corner is a page whose buttons cannot be pressed. Measured on the
-        //    tablet: 完成 did nothing.
+        //    tablet: Done did nothing.
         //
         // Nothing is lost by staying out: the page's own exit calls
         // [ensureOverlays], which is what shows this window and unfolds the card.
@@ -628,7 +628,7 @@ class BodyCoreService : Service() {
         // it: a fullscreen overlay is touchable as a whole window — returning
         // false from its root touch handler does not pass the event to the app
         // below — so a service that comes up folded cannot cover whatever the
-        // user was doing when they flipped the switch in 设置. That reasoning
+        // user was doing when they flipped the switch in Settings. That reasoning
         // was about *enabling*, and it cost more than it bought. The card is
         // the only thing that shows the scrollback, the control bar and the
         // minimise control, and a device that came back from a reboot showed
@@ -654,7 +654,7 @@ class BodyCoreService : Service() {
             window.setCompact(false)
         }
         net.kuafuai.andee.config.VoiceConfig.onSceneChanged = ::onSceneChanged
-        // The folded body: the ball or the desk pet (Settings → 形象与表情), and which pet.
+        // The folded body: the ball or the desk pet (Settings → Looks & expressions), and which pet.
         val syncBody = {
             window.setPetBody(
                 net.kuafuai.andee.config.VoiceConfig.petOn(this),
@@ -682,7 +682,7 @@ class BodyCoreService : Service() {
         // Follow-up window: when an answer has finished draining, the mic
         // opens by itself for a short beat — as if the user had pressed the
         // talk button the moment the ball went quiet. A conversation where
-        // "再帮我…" lands right on the heels of the answer, no reaching for
+        // "help me again…" lands right on the heels of the answer, no reaching for
         // the ball, no wake word. If the user says nothing the recorder's own
         // silence watchdog closes it again in ~3 s — the same close as a
         // manual press that went nowhere, not a new code path.
@@ -797,7 +797,7 @@ class BodyCoreService : Service() {
         dogLink = net.kuafuai.andee.dog.DogLink(this)
         dogSense = net.kuafuai.andee.dog.DogSense(this)
         peers = AndroidPeers(this)
-        // 守卫 saved or wiped: the dot on 小本本 follows.
+        // Guard saved or wiped: the dot on Notebook follows.
         net.kuafuai.andee.config.Notebook.onGuardChanged = { window.refreshNotebookDot() }
         peers.onCount = { window.setFriendCount(it) }
         window.setFriendCount(peers.store.all().size)
@@ -858,7 +858,7 @@ class BodyCoreService : Service() {
             // The ask/alert cards speak their text; the mute rules live here,
             // not in the dispatcher. See [speakCardText].
             sayAloud = { text, listen -> speakCardText(text, listen) },
-            // The card's 运行 button lives here (it needs the brain to wake
+            // The card's Run button lives here (it needs the brain to wake
             // on a stop); the dispatcher only forwards the call.
             onCardFlowRun = { flow -> runFlowFromUi(flow) },
         )
@@ -1000,13 +1000,13 @@ class BodyCoreService : Service() {
     /**
      * The one card. [problems] is never empty — see [runStartupSelfCheck].
      *
-     * The body is the *titles*, not the counts: "悬浮窗权限 · 麦克风" tells the
+     * The body is the *titles*, not the counts: "overlay permission · microphone" tells the
      * user in two words whether this is the errand they already know about, and
-     * the card behind 去处理 is what explains each one. Joining with " · "
+     * the card behind Fix is what explains each one. Joining with " · "
      * rather than a comma because the two languages disagree about commas and
      * agree about this.
      *
-     * **去处理 opens the card, not the Activity.** This callback only runs with
+     * **Fix opens the card, not the Activity.** This callback only runs with
      * the window up (see the guard below), which means accessibility and the
      * overlay grant are both already fine — so the card can be put up exactly
      * the way `✓` puts it up, and the launcher Activity stays what it is: the
@@ -1020,7 +1020,7 @@ class BodyCoreService : Service() {
         // the window object outlives the grant (see [ensureOverlays]): the
         // marker would be true here and this would raise a card nobody can see,
         // then sit waiting for a button that cannot be pressed. Same predicate
-        // as the checklist's own 悬浮窗 row.
+        // as the checklist's own overlay row.
         if (!::window.isInitialized || !Settings.canDrawOverlays(this)) return
         if (!window.isShown()) return
         val open = AppLocale.str(this, R.string.check_card_open)
@@ -1045,7 +1045,7 @@ class BodyCoreService : Service() {
      * The minutes are a request — the model has to produce them, so a turn is
      * exactly right. This is a fact, and a turn would buy two bad things: a
      * model call and a spoken sentence every single time a page is dismissed
-     * ("好的，看完了"), and an entry in the context that claims the user said
+     * ("OK, done reading"), and an entry in the context that claims the user said
      * it. So the local brain gets it as a silent [LocalBrain.note] (visible to
      * the next turn, never spoken), and a hub gets a purpose-built
      * `page.closed` event it can ignore.
@@ -1067,9 +1067,9 @@ class BodyCoreService : Service() {
         // Logged whatever the brain is: this is the one device-side fact in the
         // flow that has no tool call around it any more, so it is the thing to
         // look for when a page closes and something does not happen.
-        android.util.Log.i("Body", "page closed: 「$title」 after ${seconds}s")
+        android.util.Log.i("Body", "page closed: '$title' after ${seconds}s")
         localBrain?.note(
-            "(background note: the user just closed the page you were showing, 「$title」, after $seconds seconds. " +
+            "(background note: the user just closed the page you were showing, '$title', after $seconds seconds. " +
                 "This is not something the user said, so there is no need to answer; carry on only if that thing still has a next step.)"
         )
         val event = JSONObject()
@@ -1189,9 +1189,9 @@ class BodyCoreService : Service() {
         val said = text.trim()
         if (said.isEmpty() && images.isEmpty()) return
         // Typing the exit phrase exits locally, exactly as speaking it does (the voice path matches it in
-        // onTranscript before either brain is consulted). Without this a typed 退出 Andee went to the model —
+        // onTranscript before either brain is consulted). Without this a typed Exit Andee went to the model —
         // issue #44, where a user out of balance could not even quit. Same whole-utterance whitelist, so a bare
-        // 退出 or 「怎么退出」 is still an ordinary turn; only the explicit phrases exit.
+        // Exit or 'how do I exit' is still an ordinary turn; only the explicit phrases exit.
         if (how == "typed" && images.isEmpty() && VoiceExitCommand.matches(said)) {
             android.util.Log.i("Body", "typed exit phrase: $said")
             exitByVoice()
@@ -1200,7 +1200,7 @@ class BodyCoreService : Service() {
         // A card is up and waiting for an answer. Voice should answer it
         // rather than start a new turn — the user spoke to the question on
         // screen, not to the brain. Match is fuzzy (case-insensitive, prefix),
-        // so "是" / "yes" / "ok" all hit a button labelled "是" or "Yes" or "OK".
+        // so "is" / "yes" / "ok" all hit a button labelled "is" or "Yes" or "OK".
         if (how == "voice" &&
             net.kuafuai.andee.ui.CardUi.tryAnswerByVoice(said) != net.kuafuai.andee.ui.CardUi.VoiceOutcome.NOT_HANDLED
         ) {
@@ -1215,7 +1215,7 @@ class BodyCoreService : Service() {
         closeTyping()
         // The user is asking for something, so the answer is theirs to see.
         acceptBrainOutput = true
-        // A 继续修改 waiting for its words: the scrollback gets what they said,
+        // A Revise waiting for its words: the scrollback gets what they said,
         // the brain gets that plus the page it is about.
         val editing = pendingArtifact
         pendingArtifact = null
@@ -1225,7 +1225,7 @@ class BodyCoreService : Service() {
         pendingTask = null
         val task = taskId?.let { net.kuafuai.andee.config.Notebook.tasks(this).get(it) }
         // Tell the dispatcher which artifact this turn is about, before the
-        // brain can call `show_html` inside it. The panel's 继续修改 is the one
+        // brain can call `show_html` inside it. The panel's Revise is the one
         // turn that starts out already knowing, and without this the revised
         // page would be filed as a brand-new artifact — the bug the whole
         // grouping exists to fix. A turn from speech or typing passes null,
@@ -1341,7 +1341,7 @@ class BodyCoreService : Service() {
      * Folding the card is an implementation detail of the page being fullscreen
      * — an overlay sorts above everything, so a card left up would sit on the
      * page — and it therefore has to be undone when the page closes. Without
-     * that, ✕完成 reads as "throw me out of the assistant": you open a long
+     * that, ✕Done reads as "throw me out of the assistant": you open a long
      * answer to read it, close it, and find yourself looking at a ball in the
      * corner of the home screen.
      *
@@ -1352,7 +1352,7 @@ class BodyCoreService : Service() {
      * an implementation detail of the page being fullscreen — so leaving it
      * standing is the bug this fixes. The rare case (the brain folds the card
      * again while the user is reading the page) resolves in favour of the user's
-     * place, because the alternative is ✕完成 silently throwing them out of the
+     * place, because the alternative is ✕Done silently throwing them out of the
      * assistant.
      */
     private fun openPageFrom(entry: net.kuafuai.andee.ui.ChatHistory.Entry, file: java.io.File) =
@@ -1443,7 +1443,7 @@ class BodyCoreService : Service() {
      * The device is up and cannot answer anything — no brain configured, or a
      * key missing. Say so, and put the fix on the same card: the settings card
      * opens fine while the ball is folded, the ball's own chrome does not, and
-     * "长按小球 → ⚙" is a three-step errand for something one button can do.
+     * "long-press the ball → ⚙" is a three-step errand for something one button can do.
      *
      * Both brains have this failure mode and both report it through here, so
      * the sentence differs and nothing else does.
@@ -1553,7 +1553,7 @@ class BodyCoreService : Service() {
      * only while every one of these is true, and lets go within ~100 ms of any
      * of them turning false.
      *
-     * - **Listening is allowed.** Screen on, or the user left 锁屏时也听 on —
+     * - **Listening is allowed.** Screen on, or the user left Listen while locked on —
      *   see [wakeListeningAllowed]. This term used to be the screen alone, and
      *   that is the whole reason a phone in a pocket answered nothing.
      * - **ASR idle.** The turn's own recorder must never lose a race to the one
@@ -2091,7 +2091,7 @@ class BodyCoreService : Service() {
      * **Without** it: the same row, plus the fix. That action is the entire
      * return trip, and it is why this is posted by a service rather than by
      * the accessibility service that no longer exists. Today's recovery is
-     * "notice the ball is gone → open the app → read the checklist → tap 去开启
+     * "notice the ball is gone → open the app → read the checklist → tap Turn on
      * → find Andee in a list of every app on the phone"; from the shade it is
      * one tap on a row that is already open, and it survives the state it is
      * telling you about.
@@ -2227,7 +2227,7 @@ class BodyCoreService : Service() {
                     reconcileBackendAfterSettings(before, beforeBrain)
                 }
                 // The self-check card can be sitting *under* this sheet: its
-                // 打开设置 row opens us on top of itself. So this picker is
+                // Open settings row opens us on top of itself. So this picker is
                 // reachable while that card is on screen, and its language has
                 // to follow or the user closes the sheet onto a card in the
                 // language they just changed away from. The card's own picker
@@ -2274,7 +2274,7 @@ class BodyCoreService : Service() {
      *    the state this list is most needed in. Whenever we are running, we can
      *    put the card up ourselves, and doing so keeps the check one tap from
      *    the gear rather than a round trip through a fullscreen page.
-     *  * **Not exclusive with [settings].** The card offers 打开设置, which opens
+     *  * **Not exclusive with [settings].** The card offers Open settings, which opens
      *    the settings sheet *over* it — the list stays behind to return to
      *    instead of the user losing their place. Two overlays, and
      *    [net.kuafuai.andee.ui.OwnCard] counts both.
@@ -2318,12 +2318,12 @@ class BodyCoreService : Service() {
             //    behind it are both TYPE_APPLICATION_OVERLAY, and an overlay
             //    outranks every Activity on the device — a card left up sits on
             //    the Settings screen the user was just sent to use. Reported
-            //    from the field as "点击去下载ADB的时候，应该退出全屏，不然挡住浏览器了".
+            //    from the field as "tap DownloadADByou should exit full-screen, otherwise it covers the browser".
             //  * **It cannot come back.** A window gets no `onResume`, and the
             //    destination goes out with FLAG_ACTIVITY_NEW_TASK into a task of
             //    its own, so back from Settings has nowhere of ours to return to.
-            //    The user's own A/B, in one message: 「首次…逐项点击处理，回来后还是
-            //    检查项的页面。但是…点击处理，处理完退回来，就回到桌面了」 — the good
+            //    The user's own A/B, in one message: the first time…handle each item one by one, and on return it is still
+            //    the page of check items. But…'tap Fix, and after fixing, going back lands on the home screen'' — the good
             //    half of that was the *page*, which sits in the same task as the
             //    screen it opened and is simply resumed when the user gets back.
             //
@@ -2367,7 +2367,7 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * 产物 — the pages the assistant has made. Our own surface, like ✓ and ⚙:
+     * Artifacts — the pages the assistant has made. Our own surface, like ✓ and ⚙:
      * starts no task and lights no glow.
      */
     private fun openArtifacts() {
@@ -2382,7 +2382,7 @@ class BodyCoreService : Service() {
         a.show()
     }
 
-    /** 情景 — the scenes it has learned. Our own surface, like 产物. */
+    /** Scenes — the scenes it has learned. Our own surface, like Artifacts. */
     private fun openScenes() {
         if (scenesUi?.isShown() == true) return
         stopFollowUpListening()
@@ -2392,12 +2392,12 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * 脚本的运行 button — run a recorded flow straight from the card, with no
+     * the flow's Run button button — run a recorded flow straight from the card, with no
      * model call per step: that is what a flow is FOR. The device verifies
      * every step itself and produces a report. A clean run stays local and
      * costs nothing; a STOP wakes the brain and hands it that report, so the
      * assistant repairs the one bad step, runs the rest, checks the result
-     * and writes the repair back — the user never has to say 「修」 first.
+     * and writes the repair back — the user never has to say 'Fix' first.
      * A PAUSE is different: an `ai` step asked for the brain on purpose, so
      * it is woken with the instruction instead of a failure report, and the
      * run is not counted as a failed one.
@@ -2450,7 +2450,7 @@ class BodyCoreService : Service() {
                     // The detail is what the next brain turn reads. On a
                     // hand-off it must be the INSTRUCTION, not a "reason" —
                     // otherwise the model wakes knowing something happened
-                    // but not what it is meant to do (the 「修啥」 problem).
+                    // but not what it is meant to do (the 'fix what?' problem).
                     val detail = when {
                         done -> res.optJSONObject("final_screen")?.toString().orEmpty()
                         paused -> "step $pausedAt ai handoff: " + res.optString("instruction") +
@@ -2671,7 +2671,7 @@ class BodyCoreService : Service() {
             "The scene was deleted, so its rules are gone."
         }
         localBrain?.sceneEnded(
-            "(background note: the scene 「${title ?: name}」 (`$name`) has just ended. The user or the device " +
+            "(background note: the scene '${title ?: name}' (`$name`) has just ended. The user or the device " +
                 "ended it, not you.$now Its rules no longer apply. $rules This is not something the user " +
                 "said. Do whatever the end of that scene calls for, or nothing — if there is nothing " +
                 "worth saying, answer with just [END].)",
@@ -2725,7 +2725,7 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * 继续修改: remember which page, then ask the user what to change.
+     * Revise: remember which page, then ask the user what to change.
      *
      * The change itself arrives as an ordinary turn — said or typed — and
      * [submitUserTurn] wraps it with the page. Not a turn of its own here,
@@ -2734,7 +2734,7 @@ class BodyCoreService : Service() {
      * is a sentence the device can write for free.
      *
      * Opens the typing field rather than the mic: a page revision is usually a
-     * precise instruction ("把标题改成蓝色"), and the ball is one tap away for
+     * precise instruction ("change the title to blue"), and the ball is one tap away for
      * anyone who would rather say it.
      */
     private fun beginArtifactEdit(e: net.kuafuai.andee.ui.ChatHistory.Entry) {
@@ -2750,7 +2750,7 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * 继续话题: remember which topic, then ask where to take it — the same shape
+     * Continue: remember which topic, then ask where to take it — the same shape
      * as [beginArtifactEdit], for the same reason: until the user says what
      * they want there is nothing to ask the brain.
      */
@@ -2766,7 +2766,7 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * What worker [id] made, on the computer, as a drive (见 [net.kuafuai.andee.ui.WorkerFilesUi]). A page opens in the page
+     * What worker [id] made, on the computer, as a drive (see [net.kuafuai.andee.ui.WorkerFilesUi]). A page opens in the page
      * viewer; the ball folds away first, as for any page.
      */
     private fun openWorkerFiles(id: String, title: String) {
@@ -2778,15 +2778,15 @@ class BodyCoreService : Service() {
         ).show()
     }
 
-    /** The 在办 card, from the top bar's key (and from `debug.open`). */
+    /** The In Progress card, from the top bar's key (and from `debug.open`). */
     private fun openTasksCard(taskId: String? = null) {
         net.kuafuai.andee.ui.TasksUi(
             this,
-            // 接着办: a turn now, the task named by the device — not left to the model to guess from "that one".
+            // Carry on: a turn now, the task named by the device — not left to the model to guess from "that one".
             onContinue = { task -> ui.post { pendingTask = task.id; submitUserTurn(AppLocale.str(this, R.string.tasks_carry_on), "typed") } },
             onTalk = { task -> ui.post { beginTaskTalk(task) } },
             onFiles = { worker, title -> ui.post { openWorkerFiles(worker, title) } },
-            // The same path the model's delegate_cancel takes, so the 事's wait is answered as seen and nothing restarts the job.
+            // The same path the model's delegate_cancel takes, so the task's wait is answered as seen and nothing restarts the job.
             onStopWorker = { worker ->
                 val dev = peers.tasks.agentDevice()
                 dev != null && net.kuafuai.andee.peer.RemoteAgentHost(
@@ -2801,7 +2801,7 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * 说点要求再办 from 在办: remember which 事, then ask how to go on — the same shape as [beginTopicContinue]; the
+     * Say what to do, then do it from In Progress: remember which task, then ask how to go on — the same shape as [beginTopicContinue]; the
      * words the user types or says next become a turn carrying the task's whole record ([Tasks.pickedUp]).
      */
     private fun beginTaskTalk(t: net.kuafuai.andee.config.Tasks.Task) {
@@ -2813,7 +2813,7 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * What the brain is given for a 继续话题: the user's words, which topic,
+     * What the brain is given for a Continue: the user's words, which topic,
      * and the topic's archived conversation inlined.
      *
      * Inlined rather than left to `get_topic` because the whole point of the
@@ -2831,8 +2831,8 @@ class BodyCoreService : Service() {
         return buildString {
             append(row)
             append("\n\n(I picked this from a finished topic in our conversation, topic #")
-            append(t.id).append(" 「").append(t.title)
-            append("」, and want to carry on with it. What it came to: ").append(t.summary)
+            append(t.id).append(" '").append(t.title)
+            append("', and want to carry on with it. What it came to: ").append(t.summary)
             if (outputs.isNotEmpty()) {
                 append("\nPages made in it: ")
                 append(outputs.joinToString("; ") { "#${it.groupId} ${it.text} (v${it.version})" })
@@ -2852,7 +2852,7 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * What the brain is given for a 继续修改: the user's words, the page they
+     * What the brain is given for a Revise: the user's words, the page they
      * are about, and that page's current source.
      *
      * The source is inlined because neither brain can read a file off this
@@ -2882,7 +2882,7 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * 恢复出厂设置: wipe everything this app owns, then rebuild out of nothing.
+     * Factory reset: wipe everything this app owns, then rebuild out of nothing.
      *
      * Called from the settings card, after the user has read and confirmed the
      * list it showed them. The wiping is [net.kuafuai.andee.config.FactoryReset]'s
@@ -2923,7 +2923,7 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * 清空聊天记录, from the 诊断 section of the settings card.
+     * Clear chat history, from the Diagnostics section of the settings card.
      *
      * Two halves, and wiping only the first would be a lie: [ChatHistory.wipe]
      * empties the scrollback the user reads, but the conversation the *model*
@@ -2942,7 +2942,7 @@ class BodyCoreService : Service() {
     }
 
     /**
-     * 清空小本本, from the same place.
+     * Clear the notebook, from the same place.
      *
      * **No brain rebuild, and that is the difference from [clearChatHistory].**
      * The notebook is not carried in the model's context: its index is read off
@@ -2986,7 +2986,7 @@ class BodyCoreService : Service() {
         }
         acceptBrainOutput = false
         guestBrain?.cancel()
-        // A 继续修改 / 继续话题 / 在办 pick the user walked away from must not attach itself
+        // A Revise / Continue / In Progress pick the user walked away from must not attach itself
         // to whatever they ask next.
         pendingArtifact = null
         pendingTopic = null
@@ -3339,7 +3339,7 @@ class BodyCoreService : Service() {
             onSweepSpent = { tokens -> net.kuafuai.andee.config.Notebook.noteSweep(this, tokens) },
             onQuietFinal = ::onBrainQuietFinal,
             // The work card in the conversation and the tiny caption under the docked Andee; the folded
-            // 「做了 N 步」 row when the turn ends.
+            // did  N  steps' row when the turn ends.
             onStep = { net.kuafuai.andee.ui.PhoneWorkLog.on(it) },
         )
         peers.tasks.brain = peerBrain
@@ -3347,7 +3347,7 @@ class BodyCoreService : Service() {
         peers.onProgressChanged = { window.refreshTasksKey() }
         peers.onRemoteReport = { device, worker, text, title, summary ->
             val b = localBrain
-            // The job is over: stop showing it as running, and answer the 「事」 that waited on it, whether or not a brain is up.
+            // The job is over: stop showing it as running, and answer the 'task' that waited on it, whether or not a brain is up.
             net.kuafuai.andee.peer.RemoteProgress.end(worker)
             val book = net.kuafuai.andee.config.Notebook.notebook(this)
             val record = runCatching { net.kuafuai.andee.peer.RemoteAgentTasks { book.tasks }.answered(worker, summary.ifBlank { title }) }.getOrDefault("")
@@ -3729,7 +3729,7 @@ class BodyCoreService : Service() {
      * Everything here is a reason to *hold* it, never to drop it — the bubble's own TTL decides when waiting
      * stops being worth it. The first group is [waitForQuiet]'s own (the user is mid-exchange); then the
      * device being busy (a task, a meeting, typing). **Not whether the user is there, or the hour**: the device is
-     * Andee's, and the user's brakes are the 主动招呼 setting and its budget. Do Not Disturb is the one exception —
+     * Andee's, and the user's brakes are the Speaking first setting and its budget. Do Not Disturb is the one exception —
      * a system switch the user set for exactly this.
      */
     private fun nudgeGate(): net.kuafuai.andee.ui.NudgeUi.Gate {
@@ -3746,7 +3746,7 @@ class BodyCoreService : Service() {
      * The user tapped a bubble's button (or the body of one with buttons): that is a turn.
      *
      * **It runs at the trust of the turn that wrote the bubble.** A bubble raised on a notification's turn
-     * carries a stranger's influence, and a 「好」 under it must not come back as the user's own request —
+     * carries a stranger's influence, and a 'OK' under it must not come back as the user's own request —
      * so that one goes in as an untrusted wake, exactly like a todo set on such a turn ([wakeBrainFor]).
      * Only the local brain raises bubbles (`nudge` is local-only), so there is no hub branch.
      */
@@ -3889,7 +3889,7 @@ class BodyCoreService : Service() {
 
     /** The finished answer. See [onBrainProgress] for why this is not inline. */
     /**
-     * The answer was marked `[quiet]`: it is already a row in the timeline (`没出声：…`), and nothing is spoken.
+     * The answer was marked `[quiet]`: it is already a row in the timeline (`No sound:…`), and nothing is spoken.
      * What is left is what [onBrainFinal] does besides speaking — end the task light, clear the live line, and
      * put the face back to rest. Loop thread, like [onBrainFinal]; everything it touches posts to the UI.
      */
@@ -3919,13 +3919,13 @@ class BodyCoreService : Service() {
             // the one failure the user hears as being ignored.
             expectFollowUp = !END_MARKER.containsMatchIn(text) ||
                 END_MARKER.replace(text, "").trimEnd().let {
-                    it.endsWith("?") || it.endsWith("？") || it.endsWith("?") || it.endsWith("?")
+                    it.endsWith("?") || it.endsWith("\uFF1F") || it.endsWith("?") || it.endsWith("?")
                 }
             // Markers come out here, with the markdown and before anything
             // else touches the string. This is the one place the answer is
             // turned from what the model wrote into what the user gets, and a
             // tag that survives it reaches *both* the scrollback (visible
-            // junk) and 火山 (read out loud as the word "happy").
+            // junk) and Volcengine (read out loud as the word "happy").
             val script = SpeechMood.parse(stripMarkdown(END_MARKER.replace(text, "")))
             val plain = script.text
             // The finished answer is the end of the task as far as the
@@ -3958,7 +3958,7 @@ class BodyCoreService : Service() {
             // process displaces the first (the focus stack is per
             // request, not per app), so speaking would fire the
             // recorder's focus-loss callback and end the meeting —
-            // which is exactly what "好的，开始录音了" used to do, one
+            // which is exactly what "OK, started recording" used to do, one
             // second in.
             //
             // Silent through a phone / VoIP call for the mirror-image
@@ -3967,7 +3967,7 @@ class BodyCoreService : Service() {
             // same way it displaces the meeting recorder's. The
             // scrollback row above is already the answer; the user
             // reads it after they hang up.
-            // And not when the user has muted answers (the card's 朗读 key): the row above is the answer.
+            // And not when the user has muted answers (the card's Speak aloud key): the row above is the answer.
             val muted = net.kuafuai.andee.config.VoiceConfig.muted(this)
             if (!meeting.isActive() && !net.kuafuai.andee.device.CallState.isActive && !muted) {
                 tts.speak(plain, script.cues)
@@ -4244,7 +4244,7 @@ class BodyCoreService : Service() {
         lastAnswer = script.text
         expectFollowUp = false
         // The brain did not say this — the triage did — so without a note it has no idea it was said, and the user's
-        // 「回一下」 a moment later would be about nothing it knows of. Silent, costs no call; the next turn reads it.
+        // 'reply to that' a moment later would be about nothing it knows of. Silent, costs no call; the next turn reads it.
         localBrain?.note(net.kuafuai.andee.brain.NotificationTriage.toldNote(n, script.text))
         if (!meeting.isActive() && !net.kuafuai.andee.device.CallState.isActive) {
             tts.speak(script.text, script.cues)
@@ -4256,7 +4256,7 @@ class BodyCoreService : Service() {
      * Act on a notification: hand it to whichever brain is running.
      *
      * Two callers, one path. The triage says `act` ([handleNotification]), or
-     * the user taps 看看 on the signboard the triage could not replace. They
+     * the user taps Take a look on the signboard the triage could not replace. They
      * differ in the scrollback line and in nothing else — in particular **both
      * are untrusted**: the user choosing to look at a message does not make them
      * its author, and the text still came from whoever sent it. See
@@ -4402,7 +4402,7 @@ class BodyCoreService : Service() {
      * nothing can even complain about it — [runStartupSelfCheck] bails when the
      * ball is not shown, because the card it would put up needs the very
      * permission that is missing. So the app is a live process with no visible
-     * surface and no voice, which is what "点不开了" looks like from outside.
+     * surface and no voice, which is what "can't open it" looks like from outside.
      *
      * Rejection is not the only way to arrive there, and it is not even the
      * common one on a phone: on HONOR/MagicOS `addView` *succeeds* under a
@@ -4440,7 +4440,7 @@ class BodyCoreService : Service() {
         // expand-and-finish branch and there would be no surface to expand —
         // tapping the icon would look like it did nothing, which is exactly the
         // failure this function exists to prevent. Same predicate the checklist
-        // uses for its 悬浮窗 row, so the two can never disagree: see
+        // uses for its overlay row, so the two can never disagree: see
         // [net.kuafuai.andee.device.SelfCheck.overlay].
         if (!Settings.canDrawOverlays(this)) return false
         if (window.isShown()) return true
@@ -4453,7 +4453,7 @@ class BodyCoreService : Service() {
 
     /**
      * Open the settings sheet for someone outside this class — presently the
-     * self-check page, whose 打开设置 row is a door to it.
+     * self-check page, whose Open settings row is a door to it.
      *
      * Not exposed as an Intent: the sheet is built from this service's own
      * state (which brain is configured, what the hub URL is) and a second

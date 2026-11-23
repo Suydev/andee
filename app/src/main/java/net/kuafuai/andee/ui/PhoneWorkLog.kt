@@ -11,7 +11,7 @@ import net.kuafuai.andee.i18n.AppLocale
  * The phone's twin of the Mac's `WorkLog`: what the turn in progress is doing, for the two places that show it —
  * the work card at the foot of the unfolded card ([WorkCardView], the newest four lines) and the tiny caption under
  * the Andee docked into the right edge (status and the newest two). When the turn ends it folds into one row above
- * the answer, 「做了 6 步 · 38 秒 ▾」, that opens to the steps.
+ * the answer, did  6  steps · 38  seconds ▾', that opens to the steps.
  *
  * The model's reasoning arrives whole after each call; it is cut into short lines and released one every
  * [DRIP_MS] on the main thread, so it runs past rather than appearing as a block.
@@ -126,7 +126,7 @@ object PhoneWorkLog {
         val script = listOf(
             "The user wants to check tomorrow's weather in Beijing. Open the browser first; the search box should be at the top of the page." to "Open the app…",
             "The browser is open. The search box is a little above the middle; tap it first, then type the keywords." to "Tap it…",
-            "Type 「Beijing weather tomorrow」 and submit." to "Type the text…",
+            "Type 'Beijing weather tomorrow' and submit." to "Type the text…",
             "The results are up; the first one is China Weather. Look at the temperature line: sunny, high of 18 degrees." to "Take a look at the screen…",
         )
         while (System.currentTimeMillis() - t0 < seconds * 1000L) {
@@ -146,7 +146,7 @@ object PhoneWorkLog {
     /** The task light a real turn turns on and off (the dispatcher's begin/end task), for [rehearse]. */
     @Volatile var onRehearse: ((Boolean) -> Unit)? = null
 
-    /** 「思考中… 0:12」 while waiting on the model, 「第 3 步 · 0:24」 while acting. Main thread. */
+    /** Thinking… 0:12' while waiting on the model, the  3  steps · 0:24' while acting. Main thread. */
     fun status(c: Context, now: Long = System.currentTimeMillis()): String {
         val s = ((now - startedAt) / 1000).coerceAtLeast(0)
         val clock = "${s / 60}:${(s % 60).toString().padStart(2, '0')}"
@@ -165,7 +165,7 @@ object PhoneWorkLog {
 
     /** Short lines out of a paragraph of reasoning: sentence ends, then a length cap. */
     internal fun cut(text: String): List<String> =
-        Regex("""[^。！？!?\n]+[。！？!?]?""").findAll(text).map { it.value.trim() }
+        Regex("""[^\u3002\uFF01\uFF1F!?\n]+[\u3002\uFF01\uFF1F!?]?""").findAll(text).map { it.value.trim() }
             .filter { it.length > 1 }
             .flatMap { s -> if (s.length <= LINE_CHARS) sequenceOf(s) else s.chunked(LINE_CHARS).asSequence() }
             .toList()

@@ -15,12 +15,12 @@
     </style>
 
     <!--
-      三个全屏 Activity(HtmlActivity / LookActivity / ScanActivity)共用。
-      继承 Theme.Body 会拿到 colorPrimaryVariant 当状态栏色,也就是一条紫杠;
-      而 DayNight 的浅色 windowBackground 会让每次打开先白闪一下再变深。
-      两条都和 app 其余部分(纯黑 + #7FA5FF,见 ui/Glass.kt)无关,所以这里
-      全部按住。windowBackground 就是 Glass 的底色:overlay 卡片、弹框和这
-      三张全屏脸是同一套配色,开屏那一帧不该是例外。
+      three full-screen Activity(HtmlActivity / LookActivity / ScanActivity)shared.
+      inherit Theme.Body gets colorPrimaryVariant as the status-bar colour, just a purple bar;
+      and DayNight light windowBackground makes every open flash white once before darkening.
+      both are app the rest(pure black + #7FA5FF, see ui/Glass.kt)unrelated, so here
+      all pinned.windowBackground is Glass background colour: overlay card, dialogs and this
+      the three full-screen faces share one palette, that first frame shouldn't be an exception.
     -->
     <style name="Theme.Body.Fullscreen" parent="Theme.Body">
         <!-- DarkActionBar hands every one of these an "Andee" title bar over
@@ -37,46 +37,46 @@
     </style>
 
     <!--
-      三个全屏脸(HtmlActivity / LookActivity / ScanActivity)现在共用的入场
-      与退场,见 ui/Stage.kt。
+      three full-screen faces(HtmlActivity / LookActivity / ScanActivity)the entrance now shared
+      and the exit, see ui/Stage.kt.
 
-      windowAnimationStyle="@null" 是这里唯一新增的一项,也是"关掉时闪一下"
-      的真正原因:继承链上没人动过这一项,所以平台在 finish() 之后照常
-      播放它自己的退出动画 —— 动画的内容已经不在屏幕上,淡出的只是一片
-      空窗口;而底下 overlay 卡片是在 onDestroy 之后才开始恢复的。两段
-      动作因此错开,中间那一帧谁也不是,那就是用户看到的闪。
+      windowAnimationStyle="@null" the only new item here, also"flash once when turned off"
+      the real reason: nobody on the inheritance chain has touched this item, so the platform, at finish() after that, as usual
+      play its ownExitanimation —— the animation's content is no longer on screen, what fades out is just an
+      empty window; and underneath overlay the card is onDestroy only then starts to recover. The two
+      so the two motions are offset, that middle frame is neither one, that is the flash the user sees.
 
-      改成"淡入同时缩放"和"淡出同时缩小"由 StageActivity 自己画,平台的
-      这一项只需要闭嘴。enter/exit 都留 0,是因为 enter 的动画在
-      onCreate 之后才起,平台那一帧已经画完了 —— 留 0 是不给它任何机会。
+      change to"fade in while scaling"and"fade out while shrinking"by StageActivity draw itself, the platform's
+      this item only needs to shut up.enter/exit all kept 0, because enter the animation's
+      onCreate only starts after, the platform has already drawn its frame —— keep 0 gives it no chance at all.
     -->
     <style name="Theme.Body.Stage" parent="Theme.Body.Fullscreen">
         <item name="android:windowAnimationStyle">@null</item>
     </style>
 
     <!--
-      桌面图标(SelfCheckActivity)专用。服务在跑的时候,那颗图标的意思就是
-      "打开 app":这一路上 Activity 一个像素都不画,expand() 完就 finish ——
-      见 SelfCheckActivity.onCreate。但平台在 Activity 首次绘制之前会先按
-      windowBackground 铺一张 starting window,于是体感变成"点图标 → 屏幕
-      黑一下 → 卡片长出来",而长按球球没有这一下。关掉它,两条路的入场才是
-      同一件事。
+      launcher icon(SelfCheckActivity)only. When the service is running, that icon means
+      "Open app": along the way Activity not draw a single pixel, expand() and then finish ——
+      see SelfCheckActivity.onCreate. But the platform, at Activity before the first draw it first presses
+      windowBackground lay down a starting window, so it feels like"tap the icon → screen
+      goes black once → the card grows in", but the long-press on the ball doesn't do that. Turn it off, the entrance of both routes is what
+      the same thing.
 
-      无障碍关着时这一项也无害:那一路本来就是纯黑底 + revealStage 从 0.94
-      长出来,起始帧是黑是空没有区别,而卡片第一帧由 SelfCheck.local 同步
-      给出,不存在等网络的黑屏。
+      harmless even with accessibility off: that route is pure black to begin with + revealStage from 0.94
+      grows in, whether the first frame is black or empty makes no difference, and the card's first frame is SelfCheck.local synchronise
+      give, no black screen waiting for the network.
     -->
     <style name="Theme.Body.Stage.NoPreview" parent="Theme.Body.Stage">
         <item name="android:windowDisablePreview">true</item>
     </style>
 
     <!--
-      LaunchPadActivity 专用:一步也不画、一帧也不留。舞台的任务是把
-      Service 发来的 intent 在"前台"里转交给目标 app —— 交完立刻 finish,
-      所以整扇窗必须透明且不抢焦点动画:windowIsTranslucent 让它不可见,
-      windowDisablePreview + windowAnimationStyle 让首帧和动画都不存在。
-      backgroundDimEnabled 关掉,否则部分 ROM 会在透明 Activity 下面压一层
-      暗幕,目标 app 起来之前屏幕会闪一下变暗。
+      LaunchPadActivity only: not draw a step or leave a frame. The Stage's job is to take
+      Service sent by intent in"foreground"hand off to the target in app —— hand it off and immediately finish,
+      so the whole window must be transparent and not steal focus during the animation: windowIsTranslucent make it invisible,
+      windowDisablePreview + windowAnimationStyle make the first frame and the animation both nonexistent.
+      backgroundDimEnabled turn off, otherwise some ROM will, when transparent Activity with a layer underneath
+      dimming curtain, target app before it comes up the screen flashes dark once.
     -->
     <style name="Theme.Body.Transparent" parent="Theme.Body.Stage.NoPreview">
         <item name="android:windowIsTranslucent">true</item>

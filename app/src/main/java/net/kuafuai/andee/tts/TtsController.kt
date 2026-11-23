@@ -137,7 +137,7 @@ class TtsController(
     //
     // The hard part is that there is no clock in common: the markers are at
     // character offsets into our string, and the thing the user is actually
-    // hearing is an AudioTrack. The obvious bridge is 火山's own
+    // hearing is an AudioTrack. The obvious bridge is Volcengine's own
     // TTSSentenceStart, which would pin each sentence in both clocks at once —
     // and it does not work. Measured on device: the server sends that event
     // **once per [HuoshanTts.push]**, not once per sentence, and with an
@@ -153,7 +153,7 @@ class TtsController(
     // the question being answered is "which of two faces", at one-sentence
     // resolution, where a few hundred milliseconds of error is invisible.
     // Total length comes from [AudioIO.queuedMs] at [onDone] (the producer's
-    // clock, known within the first fraction of playback because 火山 streams
+    // clock, known within the first fraction of playback because Volcengine streams
     // far faster than real time) and the position from [AudioIO.playedMs]
     // (the track's own head, so real time). Until the total is known the
     // opening face holds, which is the same fallback as having no cues.
@@ -373,7 +373,7 @@ class TtsController(
                 fallbackTried = true
                 // The system engine cannot speak on this device. Fall back to
                 // the keyed engine the listening side already names — the same
-                // "fail to 火山" direction, decided here because the controller
+                // "fail to Volcengine" direction, decided here because the controller
                 // is the only thing that knows what else is available, and the
                 // adapter is the only thing that can find out it cannot speak.
                 client = null
@@ -451,9 +451,9 @@ class TtsController(
         }
 
         // Which service speaks. The listening side keeps [VoiceConfig.voiceProvider]
-        // (火山 / Google only — a system engine has no recogniser to hear with);
+        // (Volcengine / Google only — a system engine has no recogniser to hear with);
         // the speaking side may additionally pick the device's own engine, which
-        // is free and works offline. Fail direction is 火山, same as listening.
+        // is free and works offline. Fail direction is Volcengine, same as listening.
         val c: TtsEngine = when (VoiceConfig.speakProvider(context)) {
             VoiceConfig.VOICE_GOOGLE -> GoogleTts(cfg, listener)
             VoiceConfig.VOICE_SYSTEM -> SystemTts(context, listener)

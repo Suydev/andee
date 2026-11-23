@@ -16,7 +16,7 @@ import net.kuafuai.andee.pet.PetMind
 import net.kuafuai.andee.pet.PetPose
 
 /**
- * The desk pet on the phone: the folded ball's body when the user picked 桌宠 (`pet = on`), drawn inside the ball's
+ * The desk pet on the phone: the folded ball's body when the user picked desk pet (`pet = on`), drawn inside the ball's
  * own window in place of the GL sphere ([FloatingWindowUi] hides the sphere while this shows). No window of its
  * own — every overlay counts toward the 0.80 opacity ceiling above which the platform drops injected taps.
  *

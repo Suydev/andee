@@ -157,7 +157,7 @@ class DogLink(private val context: Context) {
      * answers the dialog.
      *
      * The dialog is the user's, not ours: the first time anything touches a USB
-     * device Android asks "允许 Andee 访问该 USB 设备吗？". We can only ask and
+     * device Android asks "Allow Andee access that USB device?". We can only ask and
      * wait. It is bounded ([PERMISSION_WAIT_MS]) because an unanswered dialog
      * must not wedge the tool call forever — and the timeout is reported as a
      * timeout, with the thing the user has to do named in plain words, rather

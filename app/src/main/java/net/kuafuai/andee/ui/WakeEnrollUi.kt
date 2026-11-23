@@ -190,7 +190,7 @@ class WakeEnrollUi(
         if (busy) return
         busy = true
         recordBtn.text = lctx.getString(R.string.wake_listening)
-        // Deliberately *not* 现在说吧 here. Saying it on the tapper's thread, before
+        // Deliberately *not* Say it now here. Saying it on the tapper's thread, before
         // a recorder exists, is what made "tap and talk" fail: the user was
         // invited to speak during the 100–300 ms the microphone spends opening,
         // and the onset went into a device that was not yet listening. The
@@ -218,8 +218,8 @@ class WakeEnrollUi(
         }
         // The recorder is up, so *now* the user is invited to speak. Waiting for
         // this rather than for the tap is the honest half of the trade: the card
-        // reads 正在听… for the 100–300 ms the microphone takes to come up, and
-        // 现在说吧 only once something is listening. Nothing is taken from the
+        // reads Listening… for the 100–300 ms the microphone takes to come up, and
+        // Say it now only once something is listening. Nothing is taken from the
         // user to pay for it — the window is unchanged and the 300 ms pre-roll
         // still catches an onset that beats the prompt.
         ui.post {

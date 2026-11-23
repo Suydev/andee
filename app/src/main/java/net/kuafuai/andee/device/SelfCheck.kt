@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit
  * that cannot be reached means the ball spins once and goes silent. A stale
  * notification grant means notifications are dropped while Settings happily
  * reports the permission as on. Each of those has been reported by the user as
- * "坏了" at least once, and every one of them is decidable in advance.
+ * "broken" at least once, and every one of them is decidable in advance.
  *
  * **One list, three readers.** [net.kuafuai.andee.BodyCoreService] runs it at
  * startup and puts up a nudge card if anything is wrong; that same service puts
@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit
  *
  * ### Levels
  *
- *  * [Level.FAIL] — dead right now. The user's complaint will be "没反应".
+ *  * [Level.FAIL] — dead right now. The user's complaint will be "no response".
  *  * [Level.WARN] — it works, but something downstream degrades silently (a
  *    zombie grant, an adb-only permission, a nearly-full disk).
  *  * [Level.NOTE] — not a problem, just a fact worth being able to read (the
@@ -137,14 +137,14 @@ object SelfCheck {
             val data: String? = null,
             val extras: List<Pair<String, String>> = emptyList(),
             /**
-             * The button's word, when the default 去开启 would describe the
+             * The button's word, when the default Turn on would describe the
              * errand wrongly. Zero means "no opinion" — the renderer falls back
-             * to 去开启.
+             * to Turn on.
              *
              * It exists for the notification-access row. In the zombie state the
-             * switch already reads as *on*, so 去开启 invites exactly the wrong
+             * switch already reads as *on*, so Turn on invites exactly the wrong
              * action: open the page, see it on, leave — and the row stays red.
-             * The errand there is 关闭再打开, and saying so on the button is the
+             * The errand there is Off, then on, and saying so on the button is the
              * whole hint. A word belongs to the instance rather than the action
              * because the same action is the right door in both states.
              */
@@ -167,7 +167,7 @@ object SelfCheck {
          * Somewhere off the device — currently only the ADBKeyboard download.
          *
          * Its own member rather than `Screen(ACTION_VIEW, url)` because the
-         * button it produces is a different word: 去下载 is not 去开启, and a
+         * button it produces is a different word: Download is not Turn on, and a
          * labelled-as-Settings button that opens a browser is the small lie
          * this whole list is built to avoid. The plumbing is otherwise
          * identical, which is the point — one new value, no new path.
@@ -226,7 +226,7 @@ object SelfCheck {
      *   the main thread. The version probe is the one that cannot stretch that
      *   budget: it carries its own 8 s `callTimeout`, so it adds at most 8 s
      *   whatever the socket does. With `probe = false` those three rows come
-     *   back as [Level.NOTE] "检查中…", which is what lets the page paint
+     *   back as [Level.NOTE] "Checking…", which is what lets the page paint
      *   instantly and fill in behind.
      */
     fun run(context: Context, probe: Boolean = true): List<Finding> {
@@ -352,7 +352,7 @@ object SelfCheck {
      * `TYPE_ACCESSIBILITY_OVERLAY`, so the accessibility service is *not* a
      * licence to draw. Without this the window add throws,
      * `FloatingWindowUi.show()` catches it and returns false, and the service
-     * runs perfectly with nothing on screen — the "没反应" that looks least like
+     * runs perfectly with nothing on screen — the "no response" that looks least like
      * a permission problem.
      */
     private fun overlay(context: Context): Finding {
@@ -694,7 +694,7 @@ object SelfCheck {
      * on the internet names, and on a HONOR it matches no activity at all —
      * `cmd package resolve-activity` says "No activities found", so
      * [net.kuafuai.andee.ui.SelfCheckUi.launch] caught the exception and the
-     * 去开启 button read as dead. The *detail* action
+     * Turn on button read as dead. The *detail* action
      * (`ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS`, API 30) does resolve
      * there, to `NotificationAccessDetailsActivity` — one app's switch, which is
      * the smaller page anyway: the user lands on the toggle they have to flip
@@ -712,7 +712,7 @@ object SelfCheck {
         val reachable = runCatching {
             context.packageManager.queryIntentActivities(detail, 0).isNotEmpty()
         }.getOrDefault(false)
-        // 关闭再打开 in the zombie state, 去开启 in the merely-off one — see
+        // Off, then on in the zombie state, Turn on in the merely-off one — see
         // Fix.Screen.label. The switch the user is about to see already reads
         // as on in the first case, so the button is the only place left to say
         // what has to happen; the detail says it too, in words.
@@ -903,7 +903,7 @@ object SelfCheck {
      *
      * **Which key is asked for follows the provider, and the row names
      * neither.** The checklist is about "can this device hear and speak"; a
-     * green tick earned by the 火山 key while the device is talking to Google
+     * green tick earned by the Volcengine key while the device is talking to Google
      * is the exact lie that having one checklist instead of two exists to
      * prevent. Not naming the provider in the sentence is what keeps [Finding]
      * language-free — see the note on `detailArgs` — and the settings card
@@ -919,7 +919,7 @@ object SelfCheck {
         // engine needs no key to speak, but both cloud providers do — and the
         // two sides are now chosen independently, so each has to be checked
         // against its own picker, or one green tick covers a service with no
-        // key (hear = 火山, speak = Google, no Google key → silent reply).
+        // key (hear = Volcengine, speak = Google, no Google key → silent reply).
         val speakHas = when (VoiceConfig.speakProvider(context)) {
             VoiceConfig.VOICE_SYSTEM -> true
             VoiceConfig.VOICE_GOOGLE -> cfg.googleApiKey.isNotBlank()
@@ -1007,7 +1007,7 @@ object SelfCheck {
      *
      * The read is live, not cached: [PowerManager.isIgnoringBatteryOptimizations]
      * answers from the current whitelist, so adding or removing the exemption
-     * and tapping 重新检查 flips this row on the spot — verified both ways on a
+     * and tapping Recheck flips this row on the spot — verified both ways on a
      * HONOR with `cmd deviceidle whitelist +/-` against `am get-standby-bucket`
      * (10 ACTIVE ↔ 5 EXEMPTED). Nothing was wrong with the judgement; the door
      * beside it was the problem, which is what [batteryFix] is about.
@@ -1040,14 +1040,14 @@ object SelfCheck {
      * lists ten preinstalled apps and nothing else — this package is absent even
      * while `dumpsys deviceidle whitelist` lists it, force-stopping
      * `com.android.settings` does not change it, and the page's own search box
-     * answers 「没有匹配的结果」 for the package name. A row whose fix was that
-     * page therefore had a 去开启 button that could not possibly turn its own row
+     * answers 'No matching results' for the package name. A row whose fix was that
+     * page therefore had a Turn on button that could not possibly turn its own row
      * green, which is the failure this method removes.
      *
      * The request page is one dialog that calls
      * `PowerWhitelistManager.addToWhitelist`, i.e. exactly the state this row
-     * reads. On the HONOR it reads 「是否忽略电池优化？」/「取消」+「忽略」 —
-     * note the affirmative button is 忽略, not 允许, which is why
+     * reads. On the HONOR it reads 'Ignore battery optimisations?'/'Cancel'+'Ignore' —
+     * note the affirmative button is Ignore, not Allow, which is why
      * `check_detail_battery_off` names that word rather than the AOSP one. It is
      * also silent about its own refusals —
      * `RequestIgnoreBatteryOptimizations.onCreate` finishes without a dialog when
@@ -1418,7 +1418,7 @@ object SelfCheck {
 
         return try {
             http.newCall(Request.Builder().url(url).get().build()).execute().use { resp ->
-                // The allowance is ten per address per day and 重新检查 spends
+                // The allowance is ten per address per day and Recheck spends
                 // one per tap, so a user can exhaust their own quota just by
                 // poking at this page. The service answers 429 with `code: 4290`
                 // to mean "already checked enough today" — read as such, and
@@ -1527,7 +1527,7 @@ object SelfCheck {
      *
      * Was `https://andee.kuafuai.net`, which named a mainland host whose domain
      * had to be ICP-filed before TLS would reach it at all — an unfiled domain
-     * there is answered with a 403 block page, which reads here as 查不到. The
+     * there is answered with a 403 block page, which reads here as cannot find. The
      * address behind this one is outside the mainland, so that particular trap
      * is behind us.
      *

@@ -125,7 +125,7 @@ import net.kuafuai.andee.i18n.AppLocale
  *
  * [SelfCheckUi] carries the picker and writes the preference; this class only
  * has to notice a change made *somewhere else*. There is exactly one such path
- * and it is reachable from this card: the 打开设置 row opens the assistant's
+ * and it is reachable from this card: the Open settings row opens the assistant's
  * settings sheet, and *its* picker writes the same key. [LangToggle]'s own
  * callback has already told the service by the time the sheet closes; this is
  * the other direction, and [onResume] is where it is caught.
@@ -181,7 +181,7 @@ class SelfCheckActivity : StageActivity() {
          * list**: a window gets no `onResume`, and the destination leaves with
          * `FLAG_ACTIVITY_NEW_TASK` into a task of its own, so pressing back has
          * nowhere of ours to return to. The report is exact about the shape of
-         * it: from the page, 处理 → away → back lands on the list; from the
+         * it: from the page, handle → away → back lands on the list; from the
          * card, the same three taps land on the desktop with a ball in the
          * corner.
          *
@@ -267,7 +267,7 @@ class SelfCheckActivity : StageActivity() {
 
     /**
      * Our settings sheet while it is up — see [openOwnSettings]. Held only so a
-     * second tap on 打开设置 does not stack a second window on the first.
+     * second tap on Open settings does not stack a second window on the first.
      */
     private var settings: SettingsUi? = null
 
@@ -285,7 +285,7 @@ class SelfCheckActivity : StageActivity() {
         // holds the *default* until then rather than the user's answer.
         Theme.load(this)
 
-        // The notification's 允许看屏幕 action lands here — see
+        // The notification's Allow screen viewing action lands here — see
         // [requestScreenCapture]. Asked before the branch below, because the
         // point of the action is that the page it opens is a means to an end.
         if (intent?.getBooleanExtra(EXTRA_SCREEN_CAPTURE, false) == true) {
@@ -465,8 +465,8 @@ class SelfCheckActivity : StageActivity() {
             // unfold *at this point* — but see [onStageLeaving], which is where
             // that assumption gets checked rather than trusted.
             onDismiss = { _ -> leave() },
-            // The two rows a first-run user actually has to act on — 大脑 and
-            // 语音密钥 — are `Fix.OurSettings`, and this page used to draw them
+            // The two rows a first-run user actually has to act on — brain and
+            // speech key — are `Fix.OurSettings`, and this page used to draw them
             // with no button at all on the argument that the sheet belongs to the
             // service. It does not: `SettingsUi` is a plain overlay built from a
             // Context, and the grant it needs is one of the rows right here. So
@@ -653,7 +653,7 @@ class SelfCheckActivity : StageActivity() {
                 // Re-run the list, not just repaint it: the user came here to
                 // fill in a key, and the row they were sent from is exactly the
                 // one that should be green when they get back. [SelfCheckUi.start]
-                // is what 重新检查 calls.
+                // is what Recheck calls.
                 if (::ui.isInitialized) ui.start()
             },
             onFactoryReset = {
@@ -789,11 +789,11 @@ class SelfCheckActivity : StageActivity() {
 
         // Order matters here, and it is the reverse of what it was.
         //
-        // Every row on this page sends the user out — 去开启, 允许, 去下载 — so
+        // Every row on this page sends the user out — Turn on, Allow, Download — so
         // the way back is a resume, and the first thing to do with one is
         // re-read the half that is cheap to re-read. A row the user just fixed
         // staying red reads as "the fix did not take", and the only other way
-        // to correct it was 重新检查 at the bottom of the list. Being an
+        // to correct it was Recheck at the bottom of the list. Being an
         // Activity is what makes noticing this possible at all: the same list
         // on a working device is an overlay owned by the service, gets no
         // resume callback, and is closed on the way out instead — see
@@ -804,9 +804,9 @@ class SelfCheckActivity : StageActivity() {
         // assistant as soon as it could draw one, which is a return from
         // granting the overlay — and it is also a return from fixing row one of
         // five, where it took the list away and sent the user back through the
-        // launcher icon and 看自检 to get at row two. The page is now left up
+        // launcher icon and see the self-check to get at row two. The page is now left up
         // until the user closes it, which is the one signal that actually means
-        // "I am done here": ✕ or 完成, and [onStageLeaving] puts the assistant
+        // "I am done here": ✕ or Done, and [onStageLeaving] puts the assistant
         // back. On a page whose whole job is to walk somebody down a list, the
         // user is the only one who knows when the list is finished.
         //
@@ -837,7 +837,7 @@ class SelfCheckActivity : StageActivity() {
      *    than on the toggle;
      *  * the notification-access row is `OK` only once the listener is actually
      *    *bound*, and the bind lands after the setting is written — so the
-     *    honest reading for that instant is 「已授权，但监听器没连上」.
+     *    honest reading for that instant is already granted, but the listener isn't connected'.
      *
      * Either one is a red row the user has just fixed, which is the reading that
      * makes somebody believe the fix did not take. The report was "I granted it,

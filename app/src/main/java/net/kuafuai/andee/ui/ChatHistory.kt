@@ -30,7 +30,7 @@ import java.util.Locale
  * question "what went wrong a minute ago" does not.
  *
  * **A page is a *version* of an artifact, not an artifact.** Revising a page
- * used to archive the result as a brand-new row, so 继续修改 twice left three
+ * used to archive the result as a brand-new row, so Revise twice left three
  * near-identical entries on the shelf and no way to tell which one was current
  * — the user asked for "a new version", not "another page". Rows now carry
  * [Entry.groupId] (which artifact) and [Entry.version] (which revision of it),
@@ -93,7 +93,7 @@ object ChatHistory {
     /**
      * A stretch of conversation that has finished and been put away.
      *
-     * **The other half of the 产物 idea, on the time axis.** An artifact groups
+     * **The other half of the Artifacts idea, on the time axis.** An artifact groups
      * the revisions of one *thing*; a topic groups a stretch of *talking*. They
      * are orthogonal on purpose — a page drawn while planning a trip belongs to
      * its own artifact and to that conversation at once.
@@ -129,7 +129,7 @@ object ChatHistory {
      * Two separate caps, because the two costs are unrelated: a line of text is
      * a few hundred bytes and the list is only worth scrolling if it goes back
      * a while, whereas a generated page is routinely 50–100 KB of inlined CSS,
-     * JS and base64 images — 100 of them is up to ~10 MB, the price of the 产物
+     * JS and base64 images — 100 of them is up to ~10 MB, the price of the Artifacts
      * panel being a shelf rather than a recent-items strip.
      *
      * A live page does not count against [MAX_ENTRIES]. It used to, and then the
@@ -137,7 +137,7 @@ object ChatHistory {
      * long before [MAX_PAGES] was reached.
      *
      * A page evicted from disk leaves its row behind with `page = null`. The
-     * row stays because "you showed me a 贪吃蛇 at 3pm" is still true and still
+     * row stays because "you showed me a Snake game at 3pm" is still true and still
      * worth scrolling past; it just stops claiming to be re-openable.
      */
     private const val MAX_ENTRIES = 80
@@ -274,14 +274,14 @@ object ChatHistory {
      * the rest of the turn.
      *
      * `explicit` is the model naming a page it wants to revise; `armed` is what
-     * the turn has established so far (a `get_page`, or the panel's 继续修改).
+     * the turn has established so far (a `get_page`, or the panel's Revise).
      * Explicit wins. **Either way the target comes back cleared**, and that is
      * the load-bearing half: a target is good for *one* page, so a turn that
      * reads a page back and then draws two of them gets a revision and then a
      * new artifact — not two revisions of the same thing.
      *
      * Found the hard way: `get_page` followed by two `show_html` calls left the
-     * second, unrelated page numbered 「v5」 of the first, because the target was
+     * second, unrelated page numbered 'v5' of the first, because the target was
      * read without being consumed.
      *
      * @return the group to file under (null = a new artifact), and the target
@@ -293,11 +293,11 @@ object ChatHistory {
     ): Pair<Long?, Long?> = if (explicit != null) explicit to null else armed to null
 
     /**
-     * One row per **artifact**, newest first — what the 产物 panel lists.
+     * One row per **artifact**, newest first — what the Artifacts panel lists.
      *
      * Not one row per page file: revising a page appends a new revision rather
-     * than replacing the old one, so a raw filter would show 番茄钟 three times
-     * after two rounds of 继续修改, with nothing saying which is current. This
+     * than replacing the old one, so a raw filter would show pomodoro timer three times
+     * after two rounds of Revise, with nothing saying which is current. This
      * gathers each artifact's revisions and keeps the **newest available** one
      * — available, not merely newest, because the 100-page cap can take a
      * revision's file while an older one survives, and a panel row that offers
@@ -305,7 +305,7 @@ object ChatHistory {
      * revision that is.
      *
      * The row still carries its own [Entry.version], which is what the panel
-     * prints as 「v3」 and what [versionsOf] takes to list the rest.
+     * prints as 'v3' and what [versionsOf] takes to list the rest.
      */
     fun artifacts(): List<Entry> = synchronized(lock) {
         collapseToArtifacts(entries, keepMissing = false)
@@ -339,7 +339,7 @@ object ChatHistory {
      * [artifacts] cannot serve the brain: it filters on `page != null`, which is
      * right for a panel that offers to open one and wrong for a question about
      * what was made. A row whose file the 100-page cap has taken still records
-     * that the page existed and when — the honest answer to 「上次那个番茄钟」 for
+     * that the page existed and when — the honest answer to the earlier pomodoro timer' for
      * a page that is actually gone — and a brain that cannot see the row answers
      * "I never made that", which is a failure the user can check against the
      * panel in front of them.
@@ -397,7 +397,7 @@ object ChatHistory {
 
     /**
      * The artifacts made during a topic, one per artifact, newest first — the
-     * topic card's 产出物 list.
+     * topic card's output list.
      *
      * Each is the artifact's **current** version, wherever it was made: a page
      * started in this topic and revised later is still this topic's output, and
@@ -500,13 +500,13 @@ object ChatHistory {
      *
      * **Why an index as well as `list_pages`.** A tool answers a question the
      * model thought to ask. The failure this is here to prevent is the one
-     * where it does not think to ask — 「上次那个表格改一下」 drawing a brand new
+     * where it does not think to ask — revise that spreadsheet from last time' drawing a brand new
      * table, because nothing in front of it said the old one still existed. A
      * line in the context is the difference between "there is a tool for that"
      * and knowing the thing is there.
      *
      * One line per artifact, and the version is printed: a model revising
-     * 「番茄钟 (v3)」 knows it is working on a page that has already been through
+     * pomodoro timer (v3)' knows it is working on a page that has already been through
      * three rounds, which is the difference between continuing someone's work
      * and starting over on top of it.
      */
@@ -546,7 +546,7 @@ object ChatHistory {
      * Same position and same reason as [indexForPrompt]: this list changes the
      * moment anything folds, and the system prompt is the one place it must never
      * go. `list_topics` has the full list; this is the newest few, and its whole
-     * job is to make the shelf *visible* — 「上次那个比价」 answered from memory
+     * job is to make the shelf *visible* — the earlier price comparison' answered from memory
      * is the failure, and a model that can see the topic knows to read it back.
      *
      * The counts are printed for the reason the version is printed on a page: it
@@ -565,7 +565,7 @@ object ChatHistory {
     /**
      * How much of a page's source is handed to the brain in one go.
      *
-     * Two callers, so it lives here rather than at either one: the 继续修改
+     * Two callers, so it lives here rather than at either one: the Revise
      * prompt ([net.kuafuai.andee.BodyCoreService.artifactEditQuery], which
      * inlines a page so a revision is a revision) and `ui.get_page` (which
      * reads one back so the brain can revise or answer about it unaided).
@@ -610,7 +610,7 @@ object ChatHistory {
     }
 
     /**
-     * Delete everything and forget it. For 恢复出厂设置.
+     * Delete everything and forget it. For Factory reset.
      *
      * Two halves, and both are needed: the files on disk, and the list this
      * singleton is holding in memory. Clearing only the files would leave the
@@ -688,7 +688,7 @@ object ChatHistory {
      *
      * **@param groupId which artifact this is a revision of.** Omitted (or
      *   null) means a brand-new artifact: the row becomes its own group and
-     *   starts at v1. Pass an existing artifact's group — the panel's 继续修改
+     *   starts at v1. Pass an existing artifact's group — the panel's Revise
      *   does, and so does `ui.get_page`'s follow-up `show_html` — and this
      *   lands as its next revision instead of a near-identical neighbour on the
      *   shelf. Callers get the group from [Entry.groupId].
@@ -725,7 +725,7 @@ object ChatHistory {
      *
      * Nothing already written is touched: the returned entry is the previous
      * version's bytes filed as the next version number, so the artifact's
-     * history stays append-only and 撤销 is just another 回退. That is what
+     * history stays append-only and Undo is just another Go back. That is what
      * makes this safe to expose on a tap — a rollback that edited history in
      * place would leave no way back to the thing being rolled back from.
      *

@@ -11,7 +11,7 @@ import android.widget.TextView
 import net.kuafuai.andee.config.VoiceConfig
 
 /**
- * 中 | EN — the two-cell language picker, for surfaces that are not the
+ * in | EN — the two-cell language picker, for surfaces that are not the
  * settings card.
  *
  * ### Why this exists next to `SettingsUi.langPicker`
@@ -32,7 +32,7 @@ import net.kuafuai.andee.config.VoiceConfig
  *
  * ### The labels are not in resources, and that is the point
  *
- * `中` stays `中` and `EN` stays `EN` whatever the card is speaking. A language
+ * `in` stays `in` and `EN` stays `EN` whatever the card is speaking. A language
  * picker labels each language *in its own script*; translating these is the one
  * way to make the control useless — the same rule (and the same two strings)
  * as `SettingsUi.langPicker`.
@@ -64,7 +64,7 @@ class LangToggle(
         /**
          * Keeps the two cells the same width.
          *
-         * They are not naturally: `中` is one CJK glyph and `EN` is two Latin
+         * They are not naturally: `in` is one CJK glyph and `EN` is two Latin
          * ones, so with `WRAP_CONTENT` alone the picked pane visibly changes
          * size when you switch, which reads as the control *resizing* rather
          * than as a selection moving. Weights cannot fix it either — a

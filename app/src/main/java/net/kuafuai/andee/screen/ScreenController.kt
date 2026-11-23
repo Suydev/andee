@@ -58,7 +58,7 @@ class ScreenController(
      * i.e. inside the dispatcher's gesture passthrough, which only makes the ball
      * untouchable and leaves it drawn. Without this the brain's `after_shot` shows
      * the ball over whatever sits in the bottom-right corner — a field report had
-     * it read the ball as covering Alipay's 我的 tab and abandon the route.
+     * it read the ball as covering Alipay's my tab and abandon the route.
      */
     @Volatile
     var shotGuard: ((() -> JSONObject) -> JSONObject)? = null
@@ -165,12 +165,12 @@ class ScreenController(
     //
     // A popup menu is the one place on a blind screen where a small aim error
     // is not merely a wasted tap. Its items sit a few dozen pixels apart and
-    // one of them is routinely irreversible — 删除, 撤回, 清空, 不再关注 — so
+    // one of them is routinely irreversible — Delete, withdraw, Clear, no longer follows — so
     // "aim again" is not a recovery, it is the damage.
     //
     // Measured 2026-10-20, WeChat Moments, tree withheld: reaching for the
-    // 「··」 menu the brain landed on its own comment first, got the
-    // 复制/删除 pair, aimed at 评论, and hit 删除. It reported deleting a
+    // '··' menu the brain landed on its own comment first, got the
+    // Copy/Delete pair, aimed at Comments, and hit Delete. It reported deleting a
     // comment it had written the day before. (The comment survived — the tap
     // did something else — but nothing in the software had prevented it.)
     //
@@ -179,8 +179,8 @@ class ScreenController(
     // non-active, application-type window covering the point is a popup. That
     // is the whole test. What it buys is the requirement, not the judgement:
     // the point must have been inside a zoom taken in the last [ZOOM_CONFIRM_MS],
-    // because a magnified look is the only way this brain can tell 评论 from
-    // 删除 before it commits.
+    // because a magnified look is the only way this brain can tell Comments from
+    // Delete before it commits.
     //
     // Deliberately not limited to blind trees. An app that gives us e-numbers
     // is one where the brain taps by eid and never reaches this function, so
@@ -223,7 +223,7 @@ class ScreenController(
 
     /**
      * Say whether a menu is open, so the brain does not have to judge it from
-     * pixels. Measured 2026-10-20 on WeChat Moments: the 「··」 menu is its own
+     * pixels. Measured 2026-10-20 on WeChat Moments: the '··' menu is its own
      * window even with the tree withheld, and the brain, unable to tell open
      * from closed off a picture, reopened the same menu six times. The window
      * is NOT focused, which is also why `back` leaves the page instead of
@@ -442,8 +442,8 @@ class ScreenController(
      * Measured 2026-10-20 on WeChat 8.0.79 (HONOR AMM-AN00, tree withheld):
      * taps aimed off a zoom changed the screen 33 times in 41; taps aimed off
      * the full screenshot 124 in 211, and the misses were the expensive kind —
-     * a profile page, a 关注 instead of 谢谢, a 删除 instead of 评论. On a phone
-     * the shot is downscaled to ~0.48× and a 「··」 is about 30 px in it, which
+     * a profile page, a follow instead of Thank you, a Delete instead of Comments. On a phone
+     * the shot is downscaled to ~0.48× and a '··' is about 30 px in it, which
      * is below what this brain can place a point on. Only the region's
      * geometry is checked, so a zoom aimed at one cell then a tap named off
      * the full screen still passes if it falls inside the magnified area.
@@ -847,11 +847,11 @@ class ScreenController(
             }
             // Rulers on the top and left edges only, never inside a cell.
             // A label at a cell's centre sat on whatever that cell held, and
-            // on WeChat Moments the 「··」 button is exactly at column H's
+            // on WeChat Moments the '··' button is exactly at column H's
             // centre — measured 2026-10-20, the H7 label covered it entirely,
             // so the one target of the task was invisible in the image the
             // brain aimed from. Not the right or bottom edge either: that is
-            // where 「··」 and the send button live.
+            // where '··' and the send button live.
             val top = textSize * 1.25f
             for (col in 0 until GRID_COLS) {
                 val l = ('A' + col).toString()
@@ -973,7 +973,7 @@ class ScreenController(
      * forced it — its tree is perfectly obtainable, but the accessibility
      * connection sometimes goes stale and the same screen that dumped fine ten
      * minutes ago starts handing back nothing at all. No tool call repairs
-     * that; a human toggling Andee off and on in 设置 → 无障碍 does, in about
+     * that; a human toggling Andee off and on in Settings → accessibility does, in about
      * three seconds. The brain cannot ask for that unless it knows the app was
      * supposed to work.
      *
@@ -1297,7 +1297,7 @@ class ScreenController(
     fun screenFingerprint(): JSONObject {
         val root = runCatching { activeRoot() }.getOrNull()
             // No active window at all — a full-screen video surface is the
-            // usual cause (WeChat's 视频号 playback page answers null here,
+            // usual cause (WeChat's WeChat Channels playback page answers null here,
             // measured 2026-10-20). Marked blind for the same reason a
             // withheld root is: an empty answer is identical before and after
             // any gesture, so the tree cannot say whether one landed and the
@@ -1522,7 +1522,7 @@ class ScreenController(
             before.optInt("sig") != after.optInt("sig")
         // Was there ever a second opinion? "No change" is an answer only when
         // something compared the screen; a before-frame whose after-frame never
-        // arrived is not. Measured 2026-10-20: on WeChat 视频号 the after-frame
+        // arrived is not. Measured 2026-10-20: on WeChat WeChat Channels the after-frame
         // was silently lost, `changed` stayed false, and the response told the
         // brain "the screen did NOT react" about a page it had just turned —
         // the single most expensive lie this tool can tell.
@@ -1643,7 +1643,7 @@ class ScreenController(
             // comparison ran. A blind tree with no before-frame is the one case
             // where it does not — and there, "the screen did NOT react" reads
             // as a measurement that was never taken. Measured 2026-10-20 on a
-            // 视频号 page: that sentence, repeated while the page was in fact
+            // WeChat Channels page: that sentence, repeated while the page was in fact
             // changing under every tap, sent the brain into re-aim → stuck-loop
             // guard → back out → re-enter, which is what the user watched.
             val told = !before.optBoolean("blind") || pixelTold
@@ -1870,30 +1870,30 @@ class ScreenController(
      * [typeViaAdbKeyboard].
      */
     fun typeText(text: String, id: String?, secret: Boolean): JSONObject {
-        // ── 输入通道:无障碍输入法优先,ADBKeyboard 兜底(2026-09-30) ──
+        // ── input channel: accessibility IME first, ADBKeyboard fallback(2026-09-30) ──
         //
-        // 首选 [A11yIme]:API 33 起,声明了 flagInputMethodEditor 的无障碍
-        // 服务自己就能 commitText 到焦点编辑器 —— 和键盘同一条 InputConnection,
-        // 但**不是**一个输入法:不用装、不用启用、不用切,用户自己的键盘
-        // 全程还在。它排第一位是因为下面那条路要求用户有一台电脑(见
-        // [typeViaA11yIme])。兜底仍是 ADBKeyboard,给 API 30–32 和
-        // 这条路够不着的编辑器 —— 打字静默失效这件事这个项目已经付过
-        // 两次代价了。
+        // preferred [A11yIme]: API 33 up, declares flagInputMethodEditor accessibility
+        // the service itself can commitText to the focus editor —— the same as the keyboard InputConnection,
+        // but**not**an input method: no installing, no enabling, no switching, the user's own keyboard
+        // stays up the whole time.it is first because the other route requires the user to have a computer(see
+        // [typeViaA11yIme]). The fallback is still ADBKeyboard, give API 30–32 and
+        // editors this route cannot reach —— the project has already paid for the silent-typing failure
+        // twice the cost..
         //
-        // 以下是 ADBKeyboard 那条路的原始记录(2026-09-20 定版),照旧有效:
+        // the following are ADBKeyboard the original record of that route(2026-09-20 final), still applies:
         //
-        // 实测依据(当天 bolt.new 两设备全量对比):
-        //   - SET_TEXT/剪贴板PASTE:Radix 表单串字段,CodeMirror 全灭,
-        //     MIUI 上 setPrimaryClip 还会静默丢弃(粘进旧内容);
-        //   - ADBKeyboard(IME, commitText 正统通道):bolt 注册表单
-        //     三字段全对,连 CodeMirror 都进。
-        // 设备 ADBKeyboard 为常驻默认 IME。**这句原来写的是「产品决策:平板/
-        // 手机是 Andee 本体,无真人键盘场景」—— 那个前提已经不成立**:卡片上
-        // 有了 ⌨ 文本输入,真人要打字了。现在由 ui/ImeSwitch 在用户打字期间
-        // 临时换成真键盘、发完换回来;这里唯一的要求没变 —— 轮到大脑打字时
-        // ADBKeyboard 必须是当前输入法,否则 ADB_INPUT_TEXT 发出去没人接。
-        // 通道:检查焦点 → ADB_CLEAR_TEXT 清残留
-        // → ADB_INPUT_TEXT → 双路读回验证。失败如实报错,无多通道瀑布。
+        // measured evidence(that day bolt.new full comparison of both devices):
+        //   - SET_TEXT/clipboardPASTE: Radix form fields, CodeMirror blank out,
+        //     MIUI on setPrimaryClip also silently discards(paste into the old content);
+        //   - ADBKeyboard(IME, commitText canonical channel): bolt signup form
+        //     all three fields match, even CodeMirror all go in.
+        // device ADBKeyboard as the permanent default IME.**this line used to read'product decision: tablet/
+        // a phone is Andee On-device, no real-keyboard scenario'—— that premise no longer holds**: on the card
+        // there is ⌨ text input, A real person is about to type. Now ui/ImeSwitch while the user is typing
+        // temporarily switch to the real keyboard, switch back after sending; the only requirement here is unchanged —— when it is the brain's turn to type
+        // ADBKeyboard must be the current input method, otherwise ADB_INPUT_TEXT sent with nobody receiving it.
+        // channel: check focus → ADB_CLEAR_TEXT Clear leftovers
+        // → ADB_INPUT_TEXT → two-way read-back verification.failure reports the error honestly, no multi-channel waterfall.
         val root = service.rootInActiveWindow ?: throw IllegalStateException("no active window")
         val focused = try {
             root.findFocus(AccessibilityNodeInfo.FOCUS_INPUT)
@@ -1926,17 +1926,17 @@ class ScreenController(
     }
 
     /**
-     * 首选通道:本服务自己的无障碍输入法([A11yIme])。
+     * preferred channel: this service's own accessibility IME([A11yIme]).
      *
-     * 返回 null = **这条路不通、且一个字都没打**(API < 33、当前没有
-     * 焦点编辑器、自绘编辑器拿不到 InputConnection),交给
-     * [typeViaAdbKeyboard] 兜底。返回非 null = 已经 commit 过,成功与
-     * 否都在这里定论,绝不能再兜底一次 —— 那是真正会输两遍的情况。
+     * back null = **this route fails and not a single character is typed**(API < 33, none currently
+     * focus editors and custom-drawn editors cannot get it InputConnection), hand it to
+     * [typeViaAdbKeyboard] Fallback. Return non- null = already commit over, success and
+     * are all settled here, must never fall back again —— that is the case that really types twice.
      *
-     * 它排在 ADBKeyboard 前面的理由不是快(虽然省掉了借还输入法的
-     * ~0.75s),是**用户不需要电脑**:ADB 通道要侧载一个第三方 APK,
-     * 还要 `adb shell pm grant … WRITE_SECURE_SETTINGS` 才能改默认输入
-     * 法。没有电脑的用户在那条路上一个字也打不了。
+     * it ranks ADBKeyboard the earlier reason was not speed(although it saves the borrow-and-return of the IME
+     * ~0.75s), is**the user needs no computer**: ADB the channel needs a third party sideloaded APK,
+     * still needs to `adb shell pm grant … WRITE_SECURE_SETTINGS` before you can change the default input
+     * method. Users without a computer can't type a single word on that route.
      */
     private fun typeViaA11yIme(text: String, secret: Boolean): JSONObject? {
         val got = A11yIme.replace(service, text) ?: return null
@@ -1966,43 +1966,43 @@ class ScreenController(
     }
 
     /**
-     * 通过 ADBKeyboard 的 IME 广播输入 [text]。
+     * through ADBKeyboard  of IME broadcast input [text].
      *
-     * ADBKeyboard 是激活的输入法,收到 ADB_INPUT_TEXT 后走
-     * InputConnection.commitText()——与真人敲键盘同一条路径,目标
-     * 应用无法拒绝(拒绝即拒绝一切键盘输入)。
+     * ADBKeyboard is the active input method, received ADB_INPUT_TEXT taken after
+     * InputConnection.commitText()——the same path as a real person typing, target
+     * the app cannot refuse('deny' means denying all keyboard input).
      *
-     * 语义:广播是【追加】,故先发 ADB_CLEAR_TEXT 清残留(之前失败
-     * 尝试/自动填充),再输入,最后双路读回(焦点框优先,全树兜底
-     * ——WebView 焦点节点藏文本时树里能找到)。自绘编辑器
-     * (CodeMirror)两路都可能读不到,那是 a11y 假阴性,错误信息里
-     * 提示大脑以截图为准。
+     * semantics: the broadcast is [append], so send first ADB_CLEAR_TEXT Clear leftovers(failed earlier
+     * try/autofill), type again, final two-way read-back(focus frame first, whole-tree fallback
+     * ——WebView when a focus node hides text, the tree can still find it). custom-drawn editors
+     * (CodeMirror)both routes may fail to read it, that is a11y false negative, in the error message
+     * tell the brain to treat the screenshot as authoritative.
      *
-     * action 【不带包名前缀】。ADBKeyboard 在 AdbIME.onCreate 里
-     * registerReceiver 的 filter 就是裸字符串 ADB_INPUT_TEXT(见设备
-     * `dumpsys activity broadcasts`),写成
-     * com.android.adbkeyboard.ADB_INPUT_TEXT 匹配不上任何 filter,加上
-     * setPackage 钉死收件人,广播就发出去没人接——静默失败,和被系统
-     * 拦截长得一模一样。这正是「MIUI 拦 app 跨进程广播」那个结论的
-     * 由来:电脑侧 `am broadcast -a ADB_INPUT_TEXT` 用的是对的名字所以
-     * 通,设备侧用错名字所以不通,看上去就像身份问题。
+     * action [without the package-name prefix].ADBKeyboard in AdbIME.onCreate in
+     * registerReceiver  of filter is just a bare string ADB_INPUT_TEXT(see device
+     * `dumpsys activity broadcasts`), write it as
+     * com.android.adbkeyboard.ADB_INPUT_TEXT matches nothing filter, plus
+     * setPackage pin down the recipient, the broadcast just goes out with nobody receiving it——silent failure, and by the system
+     * intercept looks exactly the same. This is exactly theMIUI block app the cross-process broadcast' conclusion
+     * origin: computer side `am broadcast -a ADB_INPUT_TEXT` uses the right name, so
+     * through, the device side uses the wrong name, so it cannot connect, looks like an identity problem.
      *
-     * [secret] 为真时(保险箱密码),读回照常做——内部比对,结果照实
-     * 报——但**成功不回声、失败不带片段**。回声本来是给大脑确认输入
-     * 成功用的,而密码回声等于把明文顺着 WebSocket 送回远端模型,
-     * 「只填不给」这条边界就是在这里成立或失效的。
+     * [secret] when true(vault password), read-back proceeds as normal——internal comparison, report results faithfully
+     * report——but**success without echo, failure without a snippet**. The echo was originally for confirming input to the brain
+     * the one used for success, and echoing the password means sending the plaintext along WebSocket send back to the remote model,
+     * This is where the 'fill in but never give' boundary holds or fails.
      */
     private fun typeViaAdbKeyboard(text: String, secret: Boolean = false): JSONObject {
-        // ── 键盘是借的,不是占的 ──
+        // ── the keyboard is borrowed, not taken up by ──
         //
-        // 设备的输入法平时是**用户自己的**那个(它能在任何 App 里打字),
-        // ADBKeyboard 只在这一次调用期间被借过来。所以:先借 → 打字 → 立刻还。
-        // 想要这条成立,`text` 的广播必须落在**已经 bind 上**的 ADBKeyboard 上,
-        // 而"选中"和"绑定"不是同一件事 —— 这就是 ImeSwitch.lendToBrain 里
-        // 那 350ms 的由来(实测 bind 上界 ~400ms,框架不对外暴露这个状态)。
+        // the device's input method is normally**the user's own**that(it can, on any App type in),
+        // ADBKeyboard borrowed only for the duration of this call.so: borrow first → typing → give it straight back.
+        // for this to hold,`text` the broadcast must land in**already bind on** of ADBKeyboard on,
+        // and"selected"and"bind"not the same thing —— this is ImeSwitch.lendToBrain in
+        // that 350ms the origin of(measured bind upper bound ~400ms, the framework does not expose this state).
         //
-        // 借不到就是**响亮的失败**,不能假装打了字:广播发出去没人接,读回
-        // 只会得到"字段还是空的",而那句错误信息会去怪目标 App 藏了文本。
+        // if you can't borrow one, that's**a loud failure**, cannot pretend text was typed: broadcast goes out with nobody receiving it, read back
+        // only gets"the field is still empty", and that error message blames the target App hid text.
         val giveBackTo = net.kuafuai.andee.ui.ImeSwitch.lendToBrain(service)
         try {
             if (net.kuafuai.andee.ui.ImeSwitch.current(service) != net.kuafuai.andee.ui.ImeSwitch.BRAIN_IME) {
@@ -2052,10 +2052,10 @@ class ScreenController(
                 .putExtra("msg", text)
                 .setPackage(ADB_KEYBOARD_PKG)
         )
-        // 轮询而不是睡一个固定值:广播是异步的,commitText 之后 WebView
-        // 还要把新值回抛给无障碍树。实测 400ms 大多数时候够,偶尔不够,
-        // 而读早了报出来的是「没输进去」——一条会让大脑重发、于是真的
-        // 输两遍的假错误。
+        // poll instead of sleeping a fixed amount: the broadcast is asynchronous, commitText after WebView
+        // and must throw the new value back to the accessibility tree. Measured 400ms enough most of the time, occasionally not enough,
+        // reading too early reports ''it didn't go in'——one that makes the brain resend, and really
+        // a fake error of typing twice.
         var afterFocused = ""
         var afterTree = ""
         val deadline = SystemClock.uptimeMillis() + READBACK_BUDGET_MS
@@ -2859,7 +2859,7 @@ class ScreenController(
      * accessibility service enabled and a freshly started WeChat, while
      * Settings dumped 89 nodes. With MIUI's `MiuiEnhanceTBService` enabled
      * alongside us the same screen dumped 219 nodes, and removing it blanked the
-     * root again — reproducible both ways, and the real "有时候可以有时候不行".
+     * root again — reproducible both ways, and the real "sometimes works, sometimes not".
      * So it is the app refusing every client, not our
      * connection going stale — and the two must not share a hint, because the
      * stale one sends the user to toggle Andee, which cannot help here.
@@ -2995,7 +2995,7 @@ class ScreenController(
      *
      *   e17|LinearLayout||[500,570]
      *     e18*|ImageView|#avatar|[62,523]
-     *     e19*|TextView|好友3|[181,509]
+     *     e19*|TextView|friend3|[181,509]
      *     e24*|ImageView|#comment_btn|[950,621]
      *
      * `*` marks clickable. The bracket pair is the element's center in
@@ -3008,10 +3008,10 @@ class ScreenController(
      *
      * This list used to be sorted text-first, then clickable, then
      * top-to-bottom, so that a context-limit truncation ate the junk tail.
-     * On any feed that ordering is fatal. A 朋友圈 page is five posts of
+     * On any feed that ordering is fatal. A WeChat Moments page is five posts of
      * {avatar, name, body, photos, time, ⋯}; sorting scattered each post
      * across the list and stacked twenty label-less `ImageView` lines at the
-     * bottom, identical to one another. "Like 好友3's post" was then not
+     * bottom, identical to one another. "Like friend3's post" was then not
      * merely hard but *unanswerable* from the list — the comment button that
      * belongs to that post is indistinguishable from the other four, so the
      * model can only guess, which is precisely the mis-tap [GroundingLog] was
@@ -3156,7 +3156,7 @@ class ScreenController(
      * What to print in the label column: the text, else the description, else
      * the tail of the view id with a `#` on it.
      *
-     * The id fallback is the fix for a whole class of blind spot. 朋友圈's
+     * The id fallback is the fix for a whole class of blind spot. WeChat Moments's
      * `⋯`, the avatars and the photos are all `ImageView`s with neither text
      * nor description, so the column came out empty and the model was told
      * (by HARD RULE 2, in so many words) to tap them by number without
@@ -3177,7 +3177,7 @@ class ScreenController(
     /**
      * The outline is one element per line with `|` between fields, so a label
      * containing either character tears the row in half — and a multi-line
-     * TextView (a 朋友圈 body, a long notification) contains newlines as a
+     * TextView (a WeChat Moments body, a long notification) contains newlines as a
      * matter of course. Neither was escaped before; the rows it produced were
      * unparseable and the model had to guess where the next element started.
      */
@@ -3230,7 +3230,7 @@ class ScreenController(
     /**
      * Wall-clock cap on one tree walk. Every `getChild` is a binder round trip
      * answered on the *target app's* UI thread, so an app busy animating
-     * answers each one late — 红果's 福利 page measured 551 nodes in 135 s,
+     * answers each one late — Hongguo's benefits page measured 551 nodes in 135 s,
      * ~245 ms a node — and a walk with no cap outlives the brain's tool deadline while
      * still holding the app's attention. A cut walk reports itself
      * (`walk_cut`) so the caller can say the list is partial, not absent.
@@ -3672,8 +3672,8 @@ class ScreenController(
         }
 
         /**
-         * ADBKeyboard 的广播接口。action 是裸字符串,没有包名前缀 ——
-         * 加了前缀就匹配不上它注册的 filter,广播静默消失。
+         * ADBKeyboard broadcast interface.action is just a bare string, no package-name prefix ——
+         * adding a prefix means it won't match what it registered filter, the broadcast vanishes silently.
          */
         private const val ADB_KEYBOARD_PKG = "com.android.adbkeyboard"
         private const val ADB_INPUT_TEXT = "ADB_INPUT_TEXT"
@@ -3785,7 +3785,7 @@ class ScreenController(
          *
          * Shorter than [ZOOM_STALE_MS] on purpose: a menu can be dismissed and
          * another one opened in the same place, and the zoom that proved this
-         * one said "评论" is not evidence about the next. A minute is long
+         * one said "Comments" is not evidence about the next. A minute is long
          * enough to look, read and tap; long enough to outlive the popup it
          * describes is the failure this is meant to stop.
          */
@@ -3830,7 +3830,7 @@ class ScreenController(
          * aimed at, so a deliberate "20 px left of where I last aimed" landed in
          * the same bucket as the miss it was correcting — and the correction
          * that is supposed to converge got refused as a loop. Measured
-         * 2026-10-20 in WeChat's 视频号 点赞 list: a 50 px-tall 「谢谢」 button
+         * 2026-10-20 in WeChat's WeChat Channels like list: a 50 px-tall 'Thank you' button
          * cannot contain two 120 px buckets, so the guard fired 10 times in one
          * task while the brain was doing exactly the right thing. 40 px keeps
          * "same spot" meaning the same spot, and still catches a jittered

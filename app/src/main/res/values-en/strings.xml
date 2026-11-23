@@ -145,8 +145,8 @@
            Chinese user says — never an oversight.
 
            **A default whose value can reach the screen belongs to kind 1, not
-           kind 2**, even though it also travels inside a prompt. `会议记录`,
-           `通话` and `AI 界面` used to be Kotlin literals in `MeetingRecorder`,
+           kind 2**, even though it also travels inside a prompt. `Meeting`,
+           `Call` and `AI UI` used to be Kotlin literals in `MeetingRecorder`,
            `BodyCoreService` and `ToolSchemas`, on the argument that the brain
            had to be handed the same title the page displayed. They are
            `meeting_default_title`, `call_default_scene` and
@@ -428,7 +428,7 @@
     <string name="tree_helper_enabled_row">(This app was hiding its screen; turned on the system\'s accessibility enhance service so it shows it again)</string>
     <string name="settings_scenes_browse">Manage scenes</string>
 
-    <!-- 脚本: recorded flows, the scenes' hands. Same card as scenes, second tab. See ui/ScenesUi.kt. -->
+    <!-- Flows: recorded flows, the scenes' hands. Same card as scenes, second tab. See ui/ScenesUi.kt. -->
     <string name="flows_tab">Flows</string>
     <string name="flows_subtitle">The hands: recorded runs that move by themselves</string>
     <string name="flows_empty">No recorded flows yet.\nSay “remember this routine” —\nrun it once with me, and it will do it itself next time.</string>
@@ -449,7 +449,7 @@
     <string name="flows_step_anchor">%1$s · %2$s</string>
     <!-- The pill under the status bar while a flow is being recorded; see ui/RecordChipUi. -->
     <string name="flows_recording_chip">● Recording · %1$d steps</string>
-    <!-- Spoken after a flow run from the card's 运行 button. -->
+    <!-- Spoken after a flow run from the card's Run button. -->
     <string name="flows_ui_run_done">“%1$s” is done — every step landed.</string>
     <string name="flows_ui_run_handoff">“%1$s” handed step %2$d to me. I will finish it and carry on.</string>
     <string name="flows_ui_run_handoff_giveup">“%1$s” handed me step %2$d again and I cannot do it right now. The flow is waiting there — what would you like me to do?</string>

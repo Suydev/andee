@@ -21,7 +21,7 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * 情景 + 脚本: what the assistant has learned with this person — ways of
+ * Scenes + Flows: what the assistant has learned with this person — ways of
  * working (scenes) and ways of moving (flows). One card, two tabs: the head
  * and the hands, side by side on purpose, because a flow is what a scene's
  * routine looks like once it can move on its own.
@@ -39,7 +39,7 @@ import java.util.Locale
  * row are drawn by the service's listener whichever of them did it. Neither
  * starts a model call: the scene rides in the system prompt from the next
  * thing the person says. Running a flow is different — it *is* the act, so
- * the 运行 button hands the flow to the service ([onRunFlow]) and the card
+ * the Run button hands the flow to the service ([onRunFlow]) and the card
  * folds out of the way.
  *
  * Same window shape as [ArtifactsUi]: focusable, hidden from accessibility,
@@ -60,7 +60,7 @@ class ScenesUi(
     /** 0 = scenes, 1 = flows, 2 = app playbooks. */
     private var tab = 0
 
-    /** The scene or flow whose 删除 has been tapped once and now reads 确认删除. */
+    /** The scene or flow whose Delete has been tapped once and now reads Confirm delete. */
     private var arming: String? = null
     private var armingFlow: String? = null
     private var armingPlaybook: String? = null
@@ -471,7 +471,7 @@ class ScenesUi(
         val meta = buildList {
             add(lctx.getString(R.string.scenes_meta_uses, s.uses))
             if (s.triggerApps.isNotEmpty()) {
-                add(lctx.getString(R.string.scenes_meta_auto, s.triggerApps.joinToString("、") { appLabel(it) }))
+                add(lctx.getString(R.string.scenes_meta_auto, s.triggerApps.joinToString("\u3001") { appLabel(it) }))
             }
         }.joinToString(" · ")
         row.addView(TextView(context).apply {

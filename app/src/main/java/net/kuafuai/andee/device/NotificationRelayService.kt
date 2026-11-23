@@ -37,9 +37,9 @@ import org.json.JSONObject
  *
  * The gauntlet, in order, and each stage exists because of a different cost:
  *
- *  1. **[inScope]** — the user's setting. Three tiers; 关 means the ring buffer
+ *  1. **[inScope]** — the user's setting. Three tiers; Off means the ring buffer
  *     and nothing else.
- *  2. **[isStructural]** — only in the 全部 tier. Progress bars and group
+ *  2. **[isStructural]** — only in the Everything tier. Progress bars and group
  *     summaries are a status display, not an event.
  *  3. **[offerForTriage]** — a [SETTLE_MS] debounce per package. A group chat
  *     posts one notification per message; the last one of a burst is the only
@@ -124,10 +124,10 @@ class NotificationRelayService : NotificationListenerService() {
      *
      *  - **WeChat/QQ do not set `CATEGORY_CALL`** (measured on real device,
      *    2026-09-22: voice call notif came in with `cat=null`). Their voice
-     *    call notif carries a distinctive text — `语音通话中` / `视频通话
-     *    中` / `来电` — and they are the *only* WeChat/QQ notifications with
-     *    that text; ordinary chat messages read "13个联系人发来66条消息" or
-     *    "张三: 在吗", never those exact strings. So text pattern is a safe
+     *    call notif carries a distinctive text — `On a voice call` / `video call
+     *    in` / `Incoming call` — and they are the *only* WeChat/QQ notifications with
+     *    that text; ordinary chat messages read "13 contacts send 66 messages" or
+     *    "Zhang San: Are you there?", never those exact strings. So text pattern is a safe
      *    fallback here.
      *
      * The text patterns are Chinese-only on purpose: this fallback exists
@@ -149,14 +149,14 @@ class NotificationRelayService : NotificationListenerService() {
 
     /** Apps whose call notifications skip CATEGORY_CALL, so we fall back on text. */
     private val CN_VOICE_APPS = setOf(
-        "com.tencent.mm",       // 微信
+        "com.tencent.mm",       // WeChat
         "com.tencent.mobileqq", // QQ
     )
 
     /**
      * Text patterns that identify a voice/video call notification inside
      * [CN_VOICE_APPS]. Ordered by specificity; the more specific patterns
-     * (e.g. "语音通话中") are unambiguous, "来电" is broad but only checked
+     * (e.g. "On a voice call") are unambiguous, "Incoming call" is broad but only checked
      * against apps in [CN_VOICE_APPS].
      *
      * **Never route these through `AppLocale`.** They are compared against text
@@ -199,13 +199,13 @@ class NotificationRelayService : NotificationListenerService() {
         }
         if (extras == null) return
         if (title.isEmpty() && text.isEmpty()) return
-        // Notification.text can be "隋小波: 在吗" (one message) or
-        // "[12条]隋小波: 在吗" (a stack: N unread, latest shown). The brain
+        // Notification.text can be "Sui Xiaobo: Are you there?" (one message) or
+        // "[12 items]Sui Xiaobo: Are you there?" (a stack: N unread, latest shown). The brain
         // needs the difference — "reply to one message" vs "a conversation
         // with 12 unread happened while you were away" — so it is parsed here
-        // rather than leaving a "[12条]" blob for the LLM to guess at.
+        // rather than leaving a "[12 items]" blob for the LLM to guess at.
         //
-        // The "条" in the pattern is the sending app's word, not ours. Do not
+        // The " items" in the pattern is the sending app's word, not ours. Do not
         // translate it — see [CN_CALL_KEYWORDS].
         var count = 1
         var headline = text
@@ -251,7 +251,7 @@ class NotificationRelayService : NotificationListenerService() {
 
     /**
      * Notifications that are a *status display* rather than an event, filtered
-     * out of the 全部 tier.
+     * out of the Everything tier.
      *
      * Not taste, and not a blocklist of apps: these are the ones the platform
      * itself marks as not-an-event. An ongoing notification is a thing that is
@@ -265,7 +265,7 @@ class NotificationRelayService : NotificationListenerService() {
      * already handle between them. The brain reading out "someone is calling
      * you" over the top of the ringtone helps nobody.
      *
-     * The 聊天类 tier does not consult this — [PUSH_PKGS] is already the
+     * The Chat apps tier does not consult this — [PUSH_PKGS] is already the
      * narrower statement, and a chat app that marks a message ongoing (some do,
      * for a pinned conversation) should still get through.
      */
@@ -419,7 +419,7 @@ class NotificationRelayService : NotificationListenerService() {
     private fun showSignboardFor(n: JSONObject) {
         // The fallback, not the default anymore: a quiet signboard for the
         // notifications the device could form no opinion about. Only a tap on
-        // 看看 forwards to the brain — on this path the user is still the spam
+        // Take a look forwards to the brain — on this path the user is still the spam
         // filter, which is what the whole service used to be.
         //
         // The labels come from [lctx] because this is a Service: per-app locale
@@ -476,23 +476,23 @@ class NotificationRelayService : NotificationListenerService() {
     }
 
     /**
-     * The 聊天类 tier: apps a *person* writes to the user from.
+     * The Chat apps tier: apps a *person* writes to the user from.
      *
      * This is the default scope, and the reason it is a hardcoded list rather
      * than a per-app screen the user fills in is that the question it answers is
      * "which apps carry a human on the other end", which does not change when
-     * they install something. The 全部 tier is there for everyone who disagrees.
+     * they install something. The Everything tier is there for everyone who disagrees.
      *
      * [isStructural] is deliberately *not* applied to this tier — see its KDoc.
      */
     private val PUSH_PKGS = setOf(
-        "com.tencent.mm",            // 微信
+        "com.tencent.mm",            // WeChat
         "com.tencent.mobileqq",      // QQ
-        "com.alibaba.android.rimet", // 钉钉
-        "com.ss.android.lark",       // 飞书
+        "com.alibaba.android.rimet", // DingTalk
+        "com.ss.android.lark",       // Lark
         "com.whatsapp",
         "com.immomo.momo", "com.sdu.didi.psnger",
-        "com.android.mms", "com.android.messaging", // 短信(含验证码)
+        "com.android.mms", "com.android.messaging", // SMS(incl. verification codes)
         "com.gmail", "com.sina.weibo",
     )
 
@@ -615,7 +615,7 @@ class NotificationRelayService : NotificationListenerService() {
 
         /**
          * `Notification.category` values that mean "this is a status display",
-         * dropped from the 全部 tier by [isStructural].
+         * dropped from the Everything tier by [isStructural].
          *
          * `CATEGORY_CALL` is in here for a different reason than the rest: a
          * ringing phone genuinely is an event, and it is one [CallState] and the

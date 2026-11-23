@@ -51,7 +51,7 @@ import java.util.concurrent.TimeUnit
  * `AppLocale`. *Everything else* in this file is a tool result: it is read by
  * the model, it is often a sentence telling the model off, and it is English
  * like the rest of the model-facing set (see the top of `res/values-en/`
- * `strings.xml`). A `设置 → 保险箱` left inside one of those English sentences
+ * `strings.xml`). A `Settings → Vault` left inside one of those English sentences
  * is not a leak and must not be translated: it is a literal path on the screen
  * that the model should repeat to the user verbatim.
  */
@@ -158,7 +158,7 @@ class CommandDispatcher(
     private val sayAloud: (text: String, listen: Boolean) -> Boolean = { _, _ -> false },
 
     /**
-     * Run a flow the way the 情景/脚本 card's 运行 button does — including
+     * Run a flow the way the Scenes/Flows card's Run button does — including
      * its "a stop wakes the brain" hand-off. Wired to
      * `BodyCoreService.runFlowFromUi`; exposed as `flow.debug_card_run` on the
      * local 9008 debug port so that path can be exercised from a cable. It is
@@ -266,13 +266,13 @@ class CommandDispatcher(
      * The model cannot be relied on to keep a page id in mind across the two
      * calls that make up a revision (`get_page` to read it, `show_html` to send
      * the new bytes), and when it forgets, the user gets the bug this exists to
-     * kill: 改一版就多一个产物. So the two places that *know* the answer say so
+     * kill: every revision adds another artifact. So the two places that *know* the answer say so
      * here, and `show_html` picks it up without being told:
      *
      *  * `ui.get_page` sets it — reading a page back has exactly one purpose,
      *    and the `show_html` that follows in the same turn is that revision;
-     *  * the service sets it when a turn starts from the 产物 panel's
-     *    继续修改, where the user has already named the artifact by tapping it.
+     *  * the service sets it when a turn starts from the Artifacts panel's
+     *    Revise, where the user has already named the artifact by tapping it.
      *
      * An explicit `revise` argument on `show_html` outranks this, so a model
      * that does keep the id can be precise. [beginTurn] clears it, which is what
@@ -283,7 +283,7 @@ class CommandDispatcher(
 
     /**
      * A user turn is starting. [groupId] is the artifact it is about when the
-     * turn began from 继续修改, else null.
+     * turn began from Revise, else null.
      *
      * Called from `BodyCoreService.submitUserTurn` — the one place every turn
      * begins, whichever way the user spoke — so the previous turn's target can
@@ -339,7 +339,7 @@ class CommandDispatcher(
     val gearShelf: net.kuafuai.andee.device.AndroidGear by lazy { net.kuafuai.andee.device.AndroidGear(appContext) }
 
     /**
-     * The `launch` step of a flow started from the 情景/脚本 card needs the
+     * The `launch` step of a flow started from the Scenes/Flows card needs the
      * same app-opening path the brain's `launch_app` uses, but that card runs
      * in [BodyCoreService] without going through [dispatch]. One door for
      * both, so a launch step behaves identically however the run was started.
@@ -969,7 +969,7 @@ class CommandDispatcher(
                     // A page is already up: put the new one *in its place*.
                     // This used to be refused with "ask the user to dismiss it
                     // first", and the model said exactly that — so the most
-                    // natural request there is, "改一下这页", ended with the user
+                    // natural request there is, "revise this page", ended with the user
                     // being told to close the page by hand. `HtmlActivity` still
                     // keeps ONE page (see its `pageUp`); what that forbids is a
                     // second instance over the shared static file, not a second
@@ -1057,7 +1057,7 @@ class CommandDispatcher(
             // ---- ui.* : the pages it made, read back -----------------------
             //
             // The read half of `ui.show_html`. The pages stay on the device
-            // after they are drawn (the 产物 panel is the user's own view of
+            // after they are drawn (the Artifacts panel is the user's own view of
             // them) but nothing puts that record into the model's context, so
             // without these a page built yesterday does not exist to the brain
             // that built it. Reading, not drawing: no fold, no dock, and
@@ -1255,7 +1255,7 @@ class CommandDispatcher(
                         .put("title", topic.title)
                         .put(
                             "note",
-                            "That topic exists — 「${topic.title}」 — but its text could not be read, " +
+                            "That topic exists — '${topic.title}' — but its text could not be read, " +
                                 "so the details are gone. Say so; do not reconstruct it from the summary " +
                                 "or from impression.",
                         )
@@ -2411,9 +2411,9 @@ class CommandDispatcher(
     /**
      * The name of a secret in the user's language, for the fill subtitle.
      *
-     * 「正在填入「招行」的密码…」 has to be true, and with a card in the same
+     * is filling in the password for 'China Merchants Bank'…' has to be true, and with a card in the same
      * entry the same call can be typing a CVV. Unknown names fall through to
-     * the wire name rather than to 密码: a raw `card_expiry` on screen says
+     * the wire name rather than to password: a raw `card_expiry` on screen says
      * something is out of step, where a confident wrong word does not.
      */
     private fun secretLabel(field: String): String {

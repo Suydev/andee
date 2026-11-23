@@ -14,7 +14,7 @@ import java.io.File
 /**
  * Back to a fresh install, on purpose.
  *
- * This is the whole of "恢复出厂设置": one list, walked in order, each entry
+ * This is the whole of "Factory reset": one list, walked in order, each entry
  * carrying both the deed and the line the user reads before agreeing to it.
  * The two live together on purpose — a confirmation screen that enumerates by
  * hand is a confirmation screen that goes stale, and a reset that deletes

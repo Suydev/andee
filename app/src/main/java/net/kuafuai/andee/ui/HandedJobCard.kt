@@ -14,7 +14,7 @@ import net.kuafuai.andee.peer.RemoteProgressText
 /**
  * A job Andee handed to the computer's agent, as a card hanging under the words that announce it — one piece with the reply,
  * not a grey line of its own above it. Live while the worker runs (three lines: where it is, its plan, what it is doing, and the
- * breathing dot), the task's state once it has reported, and the way into its files: the same facts 在办 shows, drawn in the
+ * breathing dot), the task's state once it has reported, and the way into its files: the same facts In Progress shows, drawn in the
  * conversation, from the same sources.
  *
  * [refresh] rewrites the lines in place; nothing here is rebuilt for a progress update.

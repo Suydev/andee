@@ -291,7 +291,7 @@ class TextInputActivity : Activity() {
         // The keyboard is most of a phone screen, and it arrives **over** this
         // window. A translucent window is never resized for the IME — measured:
         // with `adjustResize` set the row still sat at the window's bottom edge
-        // with 搜狗's keys drawn on top of it — so the inset has to be applied by
+        // with Sogou's keys drawn on top of it — so the inset has to be applied by
         // hand. Which needs the decor to stop fitting system windows first: with
         // it fitting, the IME inset is consumed before any listener sees it
         // (measured: it arrived as 0).
@@ -314,7 +314,7 @@ class TextInputActivity : Activity() {
                 trackTop = false
                 return@setOnApplyWindowInsetsListener insets
             } else if (imeShown && photos.isEmpty()) {
-                // The keyboard is on its way out, and so is this field:收起键盘
+                // The keyboard is on its way out, and so is this field: dismiss the keyboard
                 // means the user is done typing, and a strip left behind on an
                 // otherwise empty screen is a thing to dismiss twice.
                 //
@@ -326,7 +326,7 @@ class TextInputActivity : Activity() {
                 //
                 // Not with photos on the strip, though: those took a trip to
                 // another app to collect, and losing them to a dropped keyboard
-                // is worse than a strip that waits at the bottom for 发送.
+                // is worse than a strip that waits at the bottom for send.
                 trackTop = false
                 if (!sliding) scheduleCloseWhenGone()
                 return@setOnApplyWindowInsetsListener insets
@@ -351,7 +351,7 @@ class TextInputActivity : Activity() {
             // end there instead of covering us. Posted, because the row has no
             // position until this pass has laid it out — and sent again on every
             // inset change, which is what keeps the two in step as the keyboard
-            // slides up and as 搜狗's toolbar row comes and goes.
+            // slides up and as Sogou's toolbar row comes and goes.
             trackTop = true
             root.post { reportTop() }
             insets

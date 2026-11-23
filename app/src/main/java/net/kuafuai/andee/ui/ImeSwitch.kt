@@ -26,7 +26,7 @@ import android.view.inputmethod.InputMethodManager
  * must be *the active IME* for the `commitText` to land. ADBKeyboard is
  * headless — no keyboard UI at all — so while it is the default, a human cannot
  * type a single character in any app on the tablet. The original product
- * decision said that was fine ("平板/手机是 Andee 本体, 无真人键盘场景" — see
+ * decision said that was fine ("tablet/a phone is Andee On-device, no real-keyboard scenario" — see
  * `ScreenController`), and it was, right up until the card grew a ⌨ button and
  * the phone became a phone again.
  *
@@ -133,7 +133,7 @@ object ImeSwitch {
      * HONOR**: measured on MagicOS / Android 15 with two keyboards enabled —
      * Sogou and ADBKeyboard, `settings get secure enabled_input_methods` showing
      * both — this app read back nothing, so [typable] came out empty and the
-     * ball's double-tap answered "这台设备上只有 ADBKeyboard" to a phone that had
+     * ball's double-tap answered "on this device there is only ADBKeyboard" to a phone that had
      * a perfectly good human keyboard on it. The very same call returns the very
      * same string to `adb shell`, and granting this app
      * `WRITE_SECURE_SETTINGS` changed nothing, so it is the ROM's read

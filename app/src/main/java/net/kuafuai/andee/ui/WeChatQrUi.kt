@@ -19,7 +19,7 @@ import net.kuafuai.andee.i18n.AppLocale
 
 /**
  * The WeChat icon at the foot of the card opens this: Andee's WeChat QR code, a line saying to scan it with
- * WeChat to add Andee as a friend, and 保存到相册 — the code is no use on the screen that is showing it, so the
+ * WeChat to add Andee as a friend, and Save to Photos — the code is no use on the screen that is showing it, so the
  * way to scan it from this same phone is WeChat's "scan from album".
  *
  * Saved through [MediaStore] into Pictures/Andee, which needs no storage permission on API 29+ (this app's

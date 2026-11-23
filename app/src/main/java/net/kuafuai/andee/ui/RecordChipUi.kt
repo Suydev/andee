@@ -16,7 +16,7 @@ import net.kuafuai.andee.i18n.AppLocale
 
 /**
  * The recording indicator: a small pill pinned under the status bar while a
- * flow is being recorded — 「● 录制中 · N 步」. The one answer to "is it
+ * flow is being recorded — '● Recording · N  steps'. The one answer to "is it
  * remembering this?" that survives the card being folded: recording happens
  * exactly when the card folds out of the way, so an indicator that lives on
  * the card ([ScenesUi]) would be invisible for the whole recording.

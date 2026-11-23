@@ -26,8 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  *   → {"type":"response","id":"r7","result":{...}}
  *   → {"type":"response","id":"r7","error":"..."}
  *   → {"type":"event","kind":"asr.final","device_id":"...","data":{...}}
- *   ← {"type":"progress","content":"读取界面","agent_id":"..."}
- *   ← {"type":"message","content":"已经帮你打开微信了","agent_id":"..."}
+ *   ← {"type":"progress","content":"read the UI","agent_id":"..."}
+ *   ← {"type":"message","content":"has already opened WeChat for you","agent_id":"..."}
  *
  * `progress` is narration for the human — one subtitle line, never spoken.
  * `message` is the agent's finished answer, which the body speaks aloud.

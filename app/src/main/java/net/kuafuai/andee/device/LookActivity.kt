@@ -35,8 +35,8 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * The ball's LIVE eye — a persistent camera session the brain samples.
  * See the `look` tool description for the brain-facing contract:
- * device serves frames, brain decides cadence (once for "这是什么",
- * a self-chosen loop for "盯着水桶满了没").
+ * device serves frames, brain decides cadence (once for "What's this",
+ * a self-chosen loop for "watch whether the bucket is full yet").
  *
  * Frame source is ImageCapture (not PreviewView.getBitmap — that stayed
  * null on this OEM in COMPATIBLE mode; a hardware quirk not worth
@@ -63,7 +63,7 @@ class LookActivity : net.kuafuai.andee.ui.StageActivity() {
 
         private val mainHandler = android.os.Handler(android.os.Looper.getMainLooper())
 
-        /** How long "看到了" / "没看清" stays up before the resting line returns. */
+        /** How long "Got it" / "Didn't catch it" stays up before the resting line returns. */
         private const val STATUS_HOLD_MS = 900L
 
         /**
@@ -305,7 +305,7 @@ class LookActivity : net.kuafuai.andee.ui.StageActivity() {
                 // A refused bind is otherwise invisible: the stage stays at
                 // 0.94 and zero alpha, which reads as a black screen the user
                 // cannot leave. Show it anyway with the chrome on it, so ✕
-                // 完成 is there and the status line says what happened.
+                // Done is there and the status line says what happened.
                 android.util.Log.w("Body", "camera bind failed: ${it.message}")
                 status?.setStatus(lctx.getString(R.string.dev_camera_unavailable))
                 revealStage()

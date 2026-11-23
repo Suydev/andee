@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  * together — the wake listener releases the device before the user's turn
  * begins and takes it back afterwards. Sharing one recorder would mean one
  * owner, and the owner would have to be the wake word, which is the wrong way
- * round: the turn must never fail because something was listening for "嘿".
+ * round: the turn must never fail because something was listening for "Hey".
  *
  * Deliberately short-lived. Holding the microphone open while the screen is
  * off, or while Andee is talking, costs battery and lights the platform's

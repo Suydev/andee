@@ -20,7 +20,7 @@ import net.kuafuai.andee.R
  *
  * ### The flash, and the two separate bugs behind it
  *
- * Reported as one symptom ("关闭的时候页面闪烁一下") and it was two:
+ * Reported as one symptom ("the page flashes once when closing") and it was two:
  *
  *  **1. Nothing handed the screen back.** Closing the page ran `finish()` and
  *  nothing else; the card and the ball were only restored from `onDestroy`,
@@ -205,7 +205,7 @@ abstract class StageActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     @Suppress("DEPRECATION", "MissingSuperCall")
     override fun onBackPressed() {
-        // Back is the user saying the same thing as ✕ 完成. It has to get the
+        // Back is the user saying the same thing as ✕ Done. It has to get the
         // same exit, and on these screens there is nowhere behind them anyway
         // — the card is folded, so "back" would otherwise drop the user on a
         // home screen with only a ball in the corner.

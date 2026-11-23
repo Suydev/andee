@@ -34,7 +34,7 @@ import net.kuafuai.andee.wake.WakeWord
  * [WakeEnrollUi] because this card opens both of them on top of itself.
  *
  * Reads the saved values once on [show] so every row draws itself already
- * filled, and writes back on 保存. Text fields follow [VoiceConfig.save]'s rule
+ * filled, and writes back on Save. Text fields follow [VoiceConfig.save]'s rule
  * — a non-empty value overwrites, an empty one keeps what was there — so a
  * field can be corrected but not cleared. That limitation is why the settings
  * that are really *choices* (`brain`, `llm_thinking`, `grounding`, `lang`) are
@@ -49,7 +49,7 @@ import net.kuafuai.andee.wake.WakeWord
  *    other one's fields away instead of leaving the user to guess which four
  *    rows matter. It *folds* rather than flicking to `GONE`: rows that vanish
  *    instantly read as rows that were deleted.
- *  * **The 火山 endpoints start collapsed.** They ship working defaults
+ *  * **The Volcengine endpoints start collapsed.** They ship working defaults
  *    ([VoiceConfig.DEFAULT_ASR_ENDPOINT] and friends) and the key is compiled
  *    in, so on almost every device they are read-only trivia sitting above the
  *    settings that actually get edited.
@@ -58,8 +58,8 @@ import net.kuafuai.andee.wake.WakeWord
  * the picker sits in the header because it is the one setting whose effect is
  * the card itself. It is also the one setting written the instant it is tapped:
  * the whole card is rebuilt in the new language ([rebuild]), and that redraw is
- * the confirmation — a language switch that waited for 保存 would look broken for
- * as long as the user stared at it. Consequence, deliberate: 取消 does not put
+ * the confirmation — a language switch that waited for Save would look broken for
+ * as long as the user stared at it. Consequence, deliberate: Cancel does not put
  * the language back, because by then they are reading the answer.
  *
  * This card used to carry its own `t(zh, en)` helper, with both languages
@@ -69,10 +69,10 @@ import net.kuafuai.andee.wake.WakeWord
  * directory and no edit here at all.
  *
  * One string is deliberately *not* a resource: the two labels in [langPicker].
- * A language picker names each language in its own script, so 中 and EN are the
+ * A language picker names each language in its own script, so in and EN are the
  * same in every locale.
  *
- * The 火山 key row is where a key comes from at all: [VoiceConfig.API_KEY]
+ * The Volcengine key row is where a key comes from at all: [VoiceConfig.API_KEY]
  * ships empty in the public source, so an empty row means the device cannot
  * hear or speak. `SelfCheck`'s `voice_key` row says so before the user finds
  * out from a connect timeout.
@@ -81,13 +81,13 @@ class SettingsUi(
     private val context: Context,
     private val onDismiss: () -> Unit,
     /**
-     * 恢复出厂设置, after the user has confirmed twice. Wired to
+     * Factory reset, after the user has confirmed twice. Wired to
      * `BodyCoreService.applyFactoryReset`, which does the wiping *and*
      * rebuilds the brain — this class knows how to ask, not how to erase.
      */
     private val onFactoryReset: () -> Unit,
     /**
-     * 清空聊天记录, after the user has confirmed. Wired to
+     * Clear chat history, after the user has confirmed. Wired to
      * `BodyCoreService.clearChatHistory`, which wipes the scrollback *and*
      * rebuilds the brain so the conversation goes with it — clearing only the
      * visible rows would leave the model remembering everything the user
@@ -95,7 +95,7 @@ class SettingsUi(
      */
     private val onClearChat: () -> Unit,
     /**
-     * 清空小本本, after the user has confirmed. Wired to
+     * Clear the notebook, after the user has confirmed. Wired to
      * `BodyCoreService.clearNotebook`.
      *
      * A separate errand from [onClearChat] rather than a checkbox on it: what
@@ -128,7 +128,7 @@ class SettingsUi(
      */
     private val onOpenLink: (String) -> Unit = {},
 
-    /** Open the friends (peers) card. Non-null = show a 朋友 row here; the 朋友 key left the control bar (issue #44). */
+    /** Open the friends (peers) card. Non-null = show a Friends row here; the Friends key left the control bar (issue #44). */
     private val onOpenFriends: (() -> Unit)? = null,
 ) {
 
@@ -173,22 +173,22 @@ class SettingsUi(
     private var advancedOpen = false
 
     /**
-     * The 诊断 section is showing the factory-reset warning instead of its
+     * The Diagnostics section is showing the factory-reset warning instead of its
      * three buttons. Survives a [rebuild] so a language switch mid-confirmation
      * does not silently put the destructive button back.
      */
     private var factoryConfirm = false
 
-    /** Same, for the 清空聊天记录 warning. One confirm at a time. */
+    /** Same, for the Clear chat history warning. One confirm at a time. */
     private var clearChatConfirm = false
 
-    /** Same, for the 清空小本本 warning. */
+    /** Same, for the Clear the notebook warning. */
     private var clearNotesConfirm = false
 
     /**
      * The form's scroller, so [rebuild] can put the user back where they were.
      * It did not matter while the destructive buttons were in the footer — the
-     * footer never scrolls — but their confirms now appear in 诊断, near the
+     * footer never scrolls — but their confirms now appear in Diagnostics, near the
      * bottom of a long form, and a rebuild that starts at the top leaves the
      * user looking at the brain section wondering what their tap did.
      */
@@ -236,7 +236,7 @@ class SettingsUi(
         } catch (t: Throwable) {
             // ignore
         }
-        // Devices → 扫码配对 opens the camera from on top of this card; see [StandAside].
+        // Devices → scan to pair opens the camera from on top of this card; see [StandAside].
         if (aside == null) aside = StandAside.register(wm) { root }
     }
 
@@ -265,7 +265,7 @@ class SettingsUi(
         val offset: Int? =
             // A confirm is taller than the buttons it replaces — the factory
             // list alone is five lines — so holding the old offset leaves its
-            // 确认 row below the fold. 诊断 is the last section and the danger
+            // Confirm row below the fold. Diagnostics is the last section and the danger
             // zone is the last thing in it, so the bottom *is* the confirm.
             if (clearChatConfirm || clearNotesConfirm || factoryConfirm) null else (scroll?.scrollY ?: 0)
         Glass.fadeOut(old) {
@@ -367,20 +367,20 @@ class SettingsUi(
         // card used to be eleven sections in one flat column, in which the
         // question "what can I actually set here" took a full scroll to answer
         // because the answer was interleaved with endpoints and a factory-reset
-        // button. 常用 is what a person opens settings for; 高级 is everything
+        // button. Frequent is what a person opens settings for; Advanced is everything
         // that answers a question they have not asked yet.
         //
-        // Order inside 常用 is by how early the errand comes up, not
+        // Order inside Frequent is by how early the errand comes up, not
         // alphabetically: who does the thinking, then how it hears you, then
         // what it is allowed to keep, then what it may interrupt you for, then
-        // the credentials it can spend. 大脑 stays first because it is the one
+        // the credentials it can spend. brain stays first because it is the one
         // setting that changes what the rest of the card means.
         brainSection(form)
-        // 外观 is the only appearance setting left up here: 形象与表情 moved into 高级,
+        // Appearance is the only appearance setting left up here: Looks & expressions moved into Advanced,
         // so the "these two are the same kind of setting" argument went with it. What is
-        // left in 常用 is what a person opens settings to change.
-        // The same order as the Mac's settings page. 形象与表情, 装备 and 保险箱 are opened from here on both bodies;
-        // 小本本 and 朋友 have their own keys on the top bar (and the Mac's sidebar), so this card only holds
+        // left in Frequent is what a person opens settings to change.
+        // The same order as the Mac's settings page. Looks & expressions, Gear and Vault are opened from here on both bodies;
+        // Notebook and Friends have their own keys on the top bar (and the Mac's sidebar), so this card only holds
         // the notebook's review settings and no door to the friends list.
         themeSection(form)
         expressionsSection(form)
@@ -405,7 +405,7 @@ class SettingsUi(
     }
 
     /**
-     * 单次任务最多步数: the per-task runaway guard. In 常用 rather than 高级
+     * max steps per task: the per-task runaway guard. In Frequent rather than Advanced
      * because it is a knob a user might actually turn — "the AI gave up
      * halfway" has one cause and one fix, and burying it behind a disclosure
      * means the user cannot find the fix on their own.
@@ -426,7 +426,7 @@ class SettingsUi(
     }
 
     /**
-     * 高级: the three sections a configured device never opens.
+     * Advanced: the three sections a configured device never opens.
      *
      * A foldable *group of sections* rather than one more collapsible section —
      * the only one in the card — because its members draw their own headings and
@@ -434,14 +434,14 @@ class SettingsUi(
      * is what `bare = true` is for; see [collapsible].
      *
      * It is closed by default, which is the point: nothing it hides is needed
-     * to make the device work out of the box. The 火山 key and endpoints
-     * (which used to live here) are now rows of the 本机 tab under 后端, next
+     * to make the device work out of the box. The Volcengine key and endpoints
+     * (which used to live here) are now rows of the On-device tab under Backend, next
      * to the LLM they power; this disclosure now carries show-cloud-option,
      * typing diagnostics and the factory-reset button.
      *
      * The note under the heading is not decoration and is not optional: a
      * collapsed disclosure gives no account of itself, so a user who has lost
-     * 恢复出厂设置 has no way to know it is behind this chevron and not gone.
+     * Factory reset has no way to know it is behind this chevron and not gone.
      */
     private fun advancedSection(form: LinearLayout) {
         val body = collapsible(
@@ -450,10 +450,10 @@ class SettingsUi(
             lctx.getString(R.string.settings_advanced_note),
             bare = true,
         )
-        // 火山 (the voice section) used to live here. It is now a sub-panel
-        // of 后端 → 本机, so a user looking for its rows finds them next to
+        // Volcengine (the voice section) used to live here. It is now a sub-panel
+        // of Backend → On-device, so a user looking for its rows finds them next to
         // the backend they belong to — see [brainSection].
-        // 形象与表情, moved down here from 常用. It is a door rather than a setting —
+        // Looks & expressions, moved down here from Frequent. It is a door rather than a setting —
         // see [expressionsSection] — and a door that most users never open belongs
         // behind the disclosure rather than in the column everyone scrolls.
         showHubSection(body)
@@ -462,10 +462,10 @@ class SettingsUi(
     }
 
     /**
-     * 显示云端选项: lives in 高级 rather than beside the backend picker because
+     * Show cloud option: lives in Advanced rather than beside the backend picker because
      * it is a knob a user turns once (if ever) to reveal a tab they want. It
      * writes eagerly and rebuilds the whole card, so flipping it on and
-     * scrolling back up finds the 云端 tab already in the backend picker.
+     * scrolling back up finds the Cloud tab already in the backend picker.
      */
     private fun showHubSection(form: LinearLayout) {
         val panel = group(
@@ -534,14 +534,14 @@ class SettingsUi(
     }
 
     /**
-     * 中文 / English, and the only picker that acts on the tap.
+     * Chinese / English, and the only picker that acts on the tap.
      *
      * Deliberately not in [picks]: it is already on disk by the time [rebuild]
-     * runs, and re-writing it from 保存 would be the same value twice.
+     * runs, and re-writing it from Save would be the same value twice.
      */
     private fun langPicker(): View = segments(
         // Deliberately not resources. A language picker labels each language in
-        // its own script, so 中 stays 中 and EN stays EN no matter what the card
+        // its own script, so in stays in and EN stays EN no matter what the card
         // is currently speaking — these two are the only strings in the app that
         // must NOT be translated, and translating them is the one way to make
         // the picker unusable.
@@ -566,8 +566,8 @@ class SettingsUi(
         val row = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             // END, not the old weight trick: the row used to carry
-            // 恢复出厂设置 on the left with weight 1 to push this pair right.
-            // The destructive buttons have moved into 诊断 (see [dangerZone]),
+            // Factory reset on the left with weight 1 to push this pair right.
+            // The destructive buttons have moved into Diagnostics (see [dangerZone]),
             // so there is nothing on the left to push against.
             gravity = Gravity.CENTER_VERTICAL or Gravity.END
             setPadding(dp(18), dp(10), dp(18), dp(18))
@@ -588,7 +588,7 @@ class SettingsUi(
      * picker folds away the half that is not in play.
      */
     /**
-     * The backend section. Three tabs — 本机 / CodeFlying / 云端 — only one is
+     * The backend section. Three tabs — On-device / CodeFlying / Cloud — only one is
      * ever in play, and the picker folds away the two that are not.
      *
      * Visibility rules:
@@ -596,15 +596,15 @@ class SettingsUi(
      *    non-empty domain (the build's CODEFLYING_DOMAIN). The tab
      *    itself has no editable rows — endpoints and credential are compiled
      *    in — just a note describing what the hosted backend offers.
-     *  * **云端** is only in the picker when the user has turned the "显示
-     *    云端选项" toggle on (`show_hub`, saved eagerly so the picker rebuilds
+     *  * **Cloud** is only in the picker when the user has turned the "show
+     *    cloud option" toggle on (`show_hub`, saved eagerly so the picker rebuilds
      *    at once). It is off by default: a device nobody has configured for a
      *    hub is better off not seeing an option it has nothing to fill in.
      *
      * Voice (`asr_endpoint` / `tts_endpoint` / `api_key` and the resource IDs)
-     * used to live inside 高级 → 火山. It now lives inside the **本机** tab,
+     * used to live inside Advanced → Volcengine. It now lives inside the **On-device** tab,
      * because voice runs on this device whichever backend answers, but a
-     * CodeFlying device never touches these fields and a 云端 device cares
+     * CodeFlying device never touches these fields and a Cloud device cares
      * about hub plumbing instead.
      */
     private fun brainSection(form: LinearLayout) {
@@ -614,9 +614,9 @@ class SettingsUi(
             lctx.getString(R.string.settings_brain_panel_note),
         )
 
-        // Tab picker. 本机 and CodeFlying are always visible — CodeFlying stays
+        // Tab picker. On-device and CodeFlying are always visible — CodeFlying stays
         // in the row even when the build didn't configure it, so the user is
-        // told what it is and how to turn it on. 云端 is still gated on the
+        // told what it is and how to turn it on. Cloud is still gated on the
         // user's own show_hub toggle: it is the only tab that is pure extra
         // configuration surface, so nobody who hasn't asked for it needs to
         // see it. If the user picks CodeFlying without a configured build,
@@ -636,11 +636,11 @@ class SettingsUi(
         var applyMode: ((String, Boolean) -> Unit)? = null
         // Filled in by the picker itself: the "no key?" line below has to move the
         // tab the same way a tap on the cell would, or the card would keep showing
-        // 本机 while saving CodeFlying.
+        // On-device while saving CodeFlying.
         var pickBrain: (String) -> Unit = {}
         val mode = segmented(panel, "brain", options, setterRef = { pickBrain = it }) { applyMode?.invoke(it, true) }
 
-        // ---- 云端 tab ----
+        // ---- Cloud tab ----
         val hubBlock = block(panel)
         field(
             hubBlock,
@@ -681,7 +681,7 @@ class SettingsUi(
             copyValue = { VoiceConfig.codeFlyingKey(context) },
         )
 
-        // ---- 本机 tab: LLM + 火山 voice rows ----
+        // ---- On-device tab: LLM + Volcengine voice rows ----
         val localBlock = block(panel)
         // The hint *is* the value a blank row resolves to, so the hint and the
         // resolved config come from the same language-aware pair — see
@@ -698,7 +698,7 @@ class SettingsUi(
         // Directly under the row that asks for it: whoever has no key is
         // reading this row, not the picker at the top of the card. Tapping
         // moves the tab under their finger rather than sending them up to
-        // find which cell that was — and it only moves the pick; 保存 still
+        // find which cell that was — and it only moves the pick; Save still
         // commits it, like every other row.
         linkNote(localBlock, lctx.getString(R.string.settings_no_key_use_codeflying)) {
             pickBrain(VoiceConfig.BRAIN_CODEFLYING)
@@ -743,33 +743,33 @@ class SettingsUi(
         // One container, so that the whole block can be taken out in one move
         // rather than view by view — see the visibility flip at the end of it.
         //
-        // **Not inside `localBlock`**, even though it reads like a 本机
+        // **Not inside `localBlock`**, even though it reads like a On-device
         // concern: who hears and who thinks are two different questions, and
-        // hanging this off the 本机 tab would hide it from a 云端 device that
+        // hanging this off the On-device tab would hide it from a Cloud device that
         // legitimately wants to point its own voice service somewhere.
         //
         // The two sets of rows are mutually exclusive and are not two flavours
-        // of the same thing: 火山's are endpoints and resource ids, Google's are
+        // of the same thing: Volcengine's are endpoints and resource ids, Google's are
         // a project, a location and two model names.
         val voiceBlock = block(panel)
-        // 听（识别）：谁把用户的话转成文字。系统引擎没有识别器，所以这一
-        // 侧只有 火山/谷歌。
+        // Hearing (ASR): who turns the user's speech into text. The system engine has no recogniser, so this
+        //  side only has  Volcengine/Google.
         rowLabel(voiceBlock, lctx.getString(R.string.settings_voice_hear_provider))
         var applyProvider: ((String, Boolean) -> Unit)? = null
         val provider = segmented(
             voiceBlock,
             "voice_provider",
             listOf(
-                // 火山 first, because the first option is the fallback when
+                // Volcengine first, because the first option is the fallback when
                 // nothing is saved — and for every device that predates this
-                // row, 火山 is what it has been running. See
+                // row, Volcengine is what it has been running. See
                 // [VoiceConfig.voiceProvider].
                 VoiceConfig.VOICE_HUOSHAN to lctx.getString(R.string.settings_voice_provider_huoshan),
                 VoiceConfig.VOICE_GOOGLE to lctx.getString(R.string.settings_voice_provider_google),
             ),
         ) { applyProvider?.invoke(it, true) }
 
-        // 说（朗读）：谁把答案读出来。可以选系统自带的引擎——免费、离线。
+        // Speak (TTS): who reads the answer aloud. You can pick a built-in engine——Free and offline.
         rowLabel(voiceBlock, lctx.getString(R.string.settings_voice_speak_provider))
         var speakPicked = ""
         val speak = segmented(
@@ -786,7 +786,7 @@ class SettingsUi(
         }
         speakPicked = speak
 
-        // 火山: previously in 高级 → 火山. Rows copy that section's labels,
+        // Volcengine: previously in Advanced → Volcengine. Rows copy that section's labels,
         // which still describe exactly these keys.
         val huoshanBlock = block(voiceBlock)
         field(
@@ -895,7 +895,7 @@ class SettingsUi(
         applyProvider(provider, false)
 
         // **The voice block is not drawn at all under the hosted backend**, and
-        // not merely disabled. There, [VoiceConfig.voiceProvider] pins 火山 and
+        // not merely disabled. There, [VoiceConfig.voiceProvider] pins Volcengine and
         // [VoiceConfig.load] takes every endpoint and credential from the build
         // — so every control in this block is read by nothing. A row the user
         // can edit that changes no behaviour is the small lie this card exists
@@ -905,8 +905,8 @@ class SettingsUi(
         //
         // **Its flip belongs to the mode picker, not to this build pass.** It
         // used to be a lone `setVisible` evaluated once here, against the
-        // *saved* mode, so picking 本机 out of CodeFlying left the block hidden
-        // until 保存 rebuilt the card — a control that only appears if you
+        // *saved* mode, so picking On-device out of CodeFlying left the block hidden
+        // until Save rebuilt the card — a control that only appears if you
         // press the button standing next to it. Same condition; the difference
         // is that it is asked of the value the user just picked, through
         // [VoiceConfig.resolveBrainMode], so a build that does not enable
@@ -931,10 +931,10 @@ class SettingsUi(
     }
 
     /**
-     * 浅色 / 深色 — which of [Glass]'s two palettes the whole app draws with.
+     * light / dark — which of [Glass]'s two palettes the whole app draws with.
      *
      * **Eager, like the language picker and for the same reason**: the redraw *is* the
-     * confirmation, and routing this through 保存 would mean the card you are looking
+     * confirmation, and routing this through Save would mean the card you are looking
      * at is the one thing that does not change until you leave it.
      *
      * [Theme.set] is what does the work, and it reaches every live surface itself —
@@ -968,12 +968,12 @@ class SettingsUi(
      * The door to [ExpressionsUi]. Nothing is edited here — the card it opens is
      * where a look is picked and where every expression can be tried — so the
      * section is a sentence and one button, like [vaultSection]'s door, and the
-     * look picked inside is saved the moment it is picked rather than on 保存.
+     * look picked inside is saved the moment it is picked rather than on Save.
      *
      * Called from [advancedSection] rather than from the form's own list, which is
      * where it used to be. The argument for moving it is in the name: it is a door,
      * and what it opens is a card for *trying* looks rather than for setting
-     * anything. 常用 is the column a person scrolls looking for a knob; a door they
+     * anything. Frequent is the column a person scrolls looking for a knob; a door they
      * open once should not be in it. Its body is unchanged — it takes its parent and
      * draws the same section — so the only thing that moved is who calls it.
      */
@@ -1032,7 +1032,7 @@ class SettingsUi(
         // How strictly the phrase has to match. Written the instant it is
         // tapped, like the screen-off switch below: the listener reads it on
         // every segment, so the next thing said is judged by the new value.
-        // 严格 leftmost, the direction an unreadable value falls back to.
+        // strict leftmost, the direction an unreadable value falls back to.
         rowLabel(panel, lctx.getString(R.string.settings_wake_sens))
         val sens = segments(
             options = listOf(
@@ -1051,10 +1051,10 @@ class SettingsUi(
         // own state. Two buttons in a picker would read as a choice to make;
         // this is a thing that is on or off, and tapping it says which.
         //
-        // Written straight through rather than on 保存, like the language and
+        // Written straight through rather than on Save, like the language and
         // the ball's look: the gate that reads it reconsiders ten times a
         // second, so the new answer is live before the finger is off the
-        // button, and there is nothing left here for a 保存 to confirm.
+        // button, and there is nothing left here for a Save to confirm.
         val lockedBtn = button("", filled = false) {}
         fun paintLocked() {
             val on = VoiceConfig.wakeWhileLocked(context)
@@ -1086,7 +1086,7 @@ class SettingsUi(
      */
 
     /**
-     * The 朋友 (peers) door, moved here from the control bar so that bar had room for the quit key (issue #44).
+     * The Friends (peers) door, moved here from the control bar so that bar had room for the quit key (issue #44).
      * Only shown when the host wires [onOpenFriends]; a test or a hub-only build without peers draws nothing.
      */
     private fun friendsSection(form: LinearLayout) {
@@ -1128,7 +1128,7 @@ class SettingsUi(
     private fun diagnosticsSection(form: LinearLayout) {
         val panel = group(form, lctx.getString(R.string.settings_section_diagnostics))
         rowLabel(panel, lctx.getString(R.string.settings_grounding))
-        // 关 first, and not for looks: the leftmost option is what an
+        // Off first, and not for looks: the leftmost option is what an
         // unrecognised saved value falls back to, and this one writes pictures
         // of whatever the user is doing. Same direction as
         // VoiceConfig.groundingEnabled, which treats anything but "on" as off.
@@ -1150,9 +1150,9 @@ class SettingsUi(
     }
 
     /**
-     * The three destructive actions, together at the foot of 诊断.
+     * The three destructive actions, together at the foot of Diagnostics.
      *
-     * They used to live in the footer beside 取消/保存, and that was the
+     * They used to live in the footer beside Cancel/Save, and that was the
      * problem: a destructive control sitting next to the card's two ways out
      * reads as a third way out. Here they sit under the section that is
      * already about the device's stored state, and each replaces this row
@@ -1256,7 +1256,7 @@ class SettingsUi(
     }
 
     /**
-     * [不，返回] above [确认…] — back out is never the red button.
+     * [No, go back] above [Confirm…] — back out is never the red button.
      *
      * Stacked and full width, like the two buttons this replaces: side by side
      * the pair overflowed the panel and "Erase everything" broke mid-word.
@@ -1289,7 +1289,7 @@ class SettingsUi(
      * what it wrote down**.
      */
     /**
-     * 装备: a summary here, the card is where it is read and edited. A door like [vaultSection]'s, not a
+     * Gear: a summary here, the card is where it is read and edited. A door like [vaultSection]'s, not a
      * setting: what is installed and what Andee has learned about it is a list, not a switch.
      */
     private fun gearSection(form: LinearLayout) {
@@ -1351,7 +1351,7 @@ class SettingsUi(
 
         // The bill, such as it is. These calls are paid for with the user's own
         // key, so the count and the spend are shown rather than hidden.
-        // Read-only, like the Mac's line. Browsing memories and scenes is the top bar's 小本本 and 情景 keys.
+        // Read-only, like the Mac's line. Browsing memories and scenes is the top bar's Notebook and Scenes keys.
         readOnly(
             panel,
             lctx.getString(R.string.settings_notebook_today),
@@ -1375,7 +1375,7 @@ class SettingsUi(
      * has none of them: a checklist is a screen nobody finishes, and it goes
      * stale the next time the user installs something.
      *
-     * It sits here rather than in 诊断 because it is the same kind of setting as
+     * It sits here rather than in Diagnostics because it is the same kind of setting as
      * the notebook sweep directly above — both are the device choosing to spend
      * the user's key on something nobody asked for out loud — and a user who is
      * deciding how chatty this thing is allowed to be should find both decisions
@@ -1383,10 +1383,10 @@ class SettingsUi(
      */
     private fun notifySection(form: LinearLayout) {
         val panel = group(form, lctx.getString(R.string.settings_section_notify))
-        // 关 leftmost, which is the fallback for an unrecognised saved value —
+        // Off leftmost, which is the fallback for an unrecognised saved value —
         // the same direction VoiceConfig.notifyScope reads in, and deliberately
         // *not* the same as its default. An unset preference is a device nobody
-        // configured and gets 聊天类; an unreadable one is a value this build
+        // configured and gets Chat apps; an unreadable one is a value this build
         // does not understand and gets nothing. See that method.
         segmented(
             panel,
@@ -1428,12 +1428,12 @@ class SettingsUi(
 
     /**
      * How often the ball may hold up a bubble nobody asked for. Beside the notification setting because it is
-     * the same decision — how much this thing may interrupt — and 关 is leftmost because it is the fallback
-     * for a value nobody recognises (see `VoiceConfig.nudgeLevel`; unset reads as 少).
+     * the same decision — how much this thing may interrupt — and Off is leftmost because it is the fallback
+     * for a value nobody recognises (see `VoiceConfig.nudgeLevel`; unset reads as few).
      */
     /**
-     * 自己动起来: whether it may look at what is on its mind and get up for it without being asked
-     * ([net.kuafuai.andee.brain.Heartbeat]). 关 leftmost, the fallback for a value nobody recognises; unset reads as 开.
+     * move by itself: whether it may look at what is on its mind and get up for it without being asked
+     * ([net.kuafuai.andee.brain.Heartbeat]). Off leftmost, the fallback for a value nobody recognises; unset reads as Turn on.
      */
     private fun driveSection(form: LinearLayout) {
         val panel = group(form, lctx.getString(R.string.settings_section_drive))
@@ -1444,7 +1444,7 @@ class SettingsUi(
     /**
      * What the conversation shows: everything (what was said and the quiet event rows — a todo woke it, a
      * review ran) or only what was said. It used to be a key beside the ball; it is a preference, not a
-     * control you reach for, so it lives here. 全部 leftmost: the default, and what an unknown value reads as.
+     * control you reach for, so it lives here. Everything leftmost: the default, and what an unknown value reads as.
      */
     private fun timelineSection(form: LinearLayout) {
         val panel = group(form, lctx.getString(R.string.settings_section_timeline))
@@ -1471,7 +1471,7 @@ class SettingsUi(
         // a factory reset. Written at once, like the language: there is nothing to cancel about un-muting.
         val muted = VoiceConfig.nudgeMuted(context)
         if (muted.isNotEmpty()) {
-            val line = noteView(lctx.getString(R.string.settings_nudge_muted, muted.sorted().joinToString("、")))
+            val line = noteView(lctx.getString(R.string.settings_nudge_muted, muted.sorted().joinToString("\u3001")))
             panel.addView(line, rowParams(dp(10)))
             lateinit var unmute: TextView
             unmute = button(lctx.getString(R.string.settings_nudge_unmute), filled = false) {
@@ -1484,7 +1484,7 @@ class SettingsUi(
     }
 
     /**
-     * 它的打算: the plan, readable and trimmable by the person it is about (`Plans`, design doc §5.5).
+     * its plan: the plan, readable and trimmable by the person it is about (`Plans`, design doc §5.5).
      *
      * Removing and pausing are done by the device at once, not asked of the model — the plan is theirs to
      * cut — and the alarms follow in the same tap (`Scheduler.syncPlan`). Anything subtler goes through the
@@ -1546,7 +1546,7 @@ class SettingsUi(
     /**
      * As [group], but the panel folds away behind a chevron.
      *
-     * The chevron rotates rather than swapping between 展开 / 收起, which also
+     * The chevron rotates rather than swapping between expand / Collapse, which also
      * spares the pair of strings: a quarter turn means the same thing in both
      * languages.
      *
@@ -1554,7 +1554,7 @@ class SettingsUi(
      *   so two foldable panels can exist without one unfolding the other.
      * @param bare the returned container carries no fill of its own, so the
      *   sections that go inside it stay flush with the ones above rather than
-     *   sitting in a panel inside a panel. Used by 高级, which is a *group of
+     *   sitting in a panel inside a panel. Used by Advanced, which is a *group of
      *   sections* rather than a section — the only disclosure here whose
      *   children draw their own headings and panels. See [advancedSection].
      */
@@ -1681,7 +1681,7 @@ class SettingsUi(
     /**
      * One text row.
      *
-     * @param secret renders masked with a 显示 / Show toggle. The key is the
+     * @param secret renders masked with a show / Show toggle. The key is the
      *   user's own and this card is an overlay on top of whatever they are
      *   doing, so it has no business printing it at full size by default.
      */
@@ -1692,7 +1692,7 @@ class SettingsUi(
         hint: String? = null,
         numeric: Boolean = false,
         secret: Boolean = false,
-        /** When set, a 复制 link sits beside the 显示 toggle and copies this (the value in effect, even if the box is blank). */
+        /** When set, a Copy link sits beside the show toggle and copies this (the value in effect, even if the box is blank). */
         copyValue: (() -> String)? = null,
     ) {
         rowLabel(parent, label)
@@ -1803,7 +1803,7 @@ class SettingsUi(
      *
      * The thumb is positioned from the cells' measured geometry rather than from
      * weights, so the same code serves the full-width pickers (equal cells) and
-     * the compact language pair (中 is narrower than EN). Placement therefore
+     * the compact language pair (in is narrower than EN). Placement therefore
      * has to wait for layout, and re-runs on every later layout pass — the card
      * resizes when the IME opens.
      */
@@ -1949,7 +1949,7 @@ class SettingsUi(
             text = label
             // The footer's buttons were the card's primary targets and were
             // sized for a card narrower than this one. Larger type and more
-            // padding is what makes 保存 / 取消 hit-or-miss avoidable on a
+            // padding is what makes Save / Cancel hit-or-miss avoidable on a
             // tablet held in two hands, which is how it is actually used.
             textSize = Glass.Type.BODY
             setTextColor(

@@ -213,7 +213,7 @@ object Scheduler {
         runCatching { Notebook.seedDefaults(context) }.onFailure { Log.w(TAG, "could not seed default todos", it) }
         runCatching { Notebook.seedPlaybooks(context) }.onFailure { Log.w(TAG, "could not seed app playbooks", it) }
         // The phone has a stage, so it seeds the care of keeping it (see Selfhood.seedStageCare). In the
-        // interface language: it is shown in 小本本 → 在意 as well as read by the model.
+        // interface language: it is shown in Notebook → Care about as well as read by the model.
         runCatching {
             val en = VoiceConfig.uiLanguage(context) == VoiceConfig.LANG_EN
             Notebook.selfhood(context).seedStageCare(
@@ -268,7 +268,7 @@ object Scheduler {
     /**
      * The only thing this app can do for a promise when its brain is not
      * running. It says what was promised and that it could not act on it —
-     * a notification that just said "提醒：吃药" would be a lie about who is
+     * a notification that just said "Reminder: take medicine" would be a lie about who is
      * talking.
      */
     fun notifyMissed(context: Context, todo: net.kuafuai.andee.config.Todo) {

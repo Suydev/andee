@@ -21,7 +21,7 @@ import java.util.Locale
  *    all for views already attached. So the overlays would keep the old language
  *    until something happened to rebuild them.
  *  * **The language is a setting, not the system locale.** [VoiceConfig.uiLanguage]
- *    lets the user pick 中文 on an English tablet, and once they pick, that
+ *    lets the user pick Chinese on an English tablet, and once they pick, that
  *    choice outranks the system forever. A device whose locale says `en` but
  *    whose preference says `zh` is correct and expected here.
  *
@@ -31,7 +31,7 @@ import java.util.Locale
  *
  * **The trap this is shaped around.** Getting this wrong does not crash.
  * `getString` on an unwrapped Context silently returns the *system* language —
- * so a Chinese tablet shows a Chinese 取消 button while everything built from
+ * so a Chinese tablet shows a Chinese Cancel button while everything built from
  * the wrapped Context is English, and it reads as "that one button is hardcoded"
  * rather than "that call site missed the wrap". Hence: one entry point, called
  * where the UI object is constructed, and nowhere else.

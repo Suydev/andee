@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * Mirror of `MeetingRecorder.isActive()`, opposite direction. Meeting mode:
  * WE hold the mic and gate everyone else from stealing it. Call mode: someone
- * else (dialer, WeChat 语音, WhatsApp, Telegram) is trying to hold the mic
+ * else (dialer, WeChat voice, WhatsApp, Telegram) is trying to hold the mic
  * and WE have to gate ourselves — mainly [net.kuafuai.andee.wake.WakeWord],
  * which otherwise keeps AudioRecord open and starves the caller app.
  *

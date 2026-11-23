@@ -129,7 +129,7 @@ object Notebook {
     fun guard(context: Context): net.kuafuai.andee.config.Guard = book(context).guard
     fun notifyRule(context: Context): net.kuafuai.andee.config.NotifyRule = book(context).notifyRule
 
-    /** Told after the guard is saved or the book wiped: the red dots on 小本本 and on its 守卫 tab. */
+    /** Told after the guard is saved or the book wiped: the red dots on Notebook and on its Guard tab. */
     @Volatile var onGuardChanged: (() -> Unit)? = null
     fun wiki(context: Context): net.kuafuai.andee.wiki.WikiBook = book(context).wiki
 

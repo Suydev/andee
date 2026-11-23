@@ -45,7 +45,7 @@ class AndroidPeers(context: Context) {
         private set
     @Volatile var onChange: () -> Unit = {}
 
-    /** How many friends there are, whenever the list may have changed. For the 朋友 key's badge; separate from
+    /** How many friends there are, whenever the list may have changed. For the Friends key's badge; separate from
      *  [onChange], which belongs to whichever card is open. */
     @Volatile var onCount: (Int) -> Unit = {}
 
@@ -74,7 +74,7 @@ class AndroidPeers(context: Context) {
     /** The paired computer's agent, used as if it were this phone's own ([PeerRemote]). */
     val remote = PeerRemote.Client(connect = { id -> connect(id) }, link = { id -> links[id] })
 
-    /** A running worker's progress changed (or it ended): the 在办 card and key re-read. Set by the UI. */
+    /** A running worker's progress changed (or it ended): the In Progress card and key re-read. Set by the UI. */
     @Volatile var onProgressChanged: () -> Unit = {}
 
     /**

@@ -63,7 +63,7 @@ class PermissionsController(private val context: Context) {
         Perm("sms_send", "android.permission.SEND_SMS", null, R.string.dev_perm_feature_sms_send),
         Perm("calendar", "android.permission.READ_CALENDAR", null, R.string.dev_perm_feature_calendar),
         Perm("calendar_write", "android.permission.WRITE_CALENDAR", null, R.string.dev_perm_feature_calendar_write),
-        // 发通知 — a *different* thing from 通知使用权 below, which is the listener
+        // post notifications — a *different* thing from notification access below, which is the listener
         // that lets the ball read other apps' notifications. This one is whether
         // anything this app posts is seen at all, and on Android 13+ it is a runtime
         // permission nothing was ever asking for: declared in the manifest and never
@@ -113,7 +113,7 @@ class PermissionsController(private val context: Context) {
 
     /**
      * One sentence for the user + optional deep link. The brain should READ
-     * this aloud (or show it), ask "开吗?", then call again with confirm=true
+     * this aloud (or show it), ask "turn it on??", then call again with confirm=true
      * to fire the intent. Runtime permissions use the classic dialog
      * (needs an activity — we hand the request to the floating settings
      * host); special ones deep-link into Settings.

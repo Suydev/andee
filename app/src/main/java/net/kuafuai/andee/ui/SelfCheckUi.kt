@@ -101,7 +101,7 @@ class SelfCheckUi(
      *
      * @param yielding true when this close is the host stepping out of the way
      *   of another screen (see [onErrand]), false when the user asked for
-     *   it with ✕ or 完成. A host needs the difference, and only a host can act
+     *   it with ✕ or Done. A host needs the difference, and only a host can act
      *   on it: a user closing the check is asking for the assistant back, while
      *   a yield is one step of handing the screen to somebody else and must not
      *   undo itself. See `BodyCoreService.openSelfCheck`.
@@ -208,14 +208,14 @@ class SelfCheckUi(
 
     /**
      * Whether there is a settings sheet to open at all — the difference between
-     * 打开设置 opening a card and 打开设置 doing nothing.
+     * Open settings opening a card and Open settings doing nothing.
      *
      * Asked of the caller rather than inferred from the `accessibility` row,
      * which is what this used to do. That inference was true while only the
      * service could raise our sheet; it stopped being true when
      * [SelfCheckActivity] learned to raise its own, and an inference is exactly
      * the wrong shape for a capability its owner already knows. The rows this
-     * gates — 大脑 and 语音密钥 — are the two a user configures *before* the
+     * gates — brain and speech key — are the two a user configures *before* the
      * assistant works, so suppressing their one button on a page reached with
      * the service off is suppressing it in the case it exists for.
      */
@@ -311,7 +311,7 @@ class SelfCheckUi(
      * ### [yielding], and why the caller has to say
      *
      * The two closes look identical from in here and mean opposite things out
-     * there, so the one caller that knows which it is passes it: ✕ and 完成
+     * there, so the one caller that knows which it is passes it: ✕ and Done
      * close with the default, and [onErrand]'s host closes with `true`.
      * The distinction exists because of what the *host* does with it — see
      * [onDismiss] — and it cannot be inferred here, because the fold that
@@ -393,7 +393,7 @@ class SelfCheckUi(
 
     /**
      * How many rows still ask the user to do something — the same number the
-     * summary line prints as 「N 项需要处理」.
+     * summary line prints as 'N  items need handling'.
      *
      * Null means "nothing rendered yet", which a caller must not read as zero.
      * Read off the last render rather than recomputed: the answer wanted is
@@ -710,7 +710,7 @@ class SelfCheckUi(
     /**
      * A finding: a dot, what was checked, what was found, and the way out.
      *
-     * Two lines rather than one because the title alone ("麦克风") tells the
+     * Two lines rather than one because the title alone ("microphone") tells the
      * user nothing they can act on — the second line is the one that says the
      * permission is off, that the ball will therefore never wake, and that the
      * button beside it fixes that. See the `check_detail_*` strings.
@@ -804,7 +804,7 @@ class SelfCheckUi(
         if (f.fix is SelfCheck.Fix.OurSettings && !canOpenSettings) return null
         val label = when (val fix = f.fix) {
             // Zero means "the action's own word"; a fix instance gets to
-            // override it when 去开启 would name the wrong errand — see
+            // override it when Turn on would name the wrong errand — see
             // SelfCheck.Fix.Screen.label.
             is SelfCheck.Fix.Screen ->
                 if (fix.label != 0) fix.label else R.string.check_fix_settings
@@ -834,10 +834,10 @@ class SelfCheckUi(
      *
      * In the window host this card is a `TYPE_APPLICATION_OVERLAY` sized to 98%
      * × 96% of the display, and **an overlay outranks every Activity on the
-     * device**. So the browser 去下载 opened came up *underneath* the card that
+     * device**. So the browser Download opened came up *underneath* the card that
      * had just asked the user to look at it, and so did the system Settings page
-     * 去开启 opens. Reported from the field exactly as it looks: "点击去下载ADB
-     * 的时候，应该退出全屏，不然挡住浏览器了". Nothing about the destinations is
+     * Turn on opens. Reported from the field exactly as it looks: "tap DownloadADB
+     * you should exit full-screen, otherwise it covers the browser". Nothing about the destinations is
      * wrong — they are ordinary Activities and they do come up. They just come up
      * behind us.
      *
@@ -850,9 +850,9 @@ class SelfCheckUi(
      * screen had nowhere to return to and dropped the user on the launcher with
      * a ball in the corner. The user's own comparison, and it is the one to
      * satisfy: on the device where the check is the *page* (no assistant yet,
-     * first install) a row's 处理 sends them to Settings and coming back lands
+     * first install) a row's handle sends them to Settings and coming back lands
      * on the list — so that has to be true from the card too:
-     * 「点处理，处理完退回来，就回到桌面了」.
+     * 'tap Fix, and after fixing, going back lands on the home screen''.
      *
      * The fix is [onErrand]: the host that cannot survive the trip is asked to
      * take the Intent, and the one that can leave the per-row decision alone.
@@ -907,7 +907,7 @@ class SelfCheckUi(
      *
      * `queryIntentActivities` rather than `resolveActivity`: the stricter call
      * wants a default-browsing handler, and a device with several browsers and
-     * no default set would read as "nowhere to go" for 去下载 — refusing to
+     * no default set would read as "nowhere to go" for Download — refusing to
      * send the user out on the very button this exists to serve. When the query
      * itself
      * fails the answer is `true`: that defers to [launch]'s own failure toast,
@@ -963,9 +963,9 @@ class SelfCheckUi(
      *
      * The `runCatching` used to be the whole story, and it is how this app
      * shipped a dead button: on a HONOR, `ACTION_NOTIFICATION_LISTENER_SETTINGS`
-     * resolves to no activity at all, so 去开启 swallowed an
+     * resolves to no activity at all, so Turn on swallowed an
      * `ActivityNotFoundException` and the user reported exactly what that
-     * looks like from the outside — "点了没反应". A silent no-op on the one
+     * looks like from the outside — "tapping does nothing". A silent no-op on the one
      * control that exists to fix something is worse than no button, which is the
      * rule this whole card is built on. So the failure gets a voice.
      *
