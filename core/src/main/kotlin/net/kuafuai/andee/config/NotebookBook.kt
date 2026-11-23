@@ -831,14 +831,13 @@ class NotebookBook(private val store: NotebookStore) {
 
     fun bumpPlaybookUse(pkg: String) {
         val p = playbook(pkg) ?: return
-        savePlaybook(p.pkg, p.label, p.habits, p.shortcuts, p.anchors)
-        // Preserve the use count, which savePlaybook resets only for new rows.
         val b = book().let { JSONObject(it.toString()) }
         val arr = b.optJSONArray("playbooks") ?: return
         for (i in 0 until arr.length()) {
             val o = arr.optJSONObject(i) ?: continue
             if (o.optString("pkg") == pkg) {
                 o.put("uses", p.uses + 1)
+                o.put("updated_at", p.updatedAt)
                 write(b)
                 return
             }
@@ -860,14 +859,21 @@ class NotebookBook(private val store: NotebookStore) {
         return true
     }
 
-    /** One line per app, short enough to ride in the system prompt. */
+    /** One line per app, short enough to ride in the system prompt, with a hard total budget. */
     fun playbooksForPrompt(): String = buildString {
+        var budget = MAX_PLAYBOOK_PROMPT_CHARS
         for (p in playbooks().sortedByDescending { it.uses }) {
+            if (budget <= 0) break
             var line = "- ${p.pkg} (${p.label}):"
             if (p.habits.isNotEmpty()) line += " use: ${p.habits.take(2).joinToString("; ")}"
             if (p.shortcuts.isNotEmpty()) line += " try: ${p.shortcuts.take(3).joinToString("; ")}"
             if (p.anchors.isNotEmpty()) line += " anchors: ${p.anchors.take(2).joinToString("; ")}"
-            append(line.take(260)).append('\n')
+            val clipped = line.take(minOf(260, budget))
+            append(clipped)
+            budget -= clipped.length
+            if (budget <= 0) break
+            append('\n')
+            budget--
         }
     }.trim()
 
@@ -1271,6 +1277,7 @@ class NotebookBook(private val store: NotebookStore) {
         const val MAX_SCENES = 30
         const val MAX_SCENE_PROMPT = 3000
         const val MAX_PLAYBOOKS = 60
+        const val MAX_PLAYBOOK_PROMPT_CHARS = 4000
         const val MAX_FLOWS = 30
         const val MAX_FLOW_STEPS = 60
 
