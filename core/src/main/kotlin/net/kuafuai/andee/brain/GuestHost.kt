@@ -55,7 +55,7 @@ class GuestHost(private val inner: BrainHost) : BrainHost by inner {
         callId: String,
         silent: Boolean,
         untrusted: Boolean,
-        kind: TurnKind = TurnKind.PASSIVE,
+        kind: TurnKind,
     ): Any? {
         check(allowed(method)) {
             "This is a request from a friend's Andee, so only the screen, asking the owner and showing a page are open: " +

@@ -2,7 +2,7 @@ package net.kuafuai.andee.shell;
 
 interface IShellService {
     /** Run argv directly (no shell interpreter). Returns a JSON result string. */
-    String exec(String[] cmd, long timeoutMs);
+    String exec(in String[] cmd, long timeoutMs);
 
     /** Service version, so clients can detect a stale process after an app update. */
     int version();

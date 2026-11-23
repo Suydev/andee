@@ -160,7 +160,7 @@ class AndroidBrainHost(
         callId: String,
         silent: Boolean,
         untrusted: Boolean,
-        kind: TurnKind = TurnKind.PASSIVE,
+        kind: TurnKind,
     ): Any? {
         Notebook.callBeingRun = callId
         // Not the dispatcher's: the link to the other devices is not part of this body, and the hub must never

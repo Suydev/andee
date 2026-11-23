@@ -54,10 +54,10 @@ class GuestHostTest {
     }
 
     @Test fun everythingElseIsRefusedAndWhatRunsRunsUntrusted() {
-        guest.dispatch("screen.tap", JSONObject(), callId = "t1", silent = false, untrusted = false)
+        guest.dispatch("screen.tap", JSONObject(), callId = "t1", silent = false, untrusted = false, kind = TurnKind.PEER)
         assertEquals("screen.tap" to true, calls.single())
         for (m in listOf("device.vault.fill", "note.recall", "shell.run", "device.sms.read", "peer.ask", "device.contacts")) {
-            try { guest.dispatch(m, JSONObject(), "t2", false, false); fail("$m reached the owner's device") } catch (e: IllegalStateException) { }
+            try { guest.dispatch(m, JSONObject(), "t2", false, false, kind = TurnKind.PEER); fail("$m reached the owner's device") } catch (e: IllegalStateException) { }
         }
         assertFalse(calls.any { it.first != "screen.tap" })
     }

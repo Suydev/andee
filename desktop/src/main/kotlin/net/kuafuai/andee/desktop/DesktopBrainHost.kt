@@ -121,7 +121,7 @@ class DesktopBrainHost(
         callId: String,
         silent: Boolean,
         untrusted: Boolean,
-        kind: TurnKind = TurnKind.PASSIVE,
+        kind: TurnKind,
     ): Any? {
         TurnGuards.check(method, silent, untrusted, kind = kind)
         val p = providers.firstOrNull { it.handles(method) }
