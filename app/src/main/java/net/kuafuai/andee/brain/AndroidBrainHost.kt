@@ -66,7 +66,7 @@ class AndroidBrainHost(
 
     override fun scenesIndex(): String = Notebook.scenesForPrompt(ctx, foregroundPackage())
     override fun foregroundPackage(): String? =
-        runCatching { net.kuafuai.andee.screen.ScreenController.foregroundPackage() }.getOrNull()
+        net.kuafuai.andee.device.DeviceState.foregroundPkg?.takeIf { it.isNotBlank() }
     override fun flowsIndex(): String = Notebook.flowsForPrompt(ctx)
 
     override fun scene(name: String): Scene? = Notebook.scene(ctx, name)
