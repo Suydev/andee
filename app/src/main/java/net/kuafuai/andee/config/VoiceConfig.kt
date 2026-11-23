@@ -182,7 +182,7 @@ object VoiceConfig {
 
         const val DEFAULT_LLM_BASE_URL = "https://api.deepseek.com"
         const val DEFAULT_LLM_MODEL = "deepseek-flash"
-        const val DEFAULT_REASONING_EFFORT = "high"
+        const val DEFAULT_REASONING_EFFORT = "default"
 
         /**
          * The same two defaults for an **English** card, pointing at OpenAI.
@@ -565,7 +565,14 @@ object VoiceConfig {
                 .getString("api_key", "").orEmpty().isNotBlank()
 
         fun load(context: Context): VoiceSettings {
-            val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            if (!prefs.getBoolean("effort_default_migrated_v1", false)) {
+                prefs.edit()
+                    .remove("llm_reasoning_effort")
+                    .putBoolean("effort_default_migrated_v1", true)
+                    .apply()
+            }
+            val p = prefs
             var uid = p.getString("uid", null)
             if (uid.isNullOrEmpty()) {
                 uid = "tablet-body-${UUID.randomUUID().toString().take(8)}"

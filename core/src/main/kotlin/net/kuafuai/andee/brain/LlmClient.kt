@@ -171,7 +171,9 @@ class LlmClient(
         }
         if (thinking && !noThinking) {
             body.put("thinking", JSONObject().put("type", "enabled"))
-            body.put("reasoning_effort", reasoningEffort)
+            if (reasoningEffort.isNotBlank() && reasoningEffort.trim().lowercase() != "default") {
+                body.put("reasoning_effort", reasoningEffort)
+            }
         } else {
             body.put("thinking", JSONObject().put("type", "disabled"))
         }

@@ -206,6 +206,7 @@
     <string name="common_high">High</string>
     <string name="common_medium">Medium</string>
     <string name="common_low">Low</string>
+    <string name="common_default">Default</string>
     <string name="settings_brain_local_note">The device runs the agent loop itself, with no hub. Without a key it will not take over.</string>
     <string name="settings_codeflying_get_key">No key? Sign up at the link below, then paste your key into the box underneath. New users get free credit.</string>
     <string name="settings_codeflying_open_site">Open CodeFlying.app ›</string>

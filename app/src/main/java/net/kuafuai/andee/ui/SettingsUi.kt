@@ -730,6 +730,7 @@ class SettingsUi(
             effortBlock,
             "llm_reasoning_effort",
             listOf(
+                "default" to lctx.getString(R.string.common_default),
                 "high" to lctx.getString(R.string.common_high),
                 "medium" to lctx.getString(R.string.common_medium),
                 "low" to lctx.getString(R.string.common_low),
