@@ -64,7 +64,9 @@ class AndroidBrainHost(
     override fun reviewRecord(): String = Notebook.recordForReview(ctx)
     override fun todoStillActive(id: String): Boolean = Notebook.todoById(ctx, id)?.status == "active"
 
-    override fun scenesIndex(): String = Notebook.scenesForPrompt(ctx)
+    override fun scenesIndex(): String = Notebook.scenesForPrompt(ctx, foregroundPackage())
+    override fun foregroundPackage(): String? =
+        runCatching { net.kuafuai.andee.screen.ScreenController.foregroundPackage() }.getOrNull()
     override fun flowsIndex(): String = Notebook.flowsForPrompt(ctx)
 
     override fun scene(name: String): Scene? = Notebook.scene(ctx, name)

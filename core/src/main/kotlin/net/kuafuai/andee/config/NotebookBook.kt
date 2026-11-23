@@ -747,12 +747,12 @@ class NotebookBook(private val store: NotebookStore) {
     }
 
     /** One line per scene and per learned app playbook, for the per-turn user message. */
-    fun scenesForPrompt(): String {
+    fun scenesForPrompt(foregroundPkg: String? = null): String {
         val sceneLines = scenes().sortedByDescending { it.lastUsedAt }.joinToString("\n") { s ->
             val auto = if (s.triggerApps.isEmpty()) "" else "  [auto-enters on ${s.triggerApps.joinToString(",")}]"
             "- ${s.name} (${s.title}): ${s.summary}$auto"
         }
-        val playLines = playbooksForPrompt()
+        val playLines = playbooksForPrompt(foregroundPkg)
         return listOf(sceneLines, playLines).filter { it.isNotBlank() }.joinToString("\n\n")
     }
 
@@ -860,11 +860,15 @@ class NotebookBook(private val store: NotebookStore) {
     }
 
     /** One line per app, short enough to ride in the system prompt, with a hard total budget. */
-    fun playbooksForPrompt(): String = buildString {
+    fun playbooksForPrompt(foregroundPkg: String? = null): String = buildString {
         var budget = MAX_PLAYBOOK_PROMPT_CHARS
-        for (p in playbooks().sortedByDescending { it.uses }) {
+        val ordered = playbooks().sortedWith(
+            compareByDescending<AppPlaybook> { it.pkg == foregroundPkg }.thenByDescending { it.uses }
+        )
+        for (p in ordered) {
             if (budget <= 0) break
-            var line = "- ${p.pkg} (${p.label}):"
+            val onScreen = if (p.pkg == foregroundPkg) " [ON SCREEN]" else ""
+            var line = "- ${p.pkg} (${p.label})$onScreen:"
             if (p.habits.isNotEmpty()) line += " use: ${p.habits.take(2).joinToString("; ")}"
             if (p.shortcuts.isNotEmpty()) line += " try: ${p.shortcuts.take(3).joinToString("; ")}"
             if (p.anchors.isNotEmpty()) line += " anchors: ${p.anchors.take(2).joinToString("; ")}"
@@ -902,6 +906,33 @@ class NotebookBook(private val store: NotebookStore) {
         }
         val seeded = book().let { JSONObject(it.toString()) }
         seeded.put("playbooks_seeded", true)
+        write(seeded)
+    }
+
+    /** One-tap launch flows for the user's frequent apps; replayed locally, no model call. */
+    fun seedLaunchFlows() {
+        if (book().optBoolean("launch_flows_seeded", false)) return
+        val presets = listOf(
+            "whatsapp" to "com.whatsapp",
+            "termux" to "com.termux",
+            "youtube" to "com.google.android.youtube",
+            "brave" to "com.brave.browser",
+            "notes" to "com.yygg.note.app",
+            "chrome" to "com.android.chrome",
+        )
+        for ((name, pkg) in presets) {
+            if (flow(name) != null) continue
+            runCatching {
+                saveFlow(
+                    name = name,
+                    title = name.replace('_', ' ').replaceFirstChar { it.uppercase() },
+                    summary = "Opens $pkg",
+                    steps = listOf(FlowStep(kind = "launch", pkg = pkg)),
+                )
+            }
+        }
+        val seeded = book().let { JSONObject(it.toString()) }
+        seeded.put("launch_flows_seeded", true)
         write(seeded)
     }
 

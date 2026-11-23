@@ -192,7 +192,10 @@ class AsrController(
                     runCatching { stopImpl() }
                     // Capture the origin per session; a later tap must not
                     // turn an earlier follow-up result into an exit command.
-                    if (text.isNotBlank()) onTranscript(text, userInitiated)
+                    if (text.isNotBlank()) {
+                        if (VoiceShortcut.tryOpen(context, text)) return@execute
+                        onTranscript(text, userInitiated)
+                    }
                 }
             }
 

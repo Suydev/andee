@@ -70,6 +70,9 @@ interface BrainHost {
     /** The scenes the user can enter, one line each; empty when there are none. */
     fun scenesIndex(): String
 
+    /** Package currently on screen; lets the notebook prioritise its playbook. */
+    fun foregroundPackage(): String? = null
+
     /** The recorded flows the brain may replay, one line each; empty when there are none. */
     fun flowsIndex(): String = ""
 

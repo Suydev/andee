@@ -215,7 +215,8 @@ object Notebook {
     ): Pair<Scene, Boolean> = book(context).saveScene(name, title, summary, prompt, triggerApps)
     fun deleteScene(context: Context, name: String): Boolean = book(context).deleteScene(name)
     fun markSceneUsed(context: Context, name: String) = book(context).markSceneUsed(name)
-    fun scenesForPrompt(context: Context): String = book(context).scenesForPrompt()
+    fun scenesForPrompt(context: Context, foregroundPkg: String? = null): String =
+        book(context).scenesForPrompt(foregroundPkg)
 
     fun playbooks(context: Context): List<AppPlaybook> = book(context).playbooks()
     fun playbook(context: Context, pkg: String): AppPlaybook? = book(context).playbook(pkg)
@@ -230,6 +231,7 @@ object Notebook {
     fun deletePlaybook(context: Context, pkg: String): Boolean = book(context).deletePlaybook(pkg)
     fun bumpPlaybookUse(context: Context, pkg: String) = book(context).bumpPlaybookUse(pkg)
     fun seedPlaybooks(context: Context) = book(context).seedPlaybooks()
+    fun seedLaunchFlows(context: Context) = book(context).seedLaunchFlows()
 
     fun flows(context: Context): List<Flow> = book(context).flows()
     fun flow(context: Context, name: String): Flow? = book(context).flow(name)
