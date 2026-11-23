@@ -1890,6 +1890,72 @@ class CommandDispatcher(
                 JSONObject().put("deleted", s.name)
             }
 
+            // ---- app_playbook.* : learned ways of working inside an app ----
+            "app_playbook.list" -> {
+                val arr = org.json.JSONArray()
+                for (p in Notebook.playbooks(appContext).sortedByDescending { it.uses }) {
+                    arr.put(
+                        JSONObject()
+                            .put("pkg", p.pkg)
+                            .put("label", p.label)
+                            .put("habits", org.json.JSONArray(p.habits))
+                            .put("shortcuts", org.json.JSONArray(p.shortcuts))
+                            .put("anchors", org.json.JSONArray(p.anchors))
+                            .put("uses", p.uses),
+                    )
+                }
+                JSONObject().put("playbooks", arr).put("count", arr.length())
+            }
+
+            "app_playbook.get" -> {
+                val pkg = requireNotNull(params?.optString("pkg")?.trim()?.ifEmpty { null }) {
+                    "app_playbook.get requires pkg"
+                }
+                val p = requireNotNull(Notebook.playbook(appContext, pkg)) {
+                    "no playbook for $pkg"
+                }
+                Notebook.bumpPlaybookUse(appContext, pkg)
+                JSONObject()
+                    .put("pkg", p.pkg)
+                    .put("label", p.label)
+                    .put("habits", org.json.JSONArray(p.habits))
+                    .put("shortcuts", org.json.JSONArray(p.shortcuts))
+                    .put("anchors", org.json.JSONArray(p.anchors))
+                    .put("uses", p.uses + 1)
+            }
+
+            "app_playbook.save" -> {
+                val pkg = requireNotNull(params?.optString("pkg")?.trim()?.ifEmpty { null }) {
+                    "app_playbook.save requires pkg"
+                }
+                fun strings(key: String): List<String> {
+                    val a = params?.optJSONArray(key) ?: return emptyList()
+                    return (0 until a.length()).map { a.optString(it) }
+                }
+                val (p, created) = Notebook.savePlaybook(
+                    context = appContext,
+                    pkg = pkg,
+                    label = params?.optString("label").orEmpty().ifBlank { pkg },
+                    habits = strings("habits"),
+                    shortcuts = strings("shortcuts"),
+                    anchors = strings("anchors"),
+                )
+                JSONObject()
+                    .put("pkg", p.pkg)
+                    .put("label", p.label)
+                    .put("created", created)
+                    .put("habits", org.json.JSONArray(p.habits))
+                    .put("shortcuts", org.json.JSONArray(p.shortcuts))
+            }
+
+            "app_playbook.delete" -> {
+                val pkg = requireNotNull(params?.optString("pkg")?.trim()?.ifEmpty { null }) {
+                    "app_playbook.delete requires pkg"
+                }
+                val removed = Notebook.deletePlaybook(appContext, pkg)
+                JSONObject().put("deleted", pkg).put("removed", removed)
+            }
+
             // ---- flow.* : recorded runs — the scenes' hands ----------------
             //
             // Stored in the notebook next to scenes, so localOnly the same

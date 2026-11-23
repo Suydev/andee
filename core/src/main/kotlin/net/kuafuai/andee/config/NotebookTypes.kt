@@ -74,6 +74,26 @@ data class Flow(
     val okRuns: Int,
 )
 
+/**
+ * What the assistant has learned about working inside one app: the actions the
+ * user repeats, the screen anchors that worked, and the shortcuts worth trying
+ * first. Local-only, written after a run went right, read before the next one.
+ */
+data class AppPlaybook(
+    /** Android package, e.g. com.whatsapp. One playbook per package. */
+    val pkg: String,
+    /** Human label from the device, kept so a prompt is readable. */
+    val label: String,
+    /** Short lines: what this app is for and how the user works in it. */
+    val habits: List<String>,
+    /** Reusable opening moves, e.g. "search", "compose", "share". */
+    val shortcuts: List<String>,
+    /** Screen anchors seen to work, as "view_id|text" strings. */
+    val anchors: List<String>,
+    val uses: Int = 0,
+    val updatedAt: Long = 0L,
+)
+
 /** A promise the brain made to act later, kept in the notebook. */
 data class Todo(
     val id: String,

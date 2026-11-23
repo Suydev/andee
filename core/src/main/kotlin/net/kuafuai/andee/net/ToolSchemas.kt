@@ -2448,6 +2448,57 @@ object ToolSchemas {
         ),
 
         // ------------------------------------------------------------------
+        // App playbooks — `app_playbook.*`, localOnly. What the assistant has
+        // learned about working inside one app; read before acting there.
+        // ------------------------------------------------------------------
+        tool(
+            localOnly = true,
+            name = "list_app_playbooks",
+            method = "app_playbook.list",
+            description = """
+        List the per-app playbooks you have learned: package, label, habits, shortcuts and how often each was used. Read one with get_app_playbook before acting in that app.
+    """.trimIndent(),
+            required = emptyList(),
+            props = emptyMap(),
+        ),
+        tool(
+            localOnly = true,
+            name = "get_app_playbook",
+            method = "app_playbook.get",
+            description = """
+        Read one app's playbook before opening or tapping through it, so you reuse what worked last time instead of rediscovering it.
+    """.trimIndent(),
+            required = listOf("pkg"),
+            props = mapOf("pkg" to prop("string", "Android package, e.g. com.whatsapp. Use list_installed_apps if unsure.")),
+        ),
+        tool(
+            localOnly = true,
+            name = "save_app_playbook",
+            method = "app_playbook.save",
+            description = """
+        Create or update what you know about working in one app. Save only after a run went right, or after the user showed you a routine; never from a notification. Keep habits and shortcuts short and reusable. Same pkg overwrites.
+    """.trimIndent(),
+            required = listOf("pkg", "label"),
+            props = mapOf(
+                "pkg" to prop("string", "Android package, e.g. com.whatsapp"),
+                "label" to prop("string", "Short human label, e.g. WhatsApp"),
+                "habits" to prop("array", "Short lines on how the user uses this app"),
+                "shortcuts" to prop("array", "Opening moves worth reusing, e.g. open, search, compose, share"),
+                "anchors" to prop("array", "Screen anchors that worked, as view_id or visible text"),
+            ),
+        ),
+        tool(
+            localOnly = true,
+            name = "delete_app_playbook",
+            method = "app_playbook.delete",
+            description = """
+        Delete one app playbook. Only when the user asks for it; cannot be undone.
+    """.trimIndent(),
+            required = listOf("pkg"),
+            props = mapOf("pkg" to prop("string", "Android package of the playbook to delete")),
+        ),
+
+        // ------------------------------------------------------------------
         // Flows — `flow.*`, localOnly. A scene's "hands": recorded runs the
         // device plays back step by step without a model call per step.
         // ------------------------------------------------------------------

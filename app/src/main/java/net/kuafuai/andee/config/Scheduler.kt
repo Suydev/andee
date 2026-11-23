@@ -211,6 +211,7 @@ object Scheduler {
     fun catchUp(context: Context): List<net.kuafuai.andee.config.Todo> {
         // A fresh notebook (first start, or after a reset) gets its default todos here, so the loop below arms them.
         runCatching { Notebook.seedDefaults(context) }.onFailure { Log.w(TAG, "could not seed default todos", it) }
+        runCatching { Notebook.seedPlaybooks(context) }.onFailure { Log.w(TAG, "could not seed app playbooks", it) }
         // The phone has a stage, so it seeds the care of keeping it (see Selfhood.seedStageCare). In the
         // interface language: it is shown in 小本本 → 在意 as well as read by the model.
         runCatching {

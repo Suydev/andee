@@ -1115,4 +1115,17 @@
     <string name="window_wake_off">唤醒监听已关（不占话筒）</string>
     <string name="check_title_platform">系统版本偏低</string>
     <string name="check_detail_platform_old">当前是 Android %1$s（API %2$d），低于 Android 11。屏幕截图、看图点击、窗口毛玻璃等依赖新系统接口的功能不可用；聊天、语音、笔记和设置仍可正常使用。升级到 Android 11 及以上即可恢复。</string>
+    <string name="playbooks_tab">App Playbooks</string>
+    <string name="playbooks_empty">No app playbooks yet. Add one below, or ask the assistant to remember how you use an app after it works a routine out.</string>
+    <string name="playbooks_add_title">Add a playbook</string>
+    <string name="playbooks_pkg_hint">Package (e.g. com.whatsapp)</string>
+    <string name="playbooks_label_hint">Label (e.g. WhatsApp)</string>
+    <string name="playbooks_habits_hint">Habits, comma separated</string>
+    <string name="playbooks_shortcuts_hint">Shortcuts, comma separated</string>
+    <string name="playbooks_save">Save playbook</string>
+    <string name="playbooks_use">Use: </string>
+    <string name="playbooks_try">Try: </string>
+    <string name="playbooks_uses">Uses: </string>
+    <string name="playbooks_delete">Delete</string>
+    <string name="playbooks_confirm_delete">Confirm delete</string>
 </resources>

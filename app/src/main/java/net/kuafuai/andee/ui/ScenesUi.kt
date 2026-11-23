@@ -7,6 +7,7 @@ import android.graphics.PixelFormat
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -56,12 +57,13 @@ class ScenesUi(
     private var frosted = false
     private var lctx: Context = context
 
-    /** 0 = scenes, 1 = flows. */
+    /** 0 = scenes, 1 = flows, 2 = app playbooks. */
     private var tab = 0
 
     /** The scene or flow whose 删除 has been tapped once and now reads 确认删除. */
     private var arming: String? = null
     private var armingFlow: String? = null
+    private var armingPlaybook: String? = null
 
     /** Scenes whose rules are unfolded, and flows whose steps are. */
     private val open = mutableSetOf<String>()
@@ -143,7 +145,7 @@ class ScenesUi(
             orientation = LinearLayout.VERTICAL
             setPadding(dp(20), dp(16), dp(20), dp(16))
         }
-        if (tab == 0) buildScenesBody(body) else buildFlowsBody(body)
+        if (tab == 0) buildScenesBody(body) else if (tab == 1) buildFlowsBody(body) else buildPlaybooksBody(body)
 
         val scroll = ScrollView(context)
         scroll.addView(body, matchWrap())
@@ -194,8 +196,109 @@ class ScenesUi(
         )
     }
 
+    private fun buildPlaybooksBody(body: LinearLayout) {
+        val all = Notebook.playbooks(context).sortedByDescending { it.uses }
+        if (all.isEmpty()) body.addView(emptyState())
+        for (p in all) body.addView(playbookRow(p.pkg), matchWrap().apply { bottomMargin = dp(10) })
+
+        body.addView(
+            TextView(context).apply {
+                text = lctx.getString(R.string.playbooks_add_title)
+                textSize = Glass.Type.CAPTION
+                setTextColor(Color.parseColor(Glass.SECONDARY))
+                setPadding(dp(4), dp(16), dp(4), dp(6))
+            },
+            matchWrap(),
+        )
+        val pkgInput = input(lctx.getString(R.string.playbooks_pkg_hint))
+        val labelInput = input(lctx.getString(R.string.playbooks_label_hint))
+        val habitsInput = input(lctx.getString(R.string.playbooks_habits_hint))
+        val shortcutsInput = input(lctx.getString(R.string.playbooks_shortcuts_hint))
+        body.addView(pkgInput, matchWrap().apply { bottomMargin = dp(6) })
+        body.addView(labelInput, matchWrap().apply { bottomMargin = dp(6) })
+        body.addView(habitsInput, matchWrap().apply { bottomMargin = dp(6) })
+        body.addView(shortcutsInput, matchWrap().apply { bottomMargin = dp(8) })
+        body.addView(
+            action(lctx.getString(R.string.playbooks_save)) {
+                val pkg = pkgInput.text.toString().trim()
+                if (pkg.isEmpty()) return@action
+                fun split(s: String) = s.split(',').map { it.trim() }.filter { it.isNotEmpty() }
+                Notebook.savePlaybook(
+                    context = context,
+                    pkg = pkg,
+                    label = labelInput.text.toString().trim().ifEmpty { pkg },
+                    habits = split(habitsInput.text.toString()),
+                    shortcuts = split(shortcutsInput.text.toString()),
+                    anchors = emptyList(),
+                )
+                rebuild()
+            },
+        )
+    }
+
+    private fun playbookRow(pkg: String): View {
+        val p = Notebook.playbook(context, pkg) ?: return View(context)
+        val row = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(14), dp(12), dp(14), dp(12))
+            background = Glass.panel(context, dp(14))
+        }
+        row.addView(TextView(context).apply {
+            text = "${p.label}  ·  ${p.pkg}"
+            textSize = Glass.Type.BODY
+            setTextColor(Color.parseColor(Glass.TITLE))
+        }, matchWrap())
+        val detail = buildString {
+            if (p.habits.isNotEmpty()) append(lctx.getString(R.string.playbooks_use)).append(p.habits.take(3).joinToString("; "))
+            if (p.shortcuts.isNotEmpty()) {
+                if (isNotEmpty()) append('\n')
+                append(lctx.getString(R.string.playbooks_try)).append(p.shortcuts.take(3).joinToString("; "))
+            }
+            append('\n').append(lctx.getString(R.string.playbooks_uses)).append(p.uses)
+        }
+        row.addView(TextView(context).apply {
+            text = detail
+            textSize = Glass.Type.CAPTION
+            setTextColor(Color.parseColor(Glass.SECONDARY))
+            setPadding(0, dp(4), 0, dp(8))
+        }, matchWrap())
+        val armed = armingPlaybook == pkg
+        row.addView(
+            action(
+                lctx.getString(if (armed) R.string.playbooks_confirm_delete else R.string.playbooks_delete),
+                if (armed) Color.parseColor(Glass.WARN) else Glass.ACCENT,
+            ) {
+                if (armed) {
+                    Notebook.deletePlaybook(context, pkg)
+                    armingPlaybook = null
+                    rebuild()
+                } else {
+                    armingPlaybook = pkg
+                    rebuild()
+                }
+            },
+        )
+        return row
+    }
+
+    private fun input(hint: String): EditText = EditText(lctx).apply {
+        this.hint = hint
+        textSize = Glass.Type.CAPTION
+        setTextColor(Color.parseColor(Glass.TITLE))
+        setHintTextColor(Color.parseColor(Glass.MUTED))
+        background = Glass.well(context, dp(12))
+        setPadding(dp(12), dp(8), dp(12), dp(8))
+        isSingleLine = true
+    }
+
     private fun emptyState(): TextView = TextView(context).apply {
-        text = lctx.getString(if (tab == 0) R.string.scenes_empty else R.string.flows_empty)
+        text = lctx.getString(
+            when (tab) {
+                0 -> R.string.scenes_empty
+                1 -> R.string.flows_empty
+                else -> R.string.playbooks_empty
+            },
+        )
         textSize = Glass.Type.BODY
         setTextColor(Color.parseColor(Glass.SECONDARY))
         gravity = Gravity.CENTER
@@ -269,6 +372,8 @@ class ScenesUi(
         bar.addView(tabChip(0, lctx.getString(R.string.scenes_title)))
         bar.addView(View(context), LinearLayout.LayoutParams(dp(10), 1))
         bar.addView(tabChip(1, lctx.getString(R.string.flows_tab)))
+        bar.addView(View(context), LinearLayout.LayoutParams(dp(10), 1))
+        bar.addView(tabChip(2, lctx.getString(R.string.playbooks_tab)))
         return bar
     }
 

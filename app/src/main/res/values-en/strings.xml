@@ -1034,4 +1034,17 @@
     <string name="window_wake_off">Wake listening off (mic free)</string>
     <string name="check_title_platform">Android version too old</string>
     <string name="check_detail_platform_old">This device runs Android %1$s (API %2$d), below Android 11. Screen capture, visual tap targeting and window blur need newer system APIs and are unavailable. Chat, voice, notebook and settings still work. Upgrade to Android 11 or later to restore them.</string>
+    <string name="playbooks_tab">App Playbooks</string>
+    <string name="playbooks_empty">No app playbooks yet. Add one below, or ask the assistant to remember how you use an app after it works a routine out.</string>
+    <string name="playbooks_add_title">Add a playbook</string>
+    <string name="playbooks_pkg_hint">Package (e.g. com.whatsapp)</string>
+    <string name="playbooks_label_hint">Label (e.g. WhatsApp)</string>
+    <string name="playbooks_habits_hint">Habits, comma separated</string>
+    <string name="playbooks_shortcuts_hint">Shortcuts, comma separated</string>
+    <string name="playbooks_save">Save playbook</string>
+    <string name="playbooks_use">Use: </string>
+    <string name="playbooks_try">Try: </string>
+    <string name="playbooks_uses">Uses: </string>
+    <string name="playbooks_delete">Delete</string>
+    <string name="playbooks_confirm_delete">Confirm delete</string>
 </resources>

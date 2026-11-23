@@ -132,6 +132,7 @@ class NotebookBook(private val store: NotebookStore) {
         .put("memories", JSONArray())
         .put("todos", JSONArray())
         .put("scenes", JSONArray())
+        .put("playbooks", JSONArray())
         .put("meta", JSONObject())
 
     /**
@@ -745,12 +746,154 @@ class NotebookBook(private val store: NotebookStore) {
         }
     }
 
-    /** One line per scene for the per-turn user message; empty when there are none. */
-    fun scenesForPrompt(): String =
-        scenes().sortedByDescending { it.lastUsedAt }.joinToString("\n") { s ->
+    /** One line per scene and per learned app playbook, for the per-turn user message. */
+    fun scenesForPrompt(): String {
+        val sceneLines = scenes().sortedByDescending { it.lastUsedAt }.joinToString("\n") { s ->
             val auto = if (s.triggerApps.isEmpty()) "" else "  [auto-enters on ${s.triggerApps.joinToString(",")}]"
-            "- ${s.name}（${s.title}）：${s.summary}$auto"
+            "- ${s.name} (${s.title}): ${s.summary}$auto"
         }
+        val playLines = playbooksForPrompt()
+        return listOf(sceneLines, playLines).filter { it.isNotBlank() }.joinToString("\n\n")
+    }
+
+    // ------------------------------------------------------------------
+    // app playbooks — learned ways of working inside an app
+    // ------------------------------------------------------------------
+
+    fun playbooks(): List<AppPlaybook> {
+        val arr = book().optJSONArray("playbooks") ?: return emptyList()
+        return (0 until arr.length()).mapNotNull { i -> arr.optJSONObject(i)?.let(::toPlaybook) }
+    }
+
+    fun playbook(pkg: String): AppPlaybook? = playbooks().firstOrNull { it.pkg == pkg }
+
+    private fun stringArray(value: JSONArray?): List<String> =
+        if (value == null) emptyList()
+        else (0 until value.length()).map { value.optString(it) }.filter { it.isNotBlank() }
+
+    private fun toPlaybook(o: JSONObject): AppPlaybook = AppPlaybook(
+        pkg = o.optString("pkg"),
+        label = o.optString("label"),
+        habits = stringArray(o.optJSONArray("habits")),
+        shortcuts = stringArray(o.optJSONArray("shortcuts")),
+        anchors = stringArray(o.optJSONArray("anchors")),
+        uses = o.optInt("uses"),
+        updatedAt = o.optLong("updated_at"),
+    )
+
+    private fun toJson(p: AppPlaybook): JSONObject = JSONObject()
+        .put("pkg", p.pkg)
+        .put("label", p.label)
+        .put("habits", JSONArray(p.habits))
+        .put("shortcuts", JSONArray(p.shortcuts))
+        .put("anchors", JSONArray(p.anchors))
+        .put("uses", p.uses)
+        .put("updated_at", p.updatedAt)
+
+    /** Create or overwrite the playbook for one package. */
+    fun savePlaybook(
+        pkg: String,
+        label: String,
+        habits: List<String>,
+        shortcuts: List<String>,
+        anchors: List<String>,
+    ): Pair<AppPlaybook, Boolean> {
+        require(pkg.isNotBlank()) { "pkg is required" }
+        val b = book().let { JSONObject(it.toString()) }
+        val arr = b.optJSONArray("playbooks") ?: JSONArray()
+        val now = System.currentTimeMillis()
+        var old: AppPlaybook? = null
+        val kept = JSONArray()
+        for (i in 0 until arr.length()) {
+            val o = arr.optJSONObject(i) ?: continue
+            if (o.optString("pkg") == pkg) old = toPlaybook(o) else kept.put(o)
+        }
+        check(old != null || kept.length() < MAX_PLAYBOOKS) {
+            "already $MAX_PLAYBOOKS app playbooks; delete one first"
+        }
+        val clean = habits.map { it.trim() }.filter { it.isNotBlank() }.take(8)
+        val moves = shortcuts.map { it.trim() }.filter { it.isNotBlank() }.take(8)
+        val seen = anchors.map { it.trim() }.filter { it.isNotBlank() }.distinct().take(12)
+        val p = AppPlaybook(
+            pkg = pkg.trim(),
+            label = label.trim().take(40),
+            habits = clean,
+            shortcuts = moves,
+            anchors = seen,
+            uses = old?.uses ?: 0,
+            updatedAt = now,
+        )
+        kept.put(toJson(p))
+        b.put("playbooks", kept)
+        write(b)
+        return p to (old == null)
+    }
+
+    fun bumpPlaybookUse(pkg: String) {
+        val p = playbook(pkg) ?: return
+        savePlaybook(p.pkg, p.label, p.habits, p.shortcuts, p.anchors)
+        // Preserve the use count, which savePlaybook resets only for new rows.
+        val b = book().let { JSONObject(it.toString()) }
+        val arr = b.optJSONArray("playbooks") ?: return
+        for (i in 0 until arr.length()) {
+            val o = arr.optJSONObject(i) ?: continue
+            if (o.optString("pkg") == pkg) {
+                o.put("uses", p.uses + 1)
+                write(b)
+                return
+            }
+        }
+    }
+
+    fun deletePlaybook(pkg: String): Boolean {
+        val b = book().let { JSONObject(it.toString()) }
+        val arr = b.optJSONArray("playbooks") ?: return false
+        val kept = JSONArray()
+        var removed = false
+        for (i in 0 until arr.length()) {
+            val o = arr.optJSONObject(i) ?: continue
+            if (o.optString("pkg") == pkg) removed = true else kept.put(o)
+        }
+        if (!removed) return false
+        b.put("playbooks", kept)
+        write(b)
+        return true
+    }
+
+    /** One line per app, short enough to ride in the system prompt. */
+    fun playbooksForPrompt(): String = buildString {
+        for (p in playbooks().sortedByDescending { it.uses }) {
+            var line = "- ${p.pkg} (${p.label}):"
+            if (p.habits.isNotEmpty()) line += " use: ${p.habits.take(2).joinToString("; ")}"
+            if (p.shortcuts.isNotEmpty()) line += " try: ${p.shortcuts.take(3).joinToString("; ")}"
+            if (p.anchors.isNotEmpty()) line += " anchors: ${p.anchors.take(2).joinToString("; ")}"
+            append(line.take(260)).append('\n')
+        }
+    }.trim()
+
+    /** Seed a few useful app playbooks on a fresh notebook; never overwrite learned ones. */
+    fun seedPlaybooks() {
+        val presets = listOf(
+            Triple("com.whatsapp", "WhatsApp", listOf("read and reply to chats", "check mentions first")),
+            Triple("com.termux", "Termux", listOf("run shell commands", "check output before acting")),
+            Triple("com.google.android.youtube", "YouTube", listOf("search and play videos", "read titles before opening")),
+            Triple("com.brave.browser", "Brave", listOf("open sites and search the web", "read the page before tapping")),
+            Triple("com.yygg.note.app", "Notes", listOf("write and read notes", "confirm before deleting")),
+            Triple("com.android.chrome", "Chrome", listOf("open sites and search the web", "read the page before tapping")),
+        )
+        for ((pkg, label, habits) in presets) {
+            if (playbook(pkg) != null) continue
+            runCatching {
+                savePlaybook(
+                    pkg = pkg,
+                    label = label,
+                    habits = habits,
+                    shortcuts = listOf("open $label", "read current screen", "tap by text"),
+                    anchors = emptyList(),
+                )
+            }
+        }
+    }
 
     // ------------------------------------------------------------------
     // flows
@@ -1127,6 +1270,7 @@ class NotebookBook(private val store: NotebookStore) {
         const val SOURCE_FAILURE_REVIEW = "failure_review"
         const val MAX_SCENES = 30
         const val MAX_SCENE_PROMPT = 3000
+        const val MAX_PLAYBOOKS = 60
         const val MAX_FLOWS = 30
         const val MAX_FLOW_STEPS = 60
 

@@ -67,6 +67,18 @@ New provider value: `local` (constant in both `core/.../config/VoiceSettings.kt`
 - Keep voice shortcuts (`open <app>`, `show notifications`, `screenshot`) documented in `docs/reference.md`.
 - English-only UI: apply the 399-entry translation map (already committed on branch `translate-kotlin-strings`, 421 literals across 49 files).
 
+## App Playbooks (added scope)
+
+A per-package learning store for fast app control:
+
+- `AppPlaybook(pkg, label, habits, shortcuts, anchors, uses, updatedAt)` in `NotebookTypes.kt`.
+- Stored in the existing encrypted notebook blob under `playbooks`; CRUD, seeding, and a prompt index in `NotebookBook.kt`; façade in `Notebook.kt`.
+- Tools `list_app_playbooks`, `get_app_playbook`, `save_app_playbook`, `delete_app_playbook` (`app_playbook.*`, localOnly) in `ToolSchemas.kt` and `CommandDispatcher.kt`.
+- Six playbooks seeded on first run for WhatsApp, Termux, YouTube, Brave, Notes, Chrome.
+- Prompt index is appended to `scenesForPrompt()`, so the model reads learned app shortcuts on every turn.
+- UI: a third "App Playbooks" tab in `ScenesUi.kt` with list, delete, and an add form.
+- Learning mode (user decision): demonstrate once or complete a task successfully, then auto-save/refine; no passive screen observation.
+
 ## Build and verification
 
 - One commit on top of the current work, then a single push to `Suydev/andee` `main`.

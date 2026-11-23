@@ -217,6 +217,20 @@ object Notebook {
     fun markSceneUsed(context: Context, name: String) = book(context).markSceneUsed(name)
     fun scenesForPrompt(context: Context): String = book(context).scenesForPrompt()
 
+    fun playbooks(context: Context): List<AppPlaybook> = book(context).playbooks()
+    fun playbook(context: Context, pkg: String): AppPlaybook? = book(context).playbook(pkg)
+    fun savePlaybook(
+        context: Context,
+        pkg: String,
+        label: String,
+        habits: List<String>,
+        shortcuts: List<String>,
+        anchors: List<String>,
+    ): Pair<AppPlaybook, Boolean> = book(context).savePlaybook(pkg, label, habits, shortcuts, anchors)
+    fun deletePlaybook(context: Context, pkg: String): Boolean = book(context).deletePlaybook(pkg)
+    fun bumpPlaybookUse(context: Context, pkg: String) = book(context).bumpPlaybookUse(pkg)
+    fun seedPlaybooks(context: Context) = book(context).seedPlaybooks()
+
     fun flows(context: Context): List<Flow> = book(context).flows()
     fun flow(context: Context, name: String): Flow? = book(context).flow(name)
     fun saveFlow(
