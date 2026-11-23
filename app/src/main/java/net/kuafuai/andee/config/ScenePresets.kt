@@ -105,7 +105,7 @@ object ScenePresets {
         name = "chat_duty",
         zh = Text(
             title = "Message watch desk",
-            summary = "Watch notifications from all chat apps, tell me about the important ones right away, and keep quiet about the rest.",
+            summary = "盯着所有聊天应用的通知，要紧的立刻告诉你，其余保持安静。",
             example = "Watch my notifications, tell me about the important ones right away, and don't bother me with the rest",
             prompt = """
         When I'm in this scene, I am the watch desk for all of this person's chat apps on the device — no matter which app, WhatsApp, Telegram, Slack, Signal, Messenger, Instagram, WeChat, or anything else. This scene exists precisely because their messages are scattered across several apps that don't talk to one another. 
@@ -171,7 +171,7 @@ object ScenePresets {
         name = "subscription_audit",
         zh = Text(
             title = "Subscription cleanup",
-            summary = "Find out what subscriptions you pay for each month and ask whether to cancel them — nothing gets cancelled before you say so.",
+            summary = "查出你每月在为哪些订阅付费，问你要不要退，退之前不会动手。",
             example = "Help me check which subscriptions I'm paying for every month",
             prompt = """
         When I'm in this scene, my job is to help this person see which subscriptions they're paying for, and only help them cancel after they nod. 
@@ -215,7 +215,7 @@ object ScenePresets {
         name = "meeting_notes",
         zh = Text(
             title = "Meeting notes",
-            summary = "Record the meeting, turn it into a notes page afterwards, and ask which to-dos you want saved.",
+            summary = "开会时录音，结束后整理成纪要页，并把待办挑出来问你要不要记下。",
             example = "Record the meeting later and give me notes when it's over",
             prompt = """
         When I'm in this scene, my job is to run the meeting for this person: record it, then give them minutes they can actually use. 
@@ -271,7 +271,7 @@ object ScenePresets {
         name = "timed_booking",
         zh = Text(
             title = "Book it for me when the time comes",
-            summary = "Tickets, clinic appointments, sign-ups: I'll go in and do it at the right time, but payment and the final confirmation are always yours.",
+            summary = "抢票、挂号、报名：到点替你进去办，付款和最后确认永远留给你。",
             example = "Watch for slots to open and grab one for me when the time comes; leave the last step to me",
             prompt = """
         When I'm in this scene, my job is to grab a slot for this person at the agreed time: a train ticket, a clinic appointment, a sign-up. I take them right up to the last step, but the last step is always theirs. 
@@ -330,7 +330,7 @@ object ScenePresets {
         name = "whatsapp_fast",
         zh = Text(
             title = "WhatsApp fast lane",
-            summary = "Quick from the moment you enter: notifications only, short draft replies, and I ask before sending.",
+            summary = "进来就快：只读通知、短句草稿，发送前先问你。",
             example = "I'm in WhatsApp, help me handle messages quickly",
             prompt = """
         When I'm in this scene, the user wants everything fast in  WhatsApp . Use  get_notifications  to see what's arrived; don't go digging through chat histories on your own. Only the key points, one line per person, no reading out whole messages, never read a verification code. 

@@ -15,10 +15,10 @@ internal object VoiceExitCommand {
         "exit Andee", "close Andee", "quit Andee",
         "Andee exit", "Andee close", "Andee quit",
         "take a break", "Andee take a break", "Hey Andee take a break",
-        "Exit Andee", "Shut down Andee", "Andee, exit", "Andee, shut down",
-        "Exit Andee", "Shut down Andee", "Andee, exit", "Andee, shut down",
-        "Take a break", "Let's take a break first", "You take a break first",
-        "Andee, take a break", "Andee, take a break", "Andee, you take a break first",
+        "退出 Andee", "关闭 Andee", "Andee 退出", "Andee 关闭",
+        "退出安迪", "关闭安迪", "安迪退出", "安迪关闭",
+        "休息一下", "先休息一下", "你先休息一下",
+        "Andee 休息一下", "安迪休息一下", "安迪你先休息一下",
     ).map(::normalize).toSet()
 
     fun matches(text: String, userInitiated: Boolean = true): Boolean =
