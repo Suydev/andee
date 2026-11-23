@@ -135,9 +135,9 @@ class TasksUi(
             gravity = Gravity.CENTER_VERTICAL
             setPadding(dp(22), dp(18), dp(14), dp(12))
         }
-        if (task != null) h.addView(chip("‹ " + t("在办", "In hand")) { open = null; rebuild() })
+        if (task != null) h.addView(chip("‹ " + t("In progress", "In hand")) { open = null; rebuild() })
         h.addView(
-            label(if (task != null) "" else t("在办", "In hand"), Glass.Type.HEADLINE, Glass.TITLE),
+            label(if (task != null) "" else t("In progress", "In hand"), Glass.Type.HEADLINE, Glass.TITLE),
             LinearLayout.LayoutParams(0, WRAP, 1f),
         )
         h.addView(chip("✕") { hide() })
@@ -150,7 +150,7 @@ class TasksUi(
         val now = System.currentTimeMillis()
         val active = TaskRows.ordered(tasks.active())
         if (active.isEmpty()) {
-            body.addView(label(t("现在没有在办的事。Andee 接下一件一时办不完的事（要问别人、要等回话、要过会儿再做），就会出现在这里，办完为止。",
+            body.addView(label(t("Nothing in progress right now. When Andee picks up something that can't be finished in one go (needs to ask someone, wait for a reply, or be done later), it shows up here until it's done.",
             "Nothing in hand. When Andee takes on something it cannot finish at once, it shows here until it is done."),
             Glass.Type.CAPTION, Glass.SECONDARY), matchWrap())
         }
@@ -180,7 +180,7 @@ class TasksUi(
         val week = 7L * 24 * 3_600_000
         val closed = tasks.all().filter { !it.active && now - it.closedAt < week }.sortedByDescending { it.closedAt }
         if (closed.isNotEmpty()) {
-            body.addView(label(t("最近办完", "Recently finished"), Glass.Type.CAPTION, Glass.MUTED, top = 8), matchWrap().apply { bottomMargin = dp(6) })
+            body.addView(label(t("Recently finished", "Recently finished"), Glass.Type.CAPTION, Glass.MUTED, top = 8), matchWrap().apply { bottomMargin = dp(6) })
             for (task in closed) {
                 val row = panel()
                 row.addView(label((if (task.status == "done") "✓ " else "— ") + task.what, Glass.Type.CAPTION, Glass.SECONDARY), matchWrap())
@@ -203,14 +203,14 @@ class TasksUi(
         when {
             task.status == Tasks.DELIVERED -> {
                 val p = panel()
-                p.addView(label(t("Andee 说交付了：", "Andee says it delivered: ") + task.result.ifBlank { t("（没写交付了什么）", "(it did not say what)") },
+                p.addView(label(t("Andee says it delivered: ", "Andee says it delivered: ") + task.result.ifBlank { t("(didn't say what was delivered)", "(it did not say what)") },
                 Glass.Type.BODY, Glass.TITLE), matchWrap())
-                p.addView(label(t("办没办完，你说了算。", "Whether it is done is yours to say."), Glass.Type.CAPTION, Glass.SECONDARY, top = 4), matchWrap())
+                p.addView(label(t("Whether it's done is up to you.", "Whether it is done is yours to say."), Glass.Type.CAPTION, Glass.SECONDARY, top = 4), matchWrap())
                 body.addView(p, matchWrap().apply { bottomMargin = dp(10) })
                 body.addView(buttons(
-                    t("✓ 办完了", "✓ Done") to { confirm(task) },
-                    t("还没完", "Not yet") to {
-                        tasks.reopen(task.id, t("用户说还没完", "the user said it is not done"))
+                    t("✓ Done", "✓ Done") to { confirm(task) },
+                    t("Not done yet", "Not yet") to {
+                        tasks.reopen(task.id, t("User says it's not done", "the user said it is not done"))
                         hide(); onTalk(task)
                     },
                 ), matchWrap().apply { bottomMargin = dp(12) })
@@ -219,27 +219,27 @@ class TasksUi(
                 val running = TaskRows.runningWorker(task)
                 if (running != null && onStopWorker != null) buildRunningActions(body, task, running)
                 else body.addView(buttons(
-                    t("接着办", "Carry on") to { hide(); onContinue(task) },
-                    t("说点要求", "Say how") to { hide(); onTalk(task) },
-                    t("办完了", "Done") to { confirm(task) },
-                    t("放下", "Let go") to { letGo(task) },
+                    t("Keep going", "Carry on") to { hide(); onContinue(task) },
+                    t("Add some requirements", "Say how") to { hide(); onTalk(task) },
+                    t("Done", "Done") to { confirm(task) },
+                    t("Let go", "Let go") to { letGo(task) },
                 ), matchWrap().apply { bottomMargin = dp(12) })
             }
             else -> {
-                body.addView(label((if (task.status == "done") t("办完了：", "Done: ") else t("放下了：", "Let go: ")) + task.result,
+                body.addView(label((if (task.status == "done") t("Done: ", "Done: ") else t("Let go of: ", "Let go: ")) + task.result,
                 Glass.Type.CAPTION, Glass.SECONDARY), matchWrap().apply { bottomMargin = dp(8) })
-                body.addView(buttons(t("重新打开", "Reopen") to { tasks.reopen(task.id, t("用户重新打开", "reopened by the user")); rebuild() }),
+                body.addView(buttons(t("Reopen", "Reopen") to { tasks.reopen(task.id, t("User reopened", "reopened by the user")); rebuild() }),
                 matchWrap().apply { bottomMargin = dp(12) })
             }
         }
         val from = panel()
-        from.addView(label(t("从哪来：", "From: ") + TaskRows.whose(task.from, zh()) +
+        from.addView(label(t("Came from: ", "From: ") + TaskRows.whose(task.from, zh()) +
         task.from.quote.takeIf { it.isNotBlank() }?.let { " — 「${it.take(120)}」" }.orEmpty(), Glass.Type.CAPTION, Glass.TITLE), matchWrap())
-        if (task.deliverTo.kind != "user") from.addView(label(t("办完交给：", "Deliver to: ") + TaskRows.whose(task.deliverTo, zh()), Glass.Type.CAPTION, Glass.TITLE, top = 4), matchWrap())
-        if (task.next.isNotBlank()) from.addView(label(t("下一步：", "Next: ") + task.next, Glass.Type.CAPTION, Glass.TITLE, top = 4), matchWrap())
+        if (task.deliverTo.kind != "user") from.addView(label(t("Handed off when done: ", "Deliver to: ") + TaskRows.whose(task.deliverTo, zh()), Glass.Type.CAPTION, Glass.TITLE, top = 4), matchWrap())
+        if (task.next.isNotBlank()) from.addView(label(t("Next step: ", "Next: ") + task.next, Glass.Type.CAPTION, Glass.TITLE, top = 4), matchWrap())
         body.addView(from, matchWrap().apply { bottomMargin = dp(10) })
         if (task.waits.isNotEmpty()) {
-            body.addView(label(t("等过 / 在等", "Waits"), Glass.Type.CAPTION, Glass.MUTED), matchWrap().apply { bottomMargin = dp(6) })
+            body.addView(label(t("Waited / waiting", "Waits"), Glass.Type.CAPTION, Glass.MUTED), matchWrap().apply { bottomMargin = dp(6) })
             for (w in task.waits) {
                 val p = panel()
                 p.addView(label((if (w.open) "○ " else "● ") + TaskRows.who(w, zh()) + (if (w.asked.isNotBlank()) " · " + w.asked else ""), Glass.Type.CAPTION, Glass.TITLE), matchWrap())
@@ -248,7 +248,7 @@ class TasksUi(
             }
         }
         if (task.steps.isNotEmpty()) {
-            body.addView(label(t("经过", "Steps"), Glass.Type.CAPTION, Glass.MUTED, top = 4), matchWrap().apply { bottomMargin = dp(6) })
+            body.addView(label(t("Elapsed", "Steps"), Glass.Type.CAPTION, Glass.MUTED, top = 4), matchWrap().apply { bottomMargin = dp(6) })
             val fmt = java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.US)
             for (s in task.steps) body.addView(label(fmt.format(java.util.Date(s.at)) + "  " + s.text, Glass.Type.CAPTION, Glass.TITLE), matchWrap().apply { bottomMargin = dp(4) })
         }
@@ -273,8 +273,8 @@ class TasksUi(
                 setOnClickListener { open(w, task.what) }
             }
             row.addView(label("📁", Glass.Type.BODY, Glass.TITLE).apply { setPadding(0, 0, dp(10), 0) })
-            row.addView(label(t("工作文件", "Work files") + " · dsh #$w", Glass.Type.BODY, Glass.TITLE), LinearLayout.LayoutParams(0, WRAP, 1f))
-            row.addView(label(t("在电脑上，点开才下载 ›", "on the computer, fetched when opened ›"), Glass.Type.CAPTION, Glass.SECONDARY))
+            row.addView(label(t("Work files", "Work files") + " · dsh #$w", Glass.Type.BODY, Glass.TITLE), LinearLayout.LayoutParams(0, WRAP, 1f))
+            row.addView(label(t("On the computer — tap to download ›", "on the computer, fetched when opened ›"), Glass.Type.CAPTION, Glass.SECONDARY))
             body.addView(row, matchWrap().apply { bottomMargin = dp(10) })
         }
     }
@@ -306,20 +306,20 @@ class TasksUi(
         p.addView(oneLine(label("dsh #${w.name} · " + net.kuafuai.andee.peer.RemoteProgress.line(s, System.currentTimeMillis(), zh()),
             Glass.Type.CAPTION, Glass.ACCENT)), matchWrap())
         if (s.todos.isNotEmpty()) {
-            p.addView(label(t("它的清单 ${s.done}/${s.todos.size}", "Its checklist ${s.done}/${s.todos.size}"), Glass.Type.CAPTION, Glass.MUTED, top = 6), matchWrap())
+            p.addView(label(t("Its checklist ${s.done}/${s.todos.size}", "Its checklist ${s.done}/${s.todos.size}"), Glass.Type.CAPTION, Glass.MUTED, top = 6), matchWrap())
             for (td in s.todos.take(8)) p.addView(oneLine(label((when (td.status) { "completed" -> "✓ "; "in_progress" -> "▸ "; else -> "○ " }) + td.text,
                 Glass.Type.CAPTION, if (td.status == "in_progress") Glass.TITLE else Glass.SECONDARY, top = 2)), matchWrap())
         }
         if (s.recent.isNotEmpty()) {
-            p.addView(label(t("最近在做", "Lately"), Glass.Type.CAPTION, Glass.MUTED, top = 6), matchWrap())
+            p.addView(label(t("Recently worked on", "Lately"), Glass.Type.CAPTION, Glass.MUTED, top = 6), matchWrap())
             for (a in s.recent.takeLast(4)) p.addView(oneLine(label("· $a", Glass.Type.CAPTION, Glass.SECONDARY, top = 2)), matchWrap())
         }
-        if (s.files > 0) p.addView(label(t("已经产出 ${s.files} 个文件（在电脑上）", "${s.files} files so far (on the computer)"), Glass.Type.CAPTION, Glass.SECONDARY, top = 6), matchWrap())
+        if (s.files > 0) p.addView(label(t("Produced ${s.files} files (on the computer)", "${s.files} files so far (on the computer)"), Glass.Type.CAPTION, Glass.SECONDARY, top = 6), matchWrap())
     }
 
     /** 放下: close the 事 as dropped and cancel the alarms it had armed. */
     private fun letGo(task: Tasks.Task) {
-        tasks.close(task.id, "dropped", t("用户在在办里放下了", "let go by the user in 在办"))
+        tasks.close(task.id, "dropped", t("User let go of it in In progress", "let go by the user in In progress"))
             .onSuccess { c -> c.cancel.forEach { Scheduler.cancelTodo(context, it) } }
         open = null; rebuild()
     }
@@ -336,26 +336,26 @@ class TasksUi(
         val mode = asking
         if (mode == null) {
             body.addView(buttons(
-                t("停止 dsh", "Stop dsh") to { stopWorker(worker) },
-                t("办完了", "Done") to { asking = "done"; rebuild() },
-                t("放下", "Let go") to { asking = "dropped"; rebuild() },
+                t("Stop dsh", "Stop dsh") to { stopWorker(worker) },
+                t("Done", "Done") to { asking = "done"; rebuild() },
+                t("Let go", "Let go") to { asking = "dropped"; rebuild() },
             ), matchWrap().apply { bottomMargin = dp(12) })
             return
         }
         val done = mode == "done"
         val p = panel()
-        p.addView(label(t("dsh #$worker 还在跑", "dsh #$worker is still running"), Glass.Type.BODY, Glass.DANGER), matchWrap())
+        p.addView(label(t("dsh #$worker is still running", "dsh #$worker is still running"), Glass.Type.BODY, Glass.DANGER), matchWrap())
         p.addView(label(
-            t("先把它停掉吗？不停的话它会跑完，花的是你的额度，报告回来时这件事已经关了，没人接。",
+            t("Stop it first? If not, it'll run to completion using your quota, and by the time the report comes back the matter will already be closed with nobody to receive it.",
                 "Stop it first? If not it runs to the end on your quota, and its report arrives after this is closed, with nobody to take it."),
             Glass.Type.CAPTION, Glass.TITLE, top = 4,
         ), matchWrap())
         body.addView(p, matchWrap().apply { bottomMargin = dp(8) })
         val finish = { if (done) confirm(task) else letGo(task); asking = null }
         body.addView(buttons(
-            t("停掉并" + if (done) "办完" else "放下", "Stop it and " + if (done) "finish" else "let go") to { stopWorker(worker); finish() },
-            t("让它继续跑", "Leave it running") to { finish() },
-            t("取消", "Cancel") to { asking = null; rebuild() },
+            t("Stop and " + if (done) "done" else "Let go", "Stop it and " + if (done) "finish" else "let go") to { stopWorker(worker); finish() },
+            t("Let it keep running", "Leave it running") to { finish() },
+            t("Cancel", "Cancel") to { asking = null; rebuild() },
         ), matchWrap().apply { bottomMargin = dp(12) })
     }
 
@@ -367,8 +367,8 @@ class TasksUi(
             Handler(Looper.getMainLooper()).post {
                 ChatHistory.addEvent(
                     net.kuafuai.andee.brain.BrainEvent.Kind.STOPPED.name,
-                    if (ok) t("你叫停了电脑上的 dsh #$worker", "You stopped dsh #$worker on the computer")
-                    else t("没能叫停电脑上的 dsh #$worker（够不着电脑，或它已经结束了）", "Could not stop dsh #$worker on the computer (out of reach, or it already ended)"),
+                    if (ok) t("You stopped dsh #$worker on the computer", "You stopped dsh #$worker on the computer")
+                    else t("Couldn't stop dsh #$worker on the computer (can't reach the computer, or it has already finished)", "Could not stop dsh #$worker on the computer (out of reach, or it already ended)"),
                     "",
                 )
                 if (root != null) rebuild()
@@ -378,7 +378,7 @@ class TasksUi(
 
     private fun confirm(task: Tasks.Task) {
         tasks.confirm(task.id).onSuccess { c -> c.cancel.forEach { Scheduler.cancelTodo(context, it) } }
-        ChatHistory.addEvent(net.kuafuai.andee.brain.BrainEvent.Kind.TASK_DONE.name, t("你确认办完了：", "You confirmed done: ") + task.what, "")
+        ChatHistory.addEvent(net.kuafuai.andee.brain.BrainEvent.Kind.TASK_DONE.name, t("You confirmed it's done: ", "You confirmed done: ") + task.what, "")
         open = null
         rebuild()
     }
@@ -508,10 +508,10 @@ object TaskRows {
 
     fun state(t: Tasks.Task, now: Long, zh: Boolean): String {
         fun tr(a: String, b: String) = if (zh) a else b
-        if (t.status == Tasks.DELIVERED) return tr("交付了，等你确认", "Delivered — confirm?")
-        if (!t.active) return if (t.status == "done") tr("办完了", "done") else tr("放下了", "let go")
+        if (t.status == Tasks.DELIVERED) return tr("Delivered, waiting for your confirmation", "Delivered — confirm?")
+        if (!t.active) return if (t.status == "done") tr("Done", "done") else tr("Let go of it", "let go")
         val answered = t.waits.lastOrNull { !it.open && !it.seen }
-        if (t.status == "ready" && answered != null) return tr("回话到了：", "Answered: ") + answered.answer.lineSequence().first().take(50)
+        if (t.status == "ready" && answered != null) return tr("Reply arrived: ", "Answered: ") + answered.answer.lineSequence().first().take(50)
         val open = t.waits.filter { it.open }
         // A worker on the computer that is running now: what it is on, like the Mac's row.
         open.firstOrNull { it.kind == "worker" }?.let { w ->
@@ -519,30 +519,30 @@ object TaskRows {
                 return "dsh #${w.name} · " + net.kuafuai.andee.peer.RemoteProgressText.of(s, now, zh).asList().joinToString("\n")
             }
         }
-        if (open.isNotEmpty()) return tr("在等 ", "Waiting on ") + open.joinToString(", ") { who(it, zh) } + " · " + ago(now - open.maxOf { it.at }, zh)
-        if (t.next.isNotBlank()) return tr("下一步：", "Next: ") + t.next
-        return tr("进行中", "Under way")
+        if (open.isNotEmpty()) return tr("Waiting for ", "Waiting on ") + open.joinToString(", ") { who(it, zh) } + " · " + ago(now - open.maxOf { it.at }, zh)
+        if (t.next.isNotBlank()) return tr("Next step: ", "Next: ") + t.next
+        return tr("In progress", "Under way")
     }
 
     fun whose(s: net.kuafuai.andee.brain.Source, zh: Boolean): String = when (s.kind) {
-        "user" -> if (zh) "你" else "you"
-        "self" -> if (zh) "Andee 自己" else "Andee itself"
+        "user" -> if (zh) "You" else "you"
+        "self" -> if (zh) "Andee itself" else "Andee itself"
         else -> s.short()
     }
 
     fun who(w: Tasks.Wait, zh: Boolean): String = when (w.kind) {
-        "user" -> if (zh) "你" else "you"
-        "worker" -> if (zh) "电脑上的 dsh 工作者 #${w.name}" else "dsh worker #${w.name} on the computer"
+        "user" -> if (zh) "You" else "you"
+        "worker" -> if (zh) "dsh worker on the computer #${w.name}" else "dsh worker #${w.name} on the computer"
         else -> w.short()
     }
 
     fun ago(ms: Long, zh: Boolean): String {
         val m = ms / 60_000
         return when {
-            m < 1 -> if (zh) "刚刚" else "just now"
-            m < 60 -> if (zh) "$m 分钟" else "${m}m"
-            m < 48 * 60 -> if (zh) "${m / 60} 小时" else "${m / 60}h"
-            else -> if (zh) "${m / 1440} 天" else "${m / 1440}d"
+            m < 1 -> if (zh) "just now" else "just now"
+            m < 60 -> if (zh) "$m min" else "${m}m"
+            m < 48 * 60 -> if (zh) "${m / 60} hr" else "${m / 60}h"
+            else -> if (zh) "${m / 1440} d" else "${m / 1440}d"
         }
     }
 }

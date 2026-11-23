@@ -314,10 +314,10 @@ object Ages {
     fun ago(ms: Long, zh: Boolean = false): String {
         val m = (ms / 60_000).coerceAtLeast(0)
         return if (zh) when {
-            m < 2 -> "刚刚"
-            m < 90 -> "$m 分钟前"
-            m < 36 * 60 -> "${m / 60} 小时前"
-            else -> "${m / (24 * 60)} 天前"
+            m < 2 -> "just now"
+            m < 90 -> "$m min ago"
+            m < 36 * 60 -> "${m / 60} hr ago"
+            else -> "${m / (24 * 60)} d ago"
         } else when {
             m < 2 -> "just now"
             m < 90 -> "$m min ago"

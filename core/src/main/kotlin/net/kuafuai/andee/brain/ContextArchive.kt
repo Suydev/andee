@@ -136,7 +136,7 @@ class ContextArchive(private val dir: File) {
     }
 
     private fun firstLine(text: String): String =
-        text.lineSequence().firstOrNull { it.contains("我：") }?.substringAfter("我：")?.trim()?.take(40)
+        text.lineSequence().firstOrNull { it.contains("Me: ") }?.substringAfter("Me: ")?.trim()?.take(40)
             ?: text.lineSequence().firstOrNull { it.isNotBlank() }?.trim()?.take(40).orEmpty()
 
     companion object {
@@ -173,14 +173,14 @@ class ContextArchive(private val dir: File) {
                         if (raw == null) continue // a screenshot or a photo: not text, not kept
                         val stamp = raw.takeIf { it.startsWith("[now ") }?.let { it.substring(0, it.indexOf(']') + 1) }.orEmpty()
                         val words = TopicSplitter.spokenText(raw)
-                        if (words.isNotEmpty()) sb.append(stamp).append(if (stamp.isEmpty()) "" else " ").append("我：").append(words).append("\n")
+                        if (words.isNotEmpty()) sb.append(stamp).append(if (stamp.isEmpty()) "" else " ").append("Me: ").append(words).append("\n")
                     }
                     "assistant" -> {
-                        if (!raw.isNullOrBlank()) sb.append("他：").append(raw.trim()).append('\n')
+                        if (!raw.isNullOrBlank()) sb.append("Him: ").append(raw.trim()).append('\n')
                         val calls = m.optJSONArray("tool_calls")
                         if (calls != null) for (k in 0 until calls.length()) {
                             val f = calls.optJSONObject(k)?.optJSONObject("function") ?: continue
-                            sb.append("（调用 ").append(f.optString("name")).append(' ')
+                            sb.append("(calling ").append(f.optString("name")).append(' ')
                                 .append(f.optString("arguments").take(300)).append("）\n")
                         }
                     }
@@ -188,11 +188,11 @@ class ContextArchive(private val dir: File) {
                         val name = names[m.optString("tool_call_id")].orEmpty()
                         val body = raw.orEmpty()
                         when {
-                            sensitive(name) -> sb.append("（").append(name).append(" 的结果不留存）\n")
+                            sensitive(name) -> sb.append("（").append(name).append(" — result not kept)\n")
                             body.isBlank() -> {}
-                            body.length <= TOOL_CHARS -> sb.append("（").append(name).append(" 返回）").append(body).append('\n')
-                            else -> sb.append("（").append(name).append(" 返回，前 ").append(TOOL_CHARS).append(" 字 / 共 ")
-                                .append(body.length).append(" 字）").append(body.take(TOOL_CHARS)).append('\n')
+                            body.length <= TOOL_CHARS -> sb.append("（").append(name).append(" returned)").append(body).append('\n')
+                            else -> sb.append("（").append(name).append(" returned, first ").append(TOOL_CHARS).append(" chars / ")
+                                .append(body.length).append(" chars total)").append(body.take(TOOL_CHARS)).append('\n')
                         }
                     }
                 }

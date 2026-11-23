@@ -346,7 +346,7 @@ object ImeSwitch {
             Log.w(TAG, "default IME is the headless one and we may not change it")
             return null
         }
-        Log.i(TAG, "默认输入法是 ADBKeyboard（它没有键盘界面）→ 换回 ${human.second}")
+        Log.i(TAG, "The default input method is ADBKeyboard (it has no keyboard UI) → switch back to ${human.second}")
         return if (select(context, human.first)) human.first else null
     }
 

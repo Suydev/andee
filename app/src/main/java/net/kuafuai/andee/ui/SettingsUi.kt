@@ -546,7 +546,7 @@ class SettingsUi(
         // must NOT be translated, and translating them is the one way to make
         // the picker unusable.
         options = listOf(
-            VoiceConfig.LANG_ZH to "中",
+            VoiceConfig.LANG_ZH to "Chinese",
             VoiceConfig.LANG_EN to "EN",
         ),
         picked = if (english) VoiceConfig.LANG_EN else VoiceConfig.LANG_ZH,

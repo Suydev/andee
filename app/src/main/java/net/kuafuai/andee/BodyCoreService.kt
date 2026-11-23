@@ -2521,7 +2521,7 @@ class BodyCoreService : Service() {
             )
         }
         val wake = buildString {
-            append("[Device event — a flow the USER started from the 情景/脚本 card stopped. ")
+            append("[Device event — a flow the USER started from the Scene/Script card stopped. ")
             append("Nobody spoke; do not ask what happened and do not wait to be told. Take over now.]\n")
             append("Flow: ${flow.name} (${flow.title}), ${flow.steps.size} steps. ")
             append("Steps before the stop already succeeded — they MUST NOT run again.\n")
@@ -2576,7 +2576,7 @@ class BodyCoreService : Service() {
             )
         }
         val wake = buildString {
-            append("[Device event — a flow the USER started from the 情景/脚本 card has handed step ")
+            append("[Device event — a flow the USER started from the Scene/Script card has handed step ")
             append(pausedAt).append(" to you. Nobody spoke. This is an `ai` step, NOT a failure — ")
             append("the script is healthy and nothing needs repairing.]\n")
             append("Flow: ${flow.name} (${flow.title}), ${flow.steps.size} steps. ")
@@ -2870,7 +2870,7 @@ class BodyCoreService : Service() {
         val cut = html.length > cap
         return buildString {
             append(said)
-            append("\n\n(I picked this from the 产物 panel: it is about the page you made earlier titled \"")
+            append("\n\n(I picked this from the Artifacts panel: it is about the page you made earlier titled \"")
             append(e.text)
             append("\". Apply my change above to that page and show the full revised page with show_html,")
             append(" keeping everything I did not ask to change. Its current source follows")
@@ -3273,7 +3273,7 @@ class BodyCoreService : Service() {
         // verifiable the same way — it follows the ball's look, not a setting.
         android.util.Log.i(
             "Body",
-            "voice: 火山 key from " +
+            "voice: Volcengine key from " +
                 if (net.kuafuai.andee.config.VoiceConfig.usingOwnCredentials(this)) {
                     "settings"
                 } else {
@@ -3919,7 +3919,7 @@ class BodyCoreService : Service() {
             // the one failure the user hears as being ignored.
             expectFollowUp = !END_MARKER.containsMatchIn(text) ||
                 END_MARKER.replace(text, "").trimEnd().let {
-                    it.endsWith("?") || it.endsWith("？") || it.endsWith("吗") || it.endsWith("呢")
+                    it.endsWith("?") || it.endsWith("？") || it.endsWith("?") || it.endsWith("?")
                 }
             // Markers come out here, with the markdown and before anything
             // else touches the string. This is the one place the answer is
@@ -4301,7 +4301,7 @@ class BodyCoreService : Service() {
         if (client == null && brain == null) {
             // Nothing can answer. Say so here rather than lighting a glow that
             // nothing will put out — which is what this method was written for.
-            android.util.Log.i("Body", "notification 看看 tapped, but no brain is listening")
+            android.util.Log.i("Body", "notification \"take a look\" tapped, but no brain is listening")
             return
         }
         // Display-only and in the interface language, same split as the meeting

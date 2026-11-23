@@ -133,7 +133,7 @@ class HuoshanTts(
                 if (refusal == null) {
                     "TTS ws connect timeout"
                 } else {
-                    "TTS ws refused: $refusal (check the 火山 API Key in ⚙)"
+                    "TTS ws refused: $refusal (check the Volcengine API key in ⚙)"
                 },
             )
         }

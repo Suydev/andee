@@ -50,7 +50,7 @@ object AimParts {
         PARTS.forEachIndexed { i, p -> put(p, intArrayOf(i % COLS, i / COLS)) }
         // Row 0 / middle / last, as the old thirds meant them.
         put("left", intArrayOf(0, MID_ROW)); put("right", intArrayOf(2, MID_ROW))
-        listOf("左上", "上", "右上", "左", "中", "右", "左下", "下", "右下")
+        listOf("Top left", "Up", "Top right", "Left", "Chinese", "Right", "Bottom left", "Down", "Bottom right")
             .forEachIndexed { i, p ->
                 val fy = when (i / 3) {
                     0 -> 0
@@ -60,7 +60,7 @@ object AimParts {
                 put(p, intArrayOf(i % 3, fy))
             }
         put("centre", intArrayOf(1, MID_ROW)); put("middle", intArrayOf(1, MID_ROW))
-        put("中间", intArrayOf(1, MID_ROW)); put("中心", intArrayOf(1, MID_ROW))
+        put("Middle", intArrayOf(1, MID_ROW)); put("Center", intArrayOf(1, MID_ROW))
         put("top-center", intArrayOf(1, 0)); put("bottom-center", intArrayOf(1, ROWS - 1))
         put("center-left", intArrayOf(0, MID_ROW)); put("center-right", intArrayOf(2, MID_ROW))
         put("left-top", intArrayOf(0, 0)); put("right-top", intArrayOf(2, 0))

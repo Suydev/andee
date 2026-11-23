@@ -595,7 +595,7 @@ class CommandDispatcher(
                 val value = e.secretValue(field)
                     ?: throw IllegalArgumentException(
                         "entry '${e.label}' has no secret '$field'. It has ${e.secrets()}; " +
-                        "read the rest with get_vault, or ask the user to add it in 设置 → 保险箱"
+                        "read the rest with get_vault, or ask the user to add it in Settings → Vault"
                     )
                 // The device is typing the user's own secret for them, so say
                 // so. `pulseTool()` above is the live tell while the card is

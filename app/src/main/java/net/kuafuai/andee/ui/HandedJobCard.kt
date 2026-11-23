@@ -97,9 +97,9 @@ class HandedJobCard(
         status.text = when {
             live != null -> RemoteProgressText.of(live, System.currentTimeMillis(), zh).asList().joinToString("\n")
             task != null -> TaskRows.state(task, System.currentTimeMillis(), zh)
-            else -> if (zh) "电脑上的 dsh 工作者 #$worker" else "dsh worker #$worker on the computer"
+            else -> if (zh) "dsh worker on the computer #$worker" else "dsh worker #$worker on the computer"
         }
-        files.text = (if (zh) "📁 工作文件 ›" else "📁 Work files ›")
+        files.text = (if (zh) "📁 Work files ›" else "📁 Work files ›")
         files.setOnClickListener { onFiles(worker, task?.what.orEmpty()) }
     }
 

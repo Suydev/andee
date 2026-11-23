@@ -105,7 +105,7 @@ class WorkerFilesUi(
         rebuild()
         val dev = device()
         if (dev == null) {
-            error = t("现在够不着电脑（它没开，或不在同一个 Wi-Fi）。", "The computer cannot be reached now (it is off, or not on this Wi-Fi).")
+            error = t("The computer is out of reach right now (it's off, or not on the same Wi-Fi).", "The computer cannot be reached now (it is off, or not on this Wi-Fi).")
             rebuild(); return
         }
         Thread {
@@ -150,7 +150,7 @@ class WorkerFilesUi(
         // the HONOR), which opened and closed at once — the "flashes and is gone" the user saw.
         if (ext in TEXT_EXTS) {
             val text = runCatching { readText(file) }.getOrElse {
-                error = t("读不了这个文件：${it.message}", "Could not read this file: ${it.message}")
+                error = t("Can't read this file: ${it.message}", "Could not read this file: ${it.message}")
                 return
             }
             reading = name to text
@@ -167,7 +167,7 @@ class WorkerFilesUi(
         }
         val hasViewer = context.packageManager.queryIntentActivities(intent, 0).isNotEmpty()
         if (!hasViewer) {
-            error = t("手机上没有能打开 .$ext 的应用。文件在：${file.path}", "No app on this phone opens .$ext. The file is at ${file.path}")
+            error = t("No app on the phone can open .$ext files. The file is at: ${file.path}", "No app on this phone opens .$ext. The file is at ${file.path}")
             return
         }
         // The card is an overlay and sits above the chooser it would raise.
@@ -187,7 +187,7 @@ class WorkerFilesUi(
             }
         }
         val head = String(buf, 0, n, Charsets.UTF_8)
-        return if (file.length() > n) head + "\n\n" + t("（文件太长，只显示前 ${n / 1024} KB）", "(The file is long; only the first ${n / 1024} KB is shown.)") else head
+        return if (file.length() > n) head + "\n\n" + t("(file too long — showing only the first ${n / 1024} KB)", "(The file is long; only the first ${n / 1024} KB is shown.)") else head
     }
 
     // ---- drawing ----
@@ -213,7 +213,7 @@ class WorkerFilesUi(
         head.addView(chip("✕") { hide() })
         card.addView(head, LinearLayout.LayoutParams(MATCH, WRAP))
         card.addView(label(
-            t("在电脑上", "On the computer") + (if (path.isEmpty()) "" else " › $path") + " · " + t("点开才下载", "downloaded when you open one"),
+            t("On the computer", "On the computer") + (if (path.isEmpty()) "" else " › $path") + " · " + t("Tap to download", "downloaded when you open one"),
             Glass.Type.CAPTION, Glass.SECONDARY,
         ).apply { setPadding(dp(22), 0, dp(22), dp(8)) }, LinearLayout.LayoutParams(MATCH, WRAP))
         card.addView(View(context).apply { setBackgroundColor(Color.parseColor(Glass.PANEL_EDGE)) }, LinearLayout.LayoutParams(MATCH, dp(1)))
@@ -221,10 +221,10 @@ class WorkerFilesUi(
         val body = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(20), dp(14), dp(20), dp(16)) }
         when {
             error != null -> body.addView(label(error!!, Glass.Type.CAPTION, Glass.DANGER), matchWrap())
-            entries == null -> body.addView(label(t("正在向电脑要目录…", "Asking the computer for the folder…"), Glass.Type.CAPTION, Glass.SECONDARY), matchWrap())
-            entries!!.isEmpty() -> body.addView(label(t("这个文件夹是空的。", "This folder is empty."), Glass.Type.CAPTION, Glass.SECONDARY), matchWrap())
+            entries == null -> body.addView(label(t("Getting the directory from the computer…", "Asking the computer for the folder…"), Glass.Type.CAPTION, Glass.SECONDARY), matchWrap())
+            entries!!.isEmpty() -> body.addView(label(t("This folder is empty.", "This folder is empty."), Glass.Type.CAPTION, Glass.SECONDARY), matchWrap())
         }
-        if (fetching != null) body.addView(label(t("正在从电脑取 $fetching …", "Fetching $fetching from the computer…"), Glass.Type.CAPTION, Glass.ACCENT),
+        if (fetching != null) body.addView(label(t("Fetching $fetching from the computer …", "Fetching $fetching from the computer…"), Glass.Type.CAPTION, Glass.ACCENT),
             matchWrap().apply { bottomMargin = dp(10) })
         for (e in entries.orEmpty()) {
             val row = LinearLayout(context).apply {

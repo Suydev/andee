@@ -490,7 +490,7 @@ class FloatingWindowUi(
      * opening anything. The key itself is an ordinary [barButton]; the badge sits on top of it and ignores touches.
      */
     private fun friendsKey(): View {
-        val key = barButton(R.drawable.ic_friends, Glass.PHOTO_INK, "朋友") { listeners.onFriendsClick() }
+        val key = barButton(R.drawable.ic_friends, Glass.PHOTO_INK, "Friends") { listeners.onFriendsClick() }
         val lp = key.layoutParams as LinearLayout.LayoutParams
         key.layoutParams = FrameLayout.LayoutParams(lp.width, lp.height)
         val box = FrameLayout(context).apply {
@@ -552,7 +552,7 @@ class FloatingWindowUi(
      * or an answer came back). The phone's twin of the Mac sidebar's list.
      */
     private fun tasksKey(): View {
-        val key = barButton(R.drawable.ic_tasks, Glass.PHOTO_INK, "在办") { listeners.onTasksClick() }
+        val key = barButton(R.drawable.ic_tasks, Glass.PHOTO_INK, "In progress") { listeners.onTasksClick() }
         val lp = key.layoutParams as LinearLayout.LayoutParams
         key.layoutParams = FrameLayout.LayoutParams(lp.width, lp.height)
         val box = FrameLayout(context).apply {
@@ -615,7 +615,7 @@ class FloatingWindowUi(
 
     /** 小本本 with a red dot in the corner while 守卫 is unwritten — the same shape as [friendsKey]. */
     private fun notebookKey(): View {
-        val key = barButton(R.drawable.ic_notebook, Glass.PHOTO_INK, "小本本") { listeners.onNotebookClick() }
+        val key = barButton(R.drawable.ic_notebook, Glass.PHOTO_INK, "Notebook") { listeners.onNotebookClick() }
         val lp = key.layoutParams as LinearLayout.LayoutParams
         key.layoutParams = FrameLayout.LayoutParams(lp.width, lp.height)
         val box = FrameLayout(context).apply {
@@ -1496,7 +1496,7 @@ class FloatingWindowUi(
             VoiceConfig.setPet(context, on = true, character = pet.id)
             this.pet?.poke()
             // Named as a pet: "Andee" is both a ball look and a pet.
-            setSubtitle((if (zh) "桌宠 · " else "Desk pet · ") + (if (zh) pet.zh else pet.en), SubtitleKind.FINAL)
+            setSubtitle((if (zh) "Desktop pet · " else "Desk pet · ") + (if (zh) pet.zh else pet.en), SubtitleKind.FINAL)
         }
     }
 
@@ -3297,7 +3297,7 @@ class FloatingWindowUi(
         val icon = ImageView(context)
         mute.addView(icon, LinearLayout.LayoutParams(dp(22), dp(22)))
         muteIcon = icon; muteKey = mute
-        mute.contentDescription = "朗读"
+        mute.contentDescription = "Read aloud"
         paintMute()
         root.addView(mute, FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP or Gravity.START))
 
@@ -3380,7 +3380,7 @@ class FloatingWindowUi(
                 textSize = Glass.Type.CAPTION
                 setTextColor(Color.parseColor(Glass.SECONDARY))
                 gravity = Gravity.CENTER
-                contentDescription = "退出情景"
+                contentDescription = "Exit scene"
                 isClickable = true
                 Glass.pressable(this)
                 setOnClickListener { listeners.onSceneExitClick() }
@@ -3467,28 +3467,28 @@ class FloatingWindowUi(
         }
 
         keys.addView(
-            barButton(R.drawable.ic_artifacts, Glass.PHOTO_INK, "产物") { listeners.onArtifactsClick() }
+            barButton(R.drawable.ic_artifacts, Glass.PHOTO_INK, "Artifact") { listeners.onArtifactsClick() }
         )
         // 产物 · 小本本 · 情景 · 朋友 · 自检 · 设置 — the Mac's sidebar has the same doors in the same order.
         keys.addView(tasksKey())
         keys.addView(notebookKey())
-        keys.addView(barButton(R.drawable.ic_scene, Glass.PHOTO_INK, "情景") { listeners.onScenesClick() })
+        keys.addView(barButton(R.drawable.ic_scene, Glass.PHOTO_INK, "Scene") { listeners.onScenesClick() })
         // 朋友 moved into Settings (⚙) to make room for the quit key — see SettingsUi and issue #44.
         // ✓ and not ■: the stop button used to sit here, and stop is the one
         // action in this bar the ball can already perform — see onStopClick.
-        keys.addView(barButton(R.drawable.ic_check, Glass.PHOTO_INK, "自检") { listeners.onSelfCheckClick() })
+        keys.addView(barButton(R.drawable.ic_check, Glass.PHOTO_INK, "Self-check") { listeners.onSelfCheckClick() })
         // No ⌨ here. Typing moved onto the ball's double-tap, and the bar is
         // the wrong place for it twice over: it only exists while the card is
         // unfolded (so the way to type vanished with the fold — the same fault
         // that made "点右上角的 ⌨" a lie in a failure message), and it put a
         // second meaning on the one control the user already had to learn.
-        keys.addView(barButton(R.drawable.ic_settings, Glass.PHOTO_INK, "设置") { listeners.onSettingsClick() })
+        keys.addView(barButton(R.drawable.ic_settings, Glass.PHOTO_INK, "Settings") { listeners.onSettingsClick() })
             // Reads as close, not as resize: the card is a thing you dismiss, and the
         // corner ball it folds into stays on screen either way.
         // 彻底退出 Andee (issue #44): a local exit, no voice and no model, so it works with no balance. A power
         // glyph, not another ✕, so it does not read like 收起; the service pops a confirm before quitting.
-        keys.addView(barButton(R.drawable.ic_power, Glass.PHOTO_INK, "退出") { listeners.onQuitClick() })
-        keys.addView(barButton(R.drawable.ic_close, Glass.PHOTO_INK, "收起") { listeners.onMinimizeClick() })
+        keys.addView(barButton(R.drawable.ic_power, Glass.PHOTO_INK, "Exit") { listeners.onQuitClick() })
+        keys.addView(barButton(R.drawable.ic_close, Glass.PHOTO_INK, "Collapse") { listeners.onMinimizeClick() })
 
         bar.addView(keys)
         return bar

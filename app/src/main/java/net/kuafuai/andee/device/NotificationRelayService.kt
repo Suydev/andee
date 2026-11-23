@@ -169,11 +169,11 @@ class NotificationRelayService : NotificationListenerService() {
      * [onNotificationPosted] and for `ScreenController`'s clipboard labels.
      */
     private val CN_CALL_KEYWORDS = listOf(
-        "语音通话中",
-        "视频通话中",
-        "正在语音通话",
-        "正在视频通话",
-        "来电",
+        "On a voice call",
+        "On a video call",
+        "Voice call in progress",
+        "Video call in progress",
+        "Incoming call",
     )
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
@@ -209,7 +209,7 @@ class NotificationRelayService : NotificationListenerService() {
         // translate it — see [CN_CALL_KEYWORDS].
         var count = 1
         var headline = text
-        val m = Regex("^\\[(\\d+)条]\\s*(.*)$").find(text.trim())
+        val m = Regex("^\\[(\\d+) msgs]\\s*(.*)$").find(text.trim())
         if (m != null) {
             count = m.groupValues[1].toIntOrNull() ?: 1
             headline = m.groupValues[2]
@@ -466,12 +466,12 @@ class NotificationRelayService : NotificationListenerService() {
     }
 
     private fun appLabel(pkg: String): String = when (pkg) {
-        "com.tencent.mm" -> "微信"
+        "com.tencent.mm" -> "WeChat"
         "com.tencent.mobileqq" -> "QQ"
-        "com.alibaba.android.rimet" -> "钉钉"
-        "com.ss.android.lark" -> "飞书"
+        "com.alibaba.android.rimet" -> "DingTalk"
+        "com.ss.android.lark" -> "Feishu"
         "com.whatsapp" -> "WhatsApp"
-        "com.android.mms", "com.android.messaging" -> "短信"
+        "com.android.mms", "com.android.messaging" -> "SMS"
         else -> pkg.substringAfterLast('.')
     }
 

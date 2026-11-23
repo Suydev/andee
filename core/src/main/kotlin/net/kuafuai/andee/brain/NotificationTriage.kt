@@ -131,7 +131,7 @@ class NotificationTriage(
             <<<WAITING FOR AN ANSWER — THE ASSISTANT'S RECORD>>>
         """.trimIndent() + "\n" + awaited.joinToString("\n") + "\n<<<END>>>"
         val system = if (guard.isBlank()) withAwait else withAwait + "\n\n" + """
-            The owner's own rules for the assistant, above everything (守卫). Where they bear on this notification, follow them.
+            The owner's own rules for the assistant, above everything (guard). Where they bear on this notification, follow them.
 
             <<<THE OWNER'S RULES>>>
         """.trimIndent() + "\n" + guard.trim() + "\n<<<END OF THE OWNER'S RULES>>>"

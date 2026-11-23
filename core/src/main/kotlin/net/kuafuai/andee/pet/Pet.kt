@@ -75,12 +75,12 @@ object PetCharacters {
      */
     val PRESETS = listOf(
         PetCharacter("andee", "Andee", "Andee", baseHeight = 120),
-        PetCharacter("girl", "奶油金", "Cream", baseHeight = 210),
-        PetCharacter("boy", "奶油金·短发", "Cream short", baseHeight = 215,
+        PetCharacter("girl", "Cream gold", "Cream", baseHeight = 210),
+        PetCharacter("boy", "Cream gold · short hair", "Cream short", baseHeight = 215,
             voice = "zh_male_yangguangqingnian_uranus_bigtts", persona = PetPersonas.CREAM_SHORT),
-        PetCharacter("andee-girl", "Andee娘", "Andee girl", baseHeight = 200,
+        PetCharacter("andee-girl", "Andee girl", "Andee girl", baseHeight = 200,
             voice = "zh_female_tianmeixiaoyuan_uranus_bigtts", persona = PetPersonas.ANDEE_GIRL),
-        PetCharacter("cat", "小猫", "Kitten", baseHeight = 150,
+        PetCharacter("cat", "Kitten", "Kitten", baseHeight = 150,
             voice = "zh_female_roumeinvyou_uranus_bigtts", persona = PetPersonas.CAT),
     )
 
@@ -94,11 +94,11 @@ object PetCharacters {
 
     /** One line a settings card shows under the picked look: who this is. */
     fun blurb(id: String, zh: Boolean): String = when (canonical(id)) {
-        "andee" -> if (zh) "Andee 本尊：它自己的声音和脾气。" else "Andee itself: its own voice and manner."
-        "boy" -> if (zh) "阳光少年：男声，爽快直接。" else "A sunny boy: a young man's voice, quick and direct."
-        "andee-girl" -> if (zh) "Andee娘：毛绒小球变成的猫耳女孩，甜甜的女声，软乎乎的，有点害羞，干活很认真。" else "Andee girl: the plush ball as a cat-eared girl — a sweet voice, soft, a little shy, earnest about the work."
-        "cat" -> if (zh) "小猫：和小球的小猫同一个声音，有点傲娇，偶尔喵一声，其实很黏你。" else "A kitten: the ball kitten's voice, a bit proud, the odd meow, fond of you underneath."
-        else -> if (zh) "就是 Andee：她自己的声音和脾气。" else "Plain Andee: her own voice and manner."
+        "andee" -> if (zh) "The real Andee: her own voice and temper." else "Andee itself: its own voice and manner."
+        "boy" -> if (zh) "Sunny boy: male voice, bright and direct." else "A sunny boy: a young man's voice, quick and direct."
+        "andee-girl" -> if (zh) "Andee girl: a cat-eared girl turned from a plush ball, a sweet female voice, soft and a little shy, very serious about work." else "Andee girl: the plush ball as a cat-eared girl — a sweet voice, soft, a little shy, earnest about the work."
+        "cat" -> if (zh) "Kitten: the same voice as the ball's kitten, a bit haughty, occasionally meows, but really very clingy." else "A kitten: the ball kitten's voice, a bit proud, the odd meow, fond of you underneath."
+        else -> if (zh) "Just Andee: her own voice and temper." else "Plain Andee: her own voice and manner."
     }
 }
 

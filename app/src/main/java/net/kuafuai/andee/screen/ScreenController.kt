@@ -263,8 +263,8 @@ class ScreenController(
         throw IllegalStateException(
             "Refused: that point is inside a popup ($where px). Nothing in it is readable " +
                 "through accessibility, its items sit a few dozen pixels apart, and one of " +
-                "them is usually irreversible — 删除 / 撤回 / 清空 / 不再关注. A tap aimed at " +
-                "评论 can land on 删除, and that cannot be undone, so this one is NOT fired " +
+                "them is usually irreversible — delete / retract / clear / unfollow. A tap aimed at " +
+                "Comment can land on Delete, and that cannot be undone, so this one is NOT fired " +
                 "blind. Look first: call zoom_screen_region on this point, read the items in " +
                 "the magnified image, then send the same tap with on=\"zoom\" (or a lowercase " +
                 "cell). A zoom that covers this point, taken within " +
@@ -1917,7 +1917,7 @@ class ScreenController(
             typedBlindAt = SystemClock.uptimeMillis()
             r.put(
                 "next",
-                "Text is in the box. To send: if a Send/发送 button is visible, zoom_screen_region on it " +
+                "Text is in the box. To send: if a Send button is visible, zoom_screen_region on it " +
                     "first and tap with on=\"zoom\" — a plain grid-cell tap is refused here, because this " +
                     "strip sits on top of the content below and a missed tap opens that instead.",
             )
@@ -2138,7 +2138,7 @@ class ScreenController(
     fun submitInput(id: String?): JSONObject {
         if (id == null && A11yIme.sendsOnlyFromButton(service)) {
             throw IllegalStateException(
-                "this field has no keyboard send action — it sends only from its own Send/发送 " +
+                "this field has no keyboard send action — it sends only from its own Send button " +
                     "button. Tap that button" +
                     (if (treeBlind()) ": zoom_screen_region on it first and tap with on=\"zoom\"." else ".")
             )
@@ -3486,8 +3486,8 @@ class ScreenController(
             "A pane that draws its own pixels does not do that — it still reports its " +
             "containers. Zero nodes from an app that was readable is the signature of " +
             "our accessibility connection having gone stale, and no tool call can " +
-            "repair it: only the person holding the tablet can, by opening 设置 → " +
-            "无障碍 (Settings → Accessibility), switching Andee off and back on. That " +
+            "repair it: only the person holding the tablet can, by opening Settings → " +
+            "Accessibility, switching Andee off and back on. That " +
             "takes about three seconds. Retry this tool once first in case the screen " +
             "was merely mid-transition; if it is still empty, say so to the user in " +
             "plain words and wait for them. Taps and swipes still work and you still " +
@@ -3691,8 +3691,8 @@ class ScreenController(
          * interface is English would break clipboard pasting on every Chinese
          * keyboard. See `NotificationRelayService.CN_CALL_KEYWORDS`.
          */
-        private val CLIPBOARD_LABELS = listOf("剪贴板", "Clipboard", "clipboard", "粘贴", "Paste")
-        private val PASTE_LABELS = listOf("粘贴", "Paste", "paste", "Paste as plain text")
+        private val CLIPBOARD_LABELS = listOf("Clipboard", "Clipboard", "clipboard", "Paste", "Paste")
+        private val PASTE_LABELS = listOf("Paste", "Paste", "paste", "Paste as plain text")
         private const val SCROLL_TAG = "ScrollDir"
         private const val SETTLE_POLL_MS = 250L
         private const val SETTLE_BUDGET_MS = 1500L

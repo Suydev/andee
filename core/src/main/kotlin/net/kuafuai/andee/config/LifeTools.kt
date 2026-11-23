@@ -248,7 +248,7 @@ class LifeTools(
                 }
                 // Delivered, not closed: whether it is finished is the user's to say (`confirm`, or 在办's 办完了).
                 book.deliver(id, a.optString("result")).fold({
-                    changed(it, "delivered").put("note", "Marked delivered. It stays in hand until the user confirms it is done — in 在办, or by telling you so on their own turn (then call confirm).")
+                    changed(it, "delivered").put("note", "Marked delivered. It stays in hand until the user confirms it is done — in In progress, or by telling you so on their own turn (then call confirm).")
                 }, { fail(it.message) })
             }
             "confirm", "reopen" -> {
@@ -350,7 +350,7 @@ class LifeTools(
         val DEVICE_FIELDS = setOf(TASK_SOURCE, TASK_UNTRUSTED, TASK_SENT)
 
         /** What the model calls the user when it means them, in a wait. */
-        private val USER_WORDS = setOf("他", "她", "ta", "用户", "主人", "我", "user", "the user", "owner", "him", "her", "me")
+        private val USER_WORDS = setOf("He", "She", "ta", "User", "Master", "Me", "user", "the user", "owner", "him", "her", "me")
         val METHODS = setOf(
             "note.self", "note.cares", "note.diary", "note.person", "note.people", "note.task",
             "note.wiki_search", "note.wiki_read", "note.wiki_write", "note.wiki_status", "note.wiki_link", "note.wiki_share", "note.wiki_know",

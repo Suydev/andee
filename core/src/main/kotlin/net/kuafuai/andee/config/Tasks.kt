@@ -412,7 +412,7 @@ class Tasks(
         val t = derive(t0)
         val worker = t.waits.lastOrNull { it.kind == "worker" }?.name
         append(said)
-        append("\n\n(I picked this from 在办: it is about task ").append(t.id).append(". Its record follows. Pick it up from where it")
+        append("\n\n(I picked this from In progress: it is about task ").append(t.id).append(". Its record follows. Pick it up from where it")
         append(" stands — what it is waiting on, what came back, what is next — and use `task` on ").append(t.id).append(" as you go.")
         if (worker != null) append(" It was handed to dsh worker #").append(worker).append("; for that worker to carry on, delegate_task with for_task=").append(t.id).append(".")
         append(")\n\n").append(forPrompt(t))
@@ -540,11 +540,11 @@ class Tasks(
         /** The model names an app however it likes; the channel is what [Source.channelOf] would have said. */
         fun channelOfName(app: String): String = when (app.trim().lowercase()) {
             "", "-" -> ""
-            "微信", "wechat", "weixin", "wx" -> "wechat"
+            "WeChat", "wechat", "weixin", "wx" -> "wechat"
             "qq" -> "qq"
-            "企业微信", "wecom", "wework" -> "wecom"
-            "钉钉", "dingtalk" -> "dingtalk"
-            "飞书", "lark", "feishu" -> "feishu"
+            "WeCom", "wecom", "wework" -> "wecom"
+            "DingTalk", "dingtalk" -> "dingtalk"
+            "Feishu", "lark", "feishu" -> "feishu"
             else -> Source.channelOf(app.trim())
         }
     }

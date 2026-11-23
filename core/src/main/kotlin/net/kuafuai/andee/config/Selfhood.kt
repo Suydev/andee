@@ -447,7 +447,7 @@ class Selfhood(
             if (lines.size >= 3 && bullets * 2 > lines.size) {
                 return "This reads as a list of items done. A diary page is in your own voice: what stayed with you, what you are unsure about, what you think of someone now, why you want to do X tomorrow. Write sentences."
             }
-            val tally = Regex("""(完成了?\s*\d+\s*(项|件|个)|共\s*\d+\s*(项|件|个)\s*(工作|任务)|completed\s+\d+\s+(tasks?|items?)|\d+\s+tasks?\s+(done|completed))""", RegexOption.IGNORE_CASE)
+            val tally = Regex("""(completed?\s*\d+\s*(items?|tasks?|things)|(?:total of )\s*\d+\s*(items?|tasks?)\s*(work|tasks)|completed\s+\d+\s+(tasks?|items?)|\d+\s+tasks?\s+(done|completed))""", RegexOption.IGNORE_CASE)
             if (tally.containsMatchIn(t)) {
                 return "\"Completed N items\" is a status report, not a diary. Say what it was like, what you noticed, what you are not sure of."
             }

@@ -17,13 +17,13 @@ object RemoteProgressText {
         val s = ((now - startedAt) / 1000).coerceAtLeast(0)
         val time = "%d:%02d".format(s / 60, s % 60)
         val tok = if (tokens >= 1000) " · ${tokens / 1000}k tok" else ""
-        val where = (if (zh) "第 $step 步 · $time" else "step $step · $time") + tok
+        val where = (if (zh) "Step $step · $time" else "step $step · $time") + tok
         val done = todos.count { it.second == "completed" }
         val current = todos.firstOrNull { it.second == "in_progress" } ?: todos.firstOrNull { it.second == "pending" }
         val plan = when {
-            current != null -> (if (zh) "清单 $done/${todos.size} · " else "checklist $done/${todos.size} · ") + current.first
+            current != null -> (if (zh) "Checklist $done/${todos.size} · " else "checklist $done/${todos.size} · ") + current.first
             thought.isNotBlank() -> thought.lineSequence().first { it.isNotBlank() }.trim()
-            step == 0 -> if (zh) "正在起步…" else "getting started…"
+            step == 0 -> if (zh) "Getting started…" else "getting started…"
             else -> ""
         }
         val doing = recent.lastOrNull().orEmpty().let { if (it.isBlank()) "" else "› $it" }

@@ -195,7 +195,7 @@ class HuoshanAsr(
                     // The server answered. Name the key, because a blank or
                     // revoked one is what 403 means here and the endpoint is
                     // the thing everyone checks first.
-                    "ASR ws refused: $refusal (check the 火山 API Key in ⚙)"
+                    "ASR ws refused: $refusal (check the Volcengine API key in ⚙)"
                 },
             )
         }

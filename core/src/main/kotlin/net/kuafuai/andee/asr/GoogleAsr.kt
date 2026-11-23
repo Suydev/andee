@@ -236,7 +236,7 @@ class GoogleAsr(
 
     private fun connect() {
         if (config.googleApiKey.isBlank()) {
-            throw IllegalStateException("Gemini API key 未填写 (⚙ → 后端 → 本机)")
+            throw IllegalStateException("Gemini API key not filled in (⚙ → Backends → On-device)")
         }
 
         val socket = http.newWebSocket(
@@ -277,7 +277,7 @@ class GoogleAsr(
         ws = socket
 
         if (!setup.await(SETUP_TIMEOUT_S, TimeUnit.SECONDS)) {
-            throw IllegalStateException("ASR setup 超时 (检查 API key / 模型名)")
+            throw IllegalStateException("ASR setup timed out (check the API key / model name)")
         }
         // The latch is also counted down by a failure, so reaching here is not
         // proof of success — the error path has already said its piece.

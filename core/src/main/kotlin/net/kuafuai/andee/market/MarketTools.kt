@@ -181,7 +181,7 @@ class MarketTools(
                         .put("type", "object")
                         .put(
                             "properties", JSONObject()
-                                .put("query", prop("string", "What the user wants, in their own words — Chinese, English, keywords, all fine. e.g. \"查快递\", \"generate an image of a cat\", \"translate to Japanese\"."))
+                                .put("query", prop("string", "What the user wants, in their own words — Chinese, English, keywords, all fine. e.g. \"check my package\", \"generate an image of a cat\", \"translate to Japanese\"."))
                                 .put("limit", prop("integer", "How many tools to return. Default $DEFAULT_LIMIT."))
                         )
                         .put("required", JSONArray().put("query"))

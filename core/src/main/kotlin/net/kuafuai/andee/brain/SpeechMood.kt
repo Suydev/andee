@@ -76,27 +76,27 @@ object SpeechMood {
     private val VOCABULARY: Map<String, Mood> = buildMap {
         fun List<String>.all(m: Mood) = forEach { put(it, m) }
 
-        listOf("calm", "neutral", "normal", "relaxed", "平静", "冷静", "正常")
+        listOf("calm", "neutral", "normal", "relaxed", "Calm", "Composed", "Normal")
             .all(Mood.CALM)
         listOf(
             "happy", "glad", "pleased", "excited", "cheerful", "proud", "delighted",
-            "开心", "高兴", "快乐", "兴奋", "得意",
+            "Happy", "Glad", "Joyful", "Excited", "Smug",
         ).all(Mood.HAPPY)
         listOf(
             "curious", "interested", "surprised", "puzzled", "confused", "wondering",
-            "好奇", "疑惑", "困惑", "惊讶", "惊奇",
+            "Curious", "Puzzled", "Confused", "Surprised", "Amazed",
         ).all(Mood.CURIOUS)
         listOf(
             "tense", "angry", "mad", "annoyed", "frustrated", "irritated", "upset",
-            "生气", "愤怒", "恼火", "烦躁", "不满",
+            "Angry", "Furious", "Irritated", "Annoyed", "Displeased",
         ).all(Mood.TENSE)
         listOf(
             "anxious", "nervous", "worried", "scared", "afraid", "uneasy", "panicked",
-            "焦虑", "紧张", "担心", "不安", "害怕",
+            "Anxious", "Nervous", "Worried", "Uneasy", "Afraid",
         ).all(Mood.ANXIOUS)
         listOf(
             "concerned", "sad", "sorry", "apologetic", "disappointed", "unhappy", "serious",
-            "难过", "抱歉", "遗憾", "失望", "担忧", "严肃",
+            "Sad", "Sorry", "Regretful", "Disappointed", "Concerned", "Serious",
         ).all(Mood.CONCERNED)
         // The five gestures. They are faces in the model's eyes — it writes one the
         // way it writes `[happy]` — but they are drawn with hands and props, which
@@ -104,23 +104,23 @@ object SpeechMood {
         // its own [net.kuafuai.andee.ui.ball.FACE] row.
         listOf(
             "wink", "playful", "teasing", "cheeky", "flirty",
-            "眨眼", "调皮", "俏皮", "逗你",
+            "Winking", "Playful", "Cheeky", "Teasing you",
         ).all(Mood.WINK)
         listOf(
             "wave", "hello", "hi", "bye", "goodbye", "greeting",
-            "挥手", "你好", "再见", "拜拜", "打招呼",
+            "Waving", "Hello", "Goodbye", "Bye-bye", "Greeting",
         ).all(Mood.WAVE)
         listOf(
             "protect", "guard", "defend", "determined", "resolute",
-            "守护", "保护", "坚定", "放心",
+            "Guarding", "Protecting", "Resolute", "Relieved",
         ).all(Mood.PROTECT)
         listOf(
             "celebrate", "cheer", "yay", "hooray", "triumphant", "victory",
-            "庆祝", "欢呼", "太棒了", "成功了",
+            "Celebrating", "Cheering", "Awesome", "Success",
         ).all(Mood.CELEBRATE)
         listOf(
             "rest", "tired", "sleepy", "drowsy", "yawn", "cozy",
-            "休息", "困", "累了", "犯困", "安心",
+            "Resting", "Sleepy", "Tired", "Drowsy", "At ease",
         ).all(Mood.REST)
     }
 
@@ -138,7 +138,7 @@ object SpeechMood {
      * [isQuiet]; [parse] strips it like a face, including the Chinese spellings, which the lowercase rule in
      * [droppable] would otherwise leave in the text to be read out.
      */
-    private val QUIET = setOf("quiet", "silent", "shh", "安静", "静音", "不出声", "别出声")
+    private val QUIET = setOf("quiet", "silent", "shh", "Quiet", "Silent", "No sound", "Don't make a sound")
 
     /** The model asked for this turn to say nothing aloud. */
     fun isQuiet(raw: String): Boolean =

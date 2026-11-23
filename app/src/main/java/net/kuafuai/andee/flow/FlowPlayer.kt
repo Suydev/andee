@@ -471,9 +471,9 @@ class FlowPlayer(
         "launch_blocked" ->
             "The flow HAS a launch step and it did NOT bring its app up. This is NOT a missing opening step — " +
                 "do NOT insert another launch step. Read the reason: if it names Xiaomi's security center or a " +
-                "chained-launch confirmation (小米安全中心 / 允许), the ROM popped a confirmation dialog for " +
-                "this launch. launch_app taps its 「允许」 button on its own — only when the error still says " +
-                "the dialog was not tapped, tell the user in one sentence to tap 「允许」 themselves, and do " +
+                "chained-launch confirmation (Xiaomi Security Center / Allow), the ROM popped a confirmation dialog for " +
+                "this launch. launch_app taps its Allow button on its own — only when the error still says " +
+                "the dialog was not tapped, tell the user in one sentence to tap Allow themselves, and do " +
                 "NOT loop launch_app: retrying pops the same dialog. Otherwise take over in THIS turn: " +
                 "launch_app (if the app still will not come up, system_action home then launch_app — a " +
                 "foreground start is not blocked), confirm it is on screen, then resume_flow from " +

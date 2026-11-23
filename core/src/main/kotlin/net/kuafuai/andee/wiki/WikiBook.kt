@@ -194,7 +194,7 @@ class WikiBook(
 
     /** The auto-maintained contents page: all live articles by kind. Written to the wiki folder as `INDEX.md`. */
     fun contents(): String = buildString {
-        append("# 目录\n\n")
+        append("# Directory\n\n")
         val live = all()
         for (k in KINDS) {
             val g = live.filter { it.kind == k }.sortedByDescending { it.updated }
@@ -204,7 +204,7 @@ class WikiBook(
             append('\n')
         }
         all(true).filter { it.status == Status.LOST }.takeIf { it.isNotEmpty() }?.let { lost ->
-            append("## 失联\n"); lost.forEach { append("- ${it.title} (${it.where}) — ${it.reason}\n") }
+            append("## Lost\n"); lost.forEach { append("- ${it.title} (${it.where}) — ${it.reason}\n") }
         }
     }
 

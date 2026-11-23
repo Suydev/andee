@@ -64,7 +64,7 @@ object RemoteProgress {
     /** One line for a task's row in 在办: step, time, then what it is on. The same shape as the Mac's `DshStatus.forTask`. */
     fun line(s: State, now: Long, zh: Boolean): String {
         val sec = ((now - s.startedAt) / 1000).coerceAtLeast(0)
-        val head = (if (zh) "第 ${s.step} 步 · " else "step ${s.step} · ") + "%d:%02d".format(sec / 60, sec % 60)
+        val head = (if (zh) "Step ${s.step} · " else "step ${s.step} · ") + "%d:%02d".format(sec / 60, sec % 60)
         val what = s.current?.text ?: s.recent.lastOrNull().orEmpty()
         return head + if (what.isNotBlank()) " · $what" else ""
     }

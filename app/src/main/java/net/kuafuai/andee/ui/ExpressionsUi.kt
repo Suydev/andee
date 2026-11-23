@@ -147,10 +147,10 @@ class ExpressionsUi(
         // ---- Which body: the ball, or the desk pet ----
         val zh = VoiceConfig.uiLanguage(context) == "zh"
         petBody = VoiceConfig.petOn(context)
-        card.addView(heading(if (zh) "身体" else "Body"))
+        card.addView(heading(if (zh) "Body" else "Body"))
         card.addView(chipRow {
             // 小球 leftmost: it is what an unset preference reads as.
-            for ((on, label) in listOf(false to (if (zh) "小球" else "Ball"), true to (if (zh) "桌宠" else "Desk pet"))) {
+            for ((on, label) in listOf(false to (if (zh) "Little ball" else "Ball"), true to (if (zh) "Desktop pet" else "Desk pet"))) {
                 val chip = chip(label) { pickBody(on) }
                 chip.tag = on
                 bodyChips.add(chip)

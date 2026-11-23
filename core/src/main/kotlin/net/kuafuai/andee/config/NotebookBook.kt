@@ -1095,8 +1095,8 @@ class NotebookBook(private val store: NotebookStore) {
                 "it on the screen and say in a sentence or two what it shows. Write the page and speak in the " +
                 "language of your recent conversation with the user; only if there has been none, use the " +
                 "interface language. If nothing much happened today, paint a quiet day rather than inventing one.",
-            "每晚回顾：把今天的事过一遍（对话、做过的事、日记），据此画一张「你和我」的图，要有意境。" +
-                "画好放到屏幕上给用户看，再用一两句话说画的是什么。今天没什么事就画安静的一天，不要硬凑。",
+            "Nightly review: go over today's events (conversations, things done, journal), then draw a 「you and me」 picture with some feeling in it." +
+                "Put it on screen for the user to see, then say in a sentence or two what the picture shows. If little happened today, draw a quiet day — don't force it.",
             "Evening look-back: go over today (the conversation, what you did, your diary) and from it make a " +
                 "picture of \"you and me\" with some mood to it. Put it on the screen for the user and say in a " +
                 "sentence or two what it shows. If nothing much happened, paint a quiet day rather than inventing one.",

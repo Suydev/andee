@@ -216,10 +216,10 @@ object Scheduler {
         runCatching {
             val en = VoiceConfig.uiLanguage(context) == VoiceConfig.LANG_EN
             Notebook.selfhood(context).seedStageCare(
-                what = if (en) "Keep my stage" else "打理我的舞台",
+                what = if (en) "Keep my stage" else "Tend my stage",
                 why = if (en) "The middle of my home screen is the first thing they see when they open me; a day unchanged is worth a look."
-                else "首页中间是他打开我时第一眼看到的地方，一天没变就该看看要不要换。",
-                source = if (en) "the device: the stage is yours" else "设备：舞台是你自己的地方",
+                else "The middle of the home page is the first thing he sees when he opens me; if it hasn't changed in a day, it's time to consider a new look.",
+                source = if (en) "the device: the stage is yours" else "Device: the stage is your own place",
             )
         }.onFailure { Log.w(TAG, "could not seed the stage's care", it) }
         val now = System.currentTimeMillis()

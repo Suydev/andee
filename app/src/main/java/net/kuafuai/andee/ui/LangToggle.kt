@@ -56,7 +56,7 @@ class LangToggle(
 
     private companion object {
         /** The two tags this app ships, and the only two strings in it that must not be translated. */
-        val OPTIONS = listOf(VoiceConfig.LANG_ZH to "中", VoiceConfig.LANG_EN to "EN")
+        val OPTIONS = listOf(VoiceConfig.LANG_ZH to "Chinese", VoiceConfig.LANG_EN to "EN")
 
         const val INSET_DP = 3
         const val RADIUS_DP = 16

@@ -124,10 +124,10 @@ object PhoneWorkLog {
         on(WorkStep.Start)
         var step = 0
         val script = listOf(
-            "用户要查明天北京的天气。先打开浏览器，搜索框应该在页面顶部。" to "打开应用…",
-            "浏览器打开了。搜索框在中间偏上，先点它，再输入关键词。" to "点一下…",
-            "输入「北京明天天气」，然后提交。" to "输入文字…",
-            "结果出来了，第一条是中国天气网。看温度那一栏：晴，最高 18 度。" to "看一眼屏幕…",
+            "The user wants to check tomorrow's weather in Beijing. Open the browser first; the search box should be at the top of the page." to "Open the app…",
+            "The browser is open. The search box is a little above the middle; tap it first, then type the keywords." to "Tap it…",
+            "Type 「Beijing weather tomorrow」 and submit." to "Type the text…",
+            "The results are up; the first one is China Weather. Look at the temperature line: sunny, high of 18 degrees." to "Take a look at the screen…",
         )
         while (System.currentTimeMillis() - t0 < seconds * 1000L) {
             val (thought, action) = script[step % script.size]

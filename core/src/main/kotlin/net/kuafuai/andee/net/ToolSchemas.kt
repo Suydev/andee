@@ -74,8 +74,8 @@ object ToolSchemas {
         what:
             e17|LinearLayout||[500,570]
               e18*|ImageView|#avatar|[62,523]
-              e19*|TextView|好友3|[181,509]
-              e20|TextView|这是第3条朋友圈的正文|[493,535]
+              e19*|TextView|Friend3|[181,509]
+              e20|TextView|This is post #3 of Moments, the body text|[493,535]
               e24*|ImageView|#comment_btn|[950,621]
         `e17` is the element's number, `*` marks clickable, then class, label,
         and the element's center in 0-1000 RELATIVE coordinates (computed by
@@ -83,7 +83,7 @@ object ToolSchemas {
 
         INDENTATION IS MEANING, and it is the answer to "which one". The lines
         indented under e17 are one post: that avatar, that name, that body and
-        that comment button belong to 好友3 and to nobody else. Whenever a
+        that comment button belong to Friend3 and to nobody else. Whenever a
         screen repeats a shape — a feed, a chat list, search results, a
         settings page — the control you want is NOT identified by its own line
         alone. Find the labeled line that names the row you want, then take
@@ -106,7 +106,7 @@ object ToolSchemas {
         2) An icon button with no text and no description (Moments' comment
            bubble, an avatar, a photo) is identified by WHERE IT SITS, not by
            what it says. Read its indent group: the `#comment_btn` sitting
-           under the line that says 好友3 IS 好友3's comment button, and
+           under the line that says friend3 IS friend3's comment button, and
            tapping it by e-number is right even though you cannot name the
            icon. Only when two candidates inside the SAME group are
            indistinguishable do you need to see them — then call this tool
@@ -149,7 +149,7 @@ object ToolSchemas {
           pane — a self-drawn pane still reports its containers. It means our
           accessibility connection went stale, which happens to WeChat in
           particular. You cannot fix it with a tool call. Ask the user, in
-          plain words, to open 设置 → 无障碍 and switch Andee (this device's
+          plain words, to open Settings → Accessibility and switch Andee (this device's
           assistant, the floating ball) off and back on; it takes seconds and
           the element list comes back. Judge whether it is worth interrupting
           them — you can still tap by coordinate meanwhile — but do not silently
@@ -232,8 +232,8 @@ object ToolSchemas {
         and zoom are the fallback for when this says it cannot find the target.
 
         Describe the one element you mean so that nothing else on the screen fits: its visible text or icon,
-        and where it is ("the 发送 button right of the comment box at the bottom", "the 「··」 button at the
-        right end of 好友3's post", "the red 删除 in the menu that just opened"). Name what it looks like,
+        and where it is ("the Send button right of the comment box at the bottom", "the "··" button at the
+        right end of Friend3's post", "the red Delete in the menu that just opened"). Name what it looks like,
         not what it will do. Relational words alone ("the second one") are where it errs most.
 
         The result has `located` (0-1000), `saw` (what the element it tapped shows), `after_shot` with a
@@ -348,7 +348,7 @@ object ToolSchemas {
         tool(
             name = "type_text",
             method = "screen.type",
-            description = "Type text into the CURRENTLY FOCUSED input field (tap the field first — by e-number — then call this as the very next action; the keyboard opens by itself, do not re-tap the field). Existing content is REPLACED, not appended. Does not press Enter/Send — use submit_input for that.\n\nWhen a tap opened an input bar by itself — a reply/comment box sliding up with the keyboard (WeChat Moments 评论, a chat's reply bar) — the field is ALREADY focused: call this straight away, without tapping the field. On an app that hides its element tree this matters double: the input strip above the keyboard is thin and sits right on top of the post or message below it, so a tap aimed at it by grid cell lands on that content instead and opens it. This tool does not need the tree — it types through the editor's own input connection — so `performed: true` with the text read back is proof it went into the box.",
+            description = "Type text into the CURRENTLY FOCUSED input field (tap the field first — by e-number — then call this as the very next action; the keyboard opens by itself, do not re-tap the field). Existing content is REPLACED, not appended. Does not press Enter/Send — use submit_input for that.\n\nWhen a tap opened an input bar by itself — a reply/comment box sliding up with the keyboard (WeChat Moments Comment, a chat's reply bar) — the field is ALREADY focused: call this straight away, without tapping the field. On an app that hides its element tree this matters double: the input strip above the keyboard is thin and sits right on top of the post or message below it, so a tap aimed at it by grid cell lands on that content instead and opens it. This tool does not need the tree — it types through the editor's own input connection — so `performed: true` with the text read back is proof it went into the box.",
             required = listOf("text"),
             props = mapOf(
                 "text" to prop("string", "The text to enter."),
@@ -357,7 +357,7 @@ object ToolSchemas {
         tool(
             name = "submit_input",
             method = "screen.submit_input",
-            description = "Submit the currently focused input by firing its IME action (Enter / Send / Search / Next / Done — whichever the field was set up for). Typical uses: send a chat message after type_text, run a search. Use this instead of trying to press a keyboard Enter key — Android delivers 'Enter/Send' through this action, not a raw keystroke.\n\nIt works only when the field itself declares a send/search action; many comment and reply boxes do not and send only from their own button (WeChat's comment box is one — this errors there, and that is the answer, not a fault). In that case tap the app's Send/发送 button — and on an app that hides its tree, zoom_screen_region on that button FIRST and tap with on=\"zoom\": the button sits in a thin strip right on top of the content below, and the device refuses a plain grid-cell tap right after typing there.",
+            description = "Submit the currently focused input by firing its IME action (Enter / Send / Search / Next / Done — whichever the field was set up for). Typical uses: send a chat message after type_text, run a search. Use this instead of trying to press a keyboard Enter key — Android delivers 'Enter/Send' through this action, not a raw keystroke.\n\nIt works only when the field itself declares a send/search action; many comment and reply boxes do not and send only from their own button (WeChat's comment box is one — this errors there, and that is the answer, not a fault). In that case tap the app's Send/Send button — and on an app that hides its tree, zoom_screen_region on that button FIRST and tap with on=\"zoom\": the button sits in a thin strip right on top of the content below, and the device refuses a plain grid-cell tap right after typing there.",
             required = emptyList(),
             props = emptyMap(),
         ),
@@ -554,11 +554,11 @@ object ToolSchemas {
         tool(
             name = "launch_app",
             method = "device.launch",
-            description = "Launch an app by package name (preferred, e.g. 'com.tencent.mm') or by display label (e.g. '微信' — exact match, use list_installed_apps to find it). Direct launch intent, no screen-tapping needed.",
+            description = "Launch an app by package name (preferred, e.g. 'com.tencent.mm') or by display label (e.g. 'WeChat' — exact match, use list_installed_apps to find it). Direct launch intent, no screen-tapping needed.",
             required = emptyList(),
             props = mapOf(
                 "pkg" to prop("string", "Package name, e.g. 'com.tencent.mm'."),
-                "label" to prop("string", "Display label, e.g. '微信'. Used only if pkg is omitted."),
+                "label" to prop("string", "Display label, e.g. 'WeChat'. Used only if pkg is omitted."),
             ),
         ),
         tool(
@@ -666,7 +666,7 @@ object ToolSchemas {
             method = "device.vault.list",
             description = """
         The user's own saved accounts — what you log in AS when a task needs
-        their identity (飞书, 公司邮箱, …), and any bank card they saved for
+        their identity (Feishu, work email, …), and any bank card they saved for
         paying. Call this first; it is cheap and tells you whether the user has
         saved anything for the app in front of you.
 
@@ -679,7 +679,7 @@ object ToolSchemas {
         in front of you:
           1. list_vault → find the entry (match on its label)
           2. get_vault(entry, "phone") → the real number
-          3. tap the phone field, type_text it, tap 发送验证码
+          3. tap the phone field, type_text it, tap Send verification code
           4. read_sms → the code that just arrived (inbox, newest first)
           5. tap the code field, type_text the digits
         If the page wants a password instead, tap the password field and call
@@ -692,7 +692,7 @@ object ToolSchemas {
         three into its own field, one fill_secret per field.
 
         If the entry the task needs is missing, say so and ask the user to add
-        it in 设置 → 保险箱. Do not guess an account, and never invent one.
+        it in Settings → Vault. Do not guess an account, and never invent one.
             """.trimIndent(),
             required = emptyList(),
             props = emptyMap<String, JSONObject>(),
@@ -703,7 +703,7 @@ object ToolSchemas {
             description = """
         One identifier out of one vault entry, unmasked, so you can type it.
         Readable fields: phone, email, username, note, card_holder, card_last4.
-        `note` is the user's own hint about this account ("用手机验证码登录")
+        `note` is the user's own hint about this account ("Log in with a phone verification code")
         — worth reading before you decide how to log in.
 
         Secrets are NOT available here and asking for one is an error. That is
@@ -713,7 +713,7 @@ object ToolSchemas {
             """.trimIndent(),
             required = listOf("entry"),
             props = mapOf(
-                "entry" to prop("string", "Entry id or label from list_vault, e.g. '飞书'."),
+                "entry" to prop("string", "Entry id or label from list_vault, e.g. 'Feishu'."),
                 "field" to prop(
                     "string",
                     "phone | email | username | note | card_holder | card_last4. Default phone.",
@@ -740,21 +740,21 @@ object ToolSchemas {
         screenshot rather than retrying blindly; re-sending is how a field
         ends up with the value twice.
 
-        THIS DOES NOT WORK ON A PAYMENT SHEET. 支付宝 / 微信支付 / a banking
+        THIS DOES NOT WORK ON A PAYMENT SHEET. Alipay / WeChat Pay / a banking
         app's PIN pad draw their own keypad, which is not a text field, so
         there is nothing to type into — and the payment itself is the user's to
         authorise, not yours. What this reaches is an ordinary checkout form or
         the one-time page that binds a card to an app. When you hit a payment
         sheet, stop and hand it to the user.
 
-        The ball flashes and the transcript records 「正在填入…」, so the user
+        The ball flashes and the transcript records "Filling in…", so the user
         can always tell their secret was used. Say which card you are using (by
         its last four) before you use it. Only call it when the task the user
         actually asked for needs it.
             """.trimIndent(),
             required = listOf("entry"),
             props = mapOf(
-                "entry" to prop("string", "Entry id or label from list_vault, e.g. '飞书'."),
+                "entry" to prop("string", "Entry id or label from list_vault, e.g. 'Feishu'."),
                 "field" to prop(
                     "string",
                     "password | card_number | card_expiry | card_cvv. Default password.",
@@ -826,9 +826,9 @@ object ToolSchemas {
         It exposes no elements at all (get_screen_element comes back empty, with
         a picture and no e-numbers). A tap would land — that is the trap: with
         nothing to aim by, you are guessing at a screen whose bottom button is
-        「禁止后不再提示」, which nothing can undo. Putting it on screen is the
+        "Don't show again after denying", which nothing can undo. Putting it on screen is the
         whole of what firing does; answering it is the user's one step. So when
-        the result is "waiting", say one line — 「屏幕上弹了个权限框，点一下允许」—
+        the result is "waiting", say one line — "A permission dialog popped up on screen — tap Allow" —
         and either wait via ask_user or go on with whatever does not need it.
         Do not read its stillness as the screen being broken.
 
@@ -869,19 +869,19 @@ object ToolSchemas {
 
         WHEN TO USE — you decide the cadence, fit it to the ask:
         - NOT when the user's message came with attached photos: then
-          "这是什么/看看这个" is about those photos, which you can already
+          "What's this/Look at this" is about those photos, which you can already
           see. Answer from them; never open the camera for them.
-        - "这是什么/看看这个" → look once, answer. If the frame is blurry or
-          the target isn't in view, TELL the user to aim ("对准一点") and
+        - "What's this/Look at this" → look once, answer. If the frame is blurry or
+          the target isn't in view, TELL the user to aim ("Aim a bit closer") and
           look again.
-        - "帮我盯着水桶满了没" / monitoring tasks → loop: look → judge →
+        - "Check whether the bucket is full for me" / monitoring tasks → loop: look → judge →
           wait an interval YOU choose (30s? 2min? longer for slow changes) →
           look again. Report progress, stop when done or when the user asks.
         - Front camera (selfie cam) with front=true — check on the user,
           the room from the device's stand, etc.
 
         Each look returns the CURRENT frame only. While the session is open
-        the user sees a viewfinder and a 正在看 line, and the corners flash
+        the user sees a viewfinder and a Looking now line, and the corners flash
         every time you actually take a frame — they can tell when you looked.
 
         They can also close it themselves, with the ✕ in the bar at the top. If a look
@@ -922,7 +922,7 @@ object ToolSchemas {
         (timeout or dismissed).
 
         USE WHEN the next step genuinely needs the user's choice: which of
-        several options, yes/no on something irreversible, "要继续吗".
+        several options, yes/no on something irreversible, "Continue?".
         NOT for status updates (that's alert) and not for questions you can
         answer yourself. Two or three short buttons work best; the FIRST
         button renders as the primary (green) one.
@@ -935,14 +935,14 @@ object ToolSchemas {
                 // language. A literal default in this schema would be a second,
                 // single-language answer to the same question — and one the
                 // model reads, so it could echo it back to an English user.
-                "buttons" to prop("array", "Button labels, in the language the user is speaking — e.g. [\"帮我看看\",\"忽略\"]. First = primary. Omit it and the card supplies its own pair in the interface language."),
+                "buttons" to prop("array", "Button labels, in the language the user is speaking — e.g. [\"take a look\",\"ignore\"]. First = primary. Omit it and the card supplies its own pair in the interface language."),
                 "timeout_ms" to prop("integer", "Card auto-dismisses after this. Default 30000.", default = 30000),
             ),
         ),
         tool(
             name = "alert_user",
             method = "ui.alert",
-            description = "Show the user a short notice card and read it aloud (single 知道了 control; tapping the card also dismisses). Blocks until read or timeout. For status/heads-up only — anything needing a choice is ask_user.",
+            description = "Show the user a short notice card and read it aloud (single Got it control; tapping the card also dismisses). Blocks until read or timeout. For status/heads-up only — anything needing a choice is ask_user.",
             required = listOf("text"),
             props = mapOf(
                 "text" to prop("string", "The notice text, short — read aloud, so plain prose."),
@@ -961,8 +961,8 @@ object ToolSchemas {
         the device holds it until they are not, and drops it once `ttl_minutes`
         has passed. Ignoring it is a perfectly good answer.
 
-        USE FOR things that are fine to miss: "该喝水啦", "12点了，要帮你点外卖吗？",
-        "你下午三点有个会". NOT for anything that needs a decision now (that is
+        USE FOR things that are fine to miss: "Time to drink some water!", "12Done — want me to order takeout for you?",
+        "You have a meeting at 3 PM.". NOT for anything that needs a decision now (that is
         ask_user) and NOT as a second copy of something you are saying out
         loud in this turn — say it or bubble it, never both.
 
@@ -980,7 +980,7 @@ object ToolSchemas {
             required = listOf("text"),
             props = mapOf(
                 "text" to prop("string", "One short sentence (≤ 60 characters), in the language the user speaks. Plain text, no markdown."),
-                "buttons" to prop("array", "0–3 short labels, e.g. [\"好\",\"不用\"]. Omit for a bubble that only says something."),
+                "buttons" to prop("array", "0–3 short labels, e.g. [\"OK\",\"no thanks\"]. Omit for a bubble that only says something."),
                 "dismiss" to prop("string", "Which button means \"no thanks\" — exactly one of `buttons`. Tapping it ends the bubble with no turn."),
                 "ttl_minutes" to prop("integer", "How long it stays worth saying, 1–720. Default 30.", default = 30),
                 "kind" to prop("string", "A short stable tag for this sort of bubble, e.g. water, meal, meeting. Used for rationing and for the user muting it."),
@@ -999,7 +999,7 @@ object ToolSchemas {
         This is your canvas for rich output — dashboards, comparison
         tables, image grids, small games, interactive widgets the chat
         bubble can't hold. It comes back as soon as the page is up — the
-        page stays until the user taps 完成, and you are told when they do.
+        page stays until the user taps Done, and you are told when they do.
         Do not wait for it and do not describe the page out loud.
 
         A wall of prose is NOT rich output, however long it is. The chat
@@ -1015,7 +1015,7 @@ object ToolSchemas {
         change. Send the whole new page, not a diff. Never ask the user to
         close the page first.
 
-        The page is KEPT after it closes, on this device — the user has a 产物
+        The page is KEPT after it closes, on this device — the user has a Artifacts
         panel listing everything you have made. So a page is not gone when it
         leaves the screen: list_pages shows what exists and get_page reads one
         back for revision. Check before building something the user may already
@@ -1065,7 +1065,7 @@ object ToolSchemas {
                     "integer",
                     "The id (from list_pages) of the page this one is a revised version of. " +
                         "Optional — reading a page with get_page in the same turn sets it for you, " +
-                        "and so does the user tapping 继续修改. Give it when you know which page " +
+                        "and so does the user tapping Continue editing. Give it when you know which page " +
                         "you are continuing; omit it to build a new artifact.",
                 ),
             ),
@@ -1123,7 +1123,7 @@ object ToolSchemas {
 
         Rules the device enforces: no network from the page (no fetch, no
         remote scripts); images and media may load from https URLs. A button
-        can talk to you: `onclick="andee.say('帮我退订网盘')"` sends that sentence
+        can talk to you: `onclick="andee.say('Cancel my cloud storage subscription')"` sends that sentence
         to you as if the user said it — it only works from a real tap.
         Keep it under ~60 KB. Do not put the conversation's answer here as well
         as saying it; the stage is for what is worth leaving up.
@@ -1131,7 +1131,7 @@ object ToolSchemas {
             required = listOf("html"),
             props = mapOf(
                 "html" to prop("string", "The content of the stage: HTML for the inside of <body>, with any <style>/<script> it needs."),
-                "title" to prop("string", "A short name for what is on the stage now, e.g. 「本周三城天气」. Shown to you in later turns."),
+                "title" to prop("string", "A short name for what is on the stage now, e.g. 「This week's weather in three cities」. Shown to you in later turns."),
             ),
             localOnly = true,
         ),
@@ -1171,13 +1171,13 @@ object ToolSchemas {
         The pages you have made on this device, newest first, with the id each
         one is read back by. This is the half of your own work you cannot
         otherwise see: the pages you build with `show_html` stay on the tablet
-        afterwards — the user has a panel listing all of them (产物 on a Chinese
+        afterwards — the user has a panel listing all of them (Artifact on a Chinese
         device, *Made for you* on an English one) — but the record does not ride
         in your context, so without this call a page you built yesterday does
         not exist.
 
         Call it before answering anything that refers to earlier work
-        (「上次那个表格」「我做的番茄钟」「把昨天那页改一下」) and before rebuilding
+        ("that spreadsheet from last time" "the Pomodoro timer I made" "edit yesterday's page") and before rebuilding
         something the user may already have. A page that already exists is
         usually a page to revise, not a second one to build beside it.
 
@@ -1264,7 +1264,7 @@ object ToolSchemas {
                 // and `BodyCoreService.meetingMinutesQuery`), resolved in the
                 // interface language. It used to be spelled out here as 会议记录,
                 // which is the one string above that reaches the screen.
-                "title" to prop("string", "What this meeting is, e.g. '周会'. Becomes the title the minutes page is laid out under. Omit it and the meeting is named in the interface language."),
+                "title" to prop("string", "What this meeting is, e.g. 'weekly sync'. Becomes the title the minutes page is laid out under. Omit it and the meeting is named in the interface language."),
             ),
         ),
         tool(
@@ -1318,10 +1318,10 @@ object ToolSchemas {
           the on-the-spot *turn* that scrubs sideways and slips, which is why
           dog_turn defaults the other way.
         - gait=true — the legs walk. Slower and more impressive; use it when
-          the user says 走/步态/腿/用脚.
+          the user says walk/gait/leg/with feet.
 
         HOW LONG: seconds, up to 30 per call. Straight-line speed is NOT
-        calibrated — "往前走" is 2s, "走远一点" 4s, and if the user says it went
+        calibrated — ""walk forward"" is 2s, ""walk a bit farther"" 4s, and if the user says it went
         too far or not far enough, adjust and say what you changed. There is no
         distance unit to offer them.
 
@@ -1452,7 +1452,7 @@ object ToolSchemas {
         tool(
             name = "dog_stop",
             method = "dog.stop",
-            description = "Stop the dog now — an emergency brake, and the first thing to call whenever the user says 停 / 停下 / 别动了. Interrupts a dog_move that is still running and abandons a dog_sequence part-way. Safe to call when nothing is happening: the reply says honestly whether anything was moving, so do not announce a stop that did not happen. Note the dog would stop on its own at the end of whatever it was told to do; this is for ending it early.",
+            description = "Stop the dog now — an emergency brake, and the first thing to call whenever the user says Stop / Stop / Don't move. Interrupts a dog_move that is still running and abandons a dog_sequence part-way. Safe to call when nothing is happening: the reply says honestly whether anything was moving, so do not announce a stop that did not happen. Note the dog would stop on its own at the end of whatever it was told to do; this is for ending it early.",
             required = emptyList(),
             props = emptyMap<String, JSONObject>(),
         ),
@@ -1714,7 +1714,7 @@ object ToolSchemas {
         ## What belongs in it (about this person, not about this turn)
 
         - who they are, what they do, how to work with them → type=user
-        - they explicitly asked you to change how you do something, or confirmed how you did it (「以后都这样」「别这么干」) → type=feedback
+        - they explicitly asked you to change how you do something, or confirmed how you did it ("Always do this from now on" "Don't do that") → type=feedback
         - you personally got something done for them, walked a route through → type=way
         - an outside entrance (a website / app / account name / address / a shop they go to) → type=reference
         - a route you tried and **confirmed is a failure** → type=failure, with the "never do this again" written into content
@@ -1722,8 +1722,8 @@ object ToolSchemas {
         ## What does not belong
 
         - this turn's transient state (what you are waiting for, where you just tapped)
-        - **something you are to do later** (「到时候帮我…」「周五我发你，你帮我…」) — that is a `task`: it has an end,
-          the device brings it back when it is due or when they answer, and it shows in 在办. A memory does none of that.
+        - **something you are to do later** ("Remind me when the time comes…" "I'll send it Friday, you handle it…") — that is a `task`: it has an end,
+          the device brings it back when it is due or when they answer, and it shows in In progress. A memory does none of that.
         - coordinates, pixels, which row — they all change with the interface
         - this time's verification code, order number, amount
         - anything already stated in your system prompt
@@ -1740,7 +1740,7 @@ object ToolSchemas {
     """.trimIndent(),
             required = listOf("name", "description", "type"),
             props = mapOf(
-                "name" to prop("string", "Short identifier, and the overwrite key. e.g. 饮食禁忌 / 咖啡偏好 / 飞书登录"),
+                "name" to prop("string", "Short identifier, and the overwrite key. e.g. dietary restrictions / coffee preferences / Feishu login"),
                 "description" to prop("string", "One self-contained line, ≤120 characters"),
                 "content" to prop("string", "The body. When omitted, description is used."),
                 "type" to propEnum(
@@ -1783,10 +1783,10 @@ object ToolSchemas {
         **The user will not say "delete the memory" — they do not know it exists, so you have to see it yourself.**
         These are the signals that mean delete:
 
-        - they corrected something from before: 「不对，其实是……」
-        - they changed a preference or a decision: 「之前说的那个不做了」
-        - old and new contradict: the notebook says they do not use 微信, and they now say 「加我微信」
-        - that thing no longer exists: 「那个活动下线了」「那个需求不要了」
+        - they corrected something from before: "No, actually…"
+        - they changed a preference or a decision: "Forget what I said earlier"
+        - old and new contradict: the notebook says they do not use WeChat, and they now say "Add me on WeChat"
+        - that thing no longer exists: "That event was cancelled" "That request is no longer needed"
 
         `recall` first to check the name before deleting, and **do not delete from impression** — a deletion cannot be undone.
         If only the content changed (rather than the entry being void), overwrite it with remember under the same name; do not delete.
@@ -1848,7 +1848,7 @@ object ToolSchemas {
 
         - `list`: see them.
         - `add`: title, why, how_i_help, good_when, source. **Only from what the user said or did** — `source`
-          says when and what ("10-26: 「这周要把 0.6.2 发出去」"). A goal you think would be good for them is
+          says when and what ("10-26: "Ship  0.6.2  this week""). A goal you think would be good for them is
           not theirs; do not add it.
         - `update` / `pause` / `resume` / `done` / `drop`: by id.
 
@@ -1876,9 +1876,9 @@ object ToolSchemas {
 
         - `get`: the plan for `date` (today, tomorrow or YYYY-MM-DD).
         - `write`: replace the still-planned part of that day.
-          - `intent`: one sentence in your own voice and the user's language — 「今天我想帮他把发布收个尾，别的事少打扰。」
+          - `intent`: one sentence in your own voice and the user's language — "Today I want to help him wrap up the release — don't bother me with other things."
           - `items`: each `{time, slot, kind, what, because, buttons, dismiss, tag}`
-            - `time` "HH:mm", or "" with a `slot` (a loose time: 午饭前, when they first talk to me).
+            - `time` "HH:mm", or "" with a `slot` (a loose time: before lunch, when they first talk to me).
             - `kind`: remind (a bubble telling them something), ask (a bubble with buttons), prepare (something
               you do quietly ahead of time), follow_up (pick up something left half-way).
             - `what`: for remind/ask, exactly the bubble's words (≤ 60 characters, their language); otherwise
@@ -1965,7 +1965,7 @@ object ToolSchemas {
             description = """
         How the user wants their notifications handled — the standing instruction the notification filter reads on every
         message. That filter is a separate call that sees none of this conversation, so when the user tells you how to treat
-        messages (「消息都帮我处理一下」, 「群消息别管，私聊都回」, 「快递的告诉我一声就行」), `set` it here or it will not reach it.
+        messages ("Handle all my messages for me", "Ignore group chats, reply to private messages", "Just let me know about deliveries"), `set` it here or it will not reach it.
 
         Write it in the user's own words, one to three sentences, covering everything they asked for so far: `get` first
         and fold the new wish into what is already there, since `set` replaces it. `clear` when they say to stop. If
@@ -2010,8 +2010,8 @@ object ToolSchemas {
         - `upsert` (name, channel {kind, handle, chat}, met_how, relation, impression + source, weight 1–5, aliases).
           One record per person. If someone on record may be the same person, nothing is written and you get them back
           as `possible_same`: write again with their `id` if it is them, or with `new: true` if it is someone else.
-          A group nickname is a name *in that group*: give `chat` (the group's name) with it, so 「小王」 in one group is
-          not taken for 「小王」 in another. Leave `chat` empty for a private-chat name, an email or a phone number.
+          A group nickname is a name *in that group*: give `chat` (the group's name) with it, so "Xiao Wang" in one group is
+          not taken for "Xiao Wang" in another. Leave `chat` empty for a private-chat name, an email or a phone number.
         - `merge` (id, into, reason) — two records turned out to be one person: `id` goes into `into` and stops existing
           (its old id still finds them). Merge only when you are sure, and say why; the user can take it back.
         - `log` (id, dir in|out, channel, gist, outcome) — what passed between you; `out` counts toward the day's reach.
@@ -2298,7 +2298,7 @@ object ToolSchemas {
 
         A topic is a stretch of talking that ended — not a page (see `list_pages`) and not a way of
         working (see `list_scenes`). When the user refers to something you did together earlier
-        (「上次那个比价」「我们之前聊的那个」) and it is not in the conversation in front of you, it is
+        ("that price comparison from last time" "the one we talked about earlier") and it is not in the conversation in front of you, it is
         probably here: it was folded away to save context, and one line of it is all that is left
         in front of you.
 
@@ -2344,7 +2344,7 @@ object ToolSchemas {
         what they returned (shortened; screenshots and results from the vault, text messages, contacts
         and notifications are never kept). The summary or the cut line at the head of the conversation
         names the archive number, `#N`. A summary says what it left out — when the user asks about a
-        detail from before it (「刚才那个价格」「我一开始说的预算」), read it here instead of guessing, and
+        detail from before it ("that price from just now" "the budget I mentioned at the start"), read it here instead of guessing, and
         never tell them it is gone.
 
         - No `id`: the newest archived stretches, one line each — number, time span, size, first words.
@@ -2395,7 +2395,7 @@ object ToolSchemas {
             description = """
         Create a scene, or overwrite one under the same name.
 
-        🔴 **Only after the user said yes to this specific scene.** Propose it in words first (「要不要把这种练法存成一个情景？」) and wait for the answer. Never on your own initiative, never from a notification.
+        🔴 **Only after the user said yes to this specific scene.** Propose it in words first ("Should I save this kind of practice as a scene?") and wait for the answer. Never on your own initiative, never from a notification.
 
         `prompt` is the standing instructions you will work by while in it — write it for future you, concrete and complete:
         - the goal, and what a good session looks like
@@ -2410,7 +2410,7 @@ object ToolSchemas {
             required = listOf("name", "title", "summary", "prompt"),
             props = mapOf(
                 "name" to prop("string", "Short id, lowercase a-z 0-9 _ only, e.g. english_coach. Same name = overwrite."),
-                "title" to prop("string", "What the user sees, in their language, e.g. 陪练英语"),
+                "title" to prop("string", "What the user sees, in their language, e.g. English practice partner"),
                 "summary" to prop("string", "One line: what it is for and when to enter it"),
                 "prompt" to prop("string", "The standing instructions (see above)"),
                 "trigger_apps" to prop("array", "Optional package names that enter it automatically when the user opens them, e.g. [\"com.taobao.taobao\"]. Omit or [] for none."),
@@ -2421,7 +2421,7 @@ object ToolSchemas {
             name = "enter_scene",
             method = "scene.enter",
             description = """
-        Step into a scene: its instructions take effect from your next reply on. Leaves any scene you were in. Say one sentence when you do it (「好，进入练英语」).
+        Step into a scene: its instructions take effect from your next reply on. Leaves any scene you were in. Say one sentence when you do it (「OK, entering English practice」).
     """.trimIndent(),
             required = listOf("name"),
             props = mapOf("name" to prop("string", "The scene's name, from list_scenes")),
@@ -2457,9 +2457,9 @@ object ToolSchemas {
             method = "flow.record_start",
             description = """
         Arm flow recording: from now on every tap, long-press, swipe, typed line and wait_for_user you perform is
-        noted as a step — nothing is stored yet. Do this when the user asked you to record a routine (「把刚才这套记下来」
-        「记一个发视频到TK的流程」). When the whole run is over, propose saving it in words first (「这套存成脚本，以后说
-        发TK我就照做，行不行？」) and call save_flow only after they say yes — the same rule save_scene has.
+        noted as a step — nothing is stored yet. Do this when the user asked you to record a routine ("Note down what we just did"
+        "A flow for posting a video to TK"). When the whole run is over, propose saving it in words first ("Save this as a script; when I say 
+        post TKI'll just do it — okay?") and call save_flow only after they say yes — the same rule save_scene has.
     """.trimIndent(),
             required = emptyList(),
             props = emptyMap(),
@@ -2488,7 +2488,7 @@ object ToolSchemas {
         `handoff_to_ai` instead: that step pauses the replay and wakes you to do the job yourself.
     """.trimIndent(),
             required = listOf("note"),
-            props = mapOf("note" to prop("string", "What the user must do, in their language, e.g. 「用你的指纹确认付款」")),
+            props = mapOf("note" to prop("string", "What the user must do, in their language, e.g. 「confirm payment with your fingerprint」")),
         ),
         tool(
             localOnly = true,
@@ -2498,7 +2498,7 @@ object ToolSchemas {
         Record a step the FLOW cannot do by itself and must hand back to you — reading a CAPTCHA off the screen and
         typing it, choosing between dialogs that only appear sometimes, checking whether an upload really finished.
         Only while recording. Write `note` as a short instruction to your future self IN THE USER'S LANGUAGE, and
-        say what must be true before the flow continues (e.g. 「读出屏幕上的验证码填进去，点确定，确认已经进入下一步」).
+        say what must be true before the flow continues (e.g. "Read the verification code on screen, enter it, tap Confirm, and check that we've moved to the next step").
 
         On replay this step performs NO gesture. The flow PAUSES (`paused:true`, NOT a failure), you are woken with
         the instruction and the current screen, you do the job with your own tools, then `resume_flow` from
@@ -2528,7 +2528,7 @@ object ToolSchemas {
             required = listOf("name", "title"),
             props = mapOf(
                 "name" to prop("string", "Short id, lowercase a-z 0-9 _ only, e.g. publish_tiktok. Same name = overwrite."),
-                "title" to prop("string", "What the user sees, in their language, e.g. 发布视频到TK"),
+                "title" to prop("string", "What the user sees, in their language, e.g. post a video to TikTok"),
                 "summary" to prop("string", "One line: what it does and when to use it"),
                 "drop" to prop("array", "1-based step numbers to leave out, from preview_flow — e.g. [3]. Omit to keep every step."),
             ),
@@ -2615,7 +2615,7 @@ object ToolSchemas {
             props = mapOf(
                 "name" to prop("string", "The flow's name, from list_flows"),
                 "from_step" to prop("integer", "1-based step to start from. Omit to run the whole flow."),
-                "replace" to prop("object", "Map of 1-based step number → text to type instead of the recorded one, e.g. {\"4\": \"新的标题\"}."),
+                "replace" to prop("object", "Map of 1-based step number → text to type instead of the recorded one, e.g. {\"4\": \"new title\"}."),
             ),
         ),
         tool(
@@ -2658,7 +2658,7 @@ object ToolSchemas {
 
         - the step itself is wrong (an app update moved the element, a step turned out useless) → `drop` it:
           {"name": "publish_tiktok", "drop": [4]} — later steps keep their actions and renumber.
-        - a step types the wrong default text now → `retype` it: {"name": "...", "retype": {"3": "新的标题"}} —
+        - a step types the wrong default text now → `retype` it: {"name": "...", "retype": {"3": "new title"}} —
           only works on steps that type.
         - the ROOT CAUSE is a MISSING step → `insert` it. The common one: a flow recorded while its app was
           already open dies at step 1 from the home screen, because it never opens that app itself. Fix it
@@ -2667,7 +2667,7 @@ object ToolSchemas {
           add an opening step. `before` is an ORIGINAL get_flow step number, or steps+1 to append.
 
         `insert` also adds an `ai` step when a routine needs judgement in the middle — {"before": 4, "kind": "ai",
-        "note": "读出屏幕上的验证码填进去并确认"}. On replay that step pauses (never fails) and hands the note
+        "note": "Read the verification code on screen, enter it, and confirm"}. On replay that step pauses (never fails) and hands the note
         back to you; do the job, then resume_flow from the next step. Useful for a CAPTCHA or a dialog that a
         recorded tap cannot handle. Use `human` {note} when the USER's own hand is required instead.
 
@@ -2681,8 +2681,8 @@ object ToolSchemas {
             props = mapOf(
                 "name" to prop("string", "The flow's name, from list_flows"),
                 "drop" to prop("array", "1-based step numbers to remove, from get_flow, e.g. [4]."),
-                "retype" to prop("object", "Map of 1-based step number → the new text a type step should type, e.g. {\"3\": \"新标题\"}."),
-                "insert" to prop("array", "Steps to ADD, e.g. [{\"before\":1,\"kind\":\"launch\",\"pkg\":\"com.android.settings\"}] for a missing opening step, or [{\"before\":4,\"kind\":\"ai\",\"note\":\"读出验证码填进去\"}] for a step that needs judgement. before is an ORIGINAL 1-based step number (steps+1 appends)."),
+                "retype" to prop("object", "Map of 1-based step number → the new text a type step should type, e.g. {\"3\": \"new title\"}."),
+                "insert" to prop("array", "Steps to ADD, e.g. [{\"before\":1,\"kind\":\"launch\",\"pkg\":\"com.android.settings\"}] for a missing opening step, or [{\"before\":4,\"kind\":\"ai\",\"note\":\"Read the verification code and enter it\"}] for a step that needs judgement. before is an ORIGINAL 1-based step number (steps+1 appends)."),
             ),
         ),
         tool(

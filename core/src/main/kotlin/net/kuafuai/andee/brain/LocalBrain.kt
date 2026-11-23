@@ -969,7 +969,7 @@ class LocalBrain(
         val at = java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(java.util.Date(u.at))
         return "\n\n(unfinished: at $at you stopped a task after ${u.steps} steps before it was done — it began with " +
             "\"${u.request}\". Its steps are still above, and so is what you told the user when you stopped. If they want " +
-            "you to go on (继续 / go on / keep going), carry on from where you stopped — do not start over, and do not " +
+            "you to go on (continue / go on / keep going), carry on from where you stopped — do not start over, and do not " +
             "ask what they mean.)"
     }
 
@@ -1987,7 +1987,7 @@ class LocalBrain(
         content.put(
             LlmClient.textBlock(
                 "The ${images.size} photo(s) the user attached to the message above. " +
-                    "You can already see them here — \"这个 / this\" means these photos. " +
+                    "You can already see them here — \"this / this\" means these photos. " +
                     "Do NOT open the camera or take a screenshot to look at them.",
             ),
         )
@@ -2598,7 +2598,7 @@ A topic that is clearly over is worth putting away: it stops costing room, and i
 Decide where each topic begins and ends, and for each one that is finished call `fold_topic` with:
 - `from_turn` / `to_turn` — the first and the last U-number of that topic (inclusive). Use the numbers above;
   everything you and the tools said in between goes with them.
-- `title` — what it was about, in his words where you have them. 「番茄钟」「三款扫地机器人比价」, not 「用户询问产品信息」.
+- `title` — what it was about, in his words where you have them. "Pomodoro timer" "Comparing three robot vacuums", not "the user asking about product info".
 - `summary` — four short lines, and the last one is not optional:
     What it was about / where it got to / how it ended / **what you have left out**.
   The last line is the door: it tells future-you the summary is not the whole story, so a question about
@@ -2606,7 +2606,7 @@ Decide where each topic begins and ends, and for each one that is finished call 
 
 Fold a topic when:
 - the subject clearly CHANGED after it — a different request, not a follow-up to the same one
-  (「做个番茄钟」→「改好看点」 is ONE topic; 「做个番茄钟」→「今天天气怎么样」 is two);
+  ("Make a Pomodoro timer"→"Make it look better" is ONE topic; "Make a Pomodoro timer"→"How's the weather today" is two);
 - and nothing in it is still hanging — an unanswered question, a request you did not finish.
 
 Never fold the latest turn: nothing has started after it, so you cannot tell it is over.

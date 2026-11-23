@@ -111,8 +111,8 @@ class DeviceActionsController(private val context: Context) {
             opened -> JSONObject().put("launched", target).put("via", "pad")
             guardShown -> JSONObject().put(
                 "error",
-                "小米安全中心的链式启动确认框挡在屏幕上（正在询问是否允许打开 '$target'），自动点击「允许」" +
-                    "没有成功 —— 请用户在弹窗上点一下「允许」，点完重新运行即可。不要反复 launch_app 空转。",
+                "Xiaomi Security Center's chained-launch confirmation dialog is blocking the screen (asking whether to allow opening '$target') — tap Allow automatically" +
+                    "Didn't work — ask the user to tap Allow on the dialog, then rerun. Don't keep retrying launch_app in a loop.",
             )
             else -> JSONObject().put(
                 "error",
@@ -147,7 +147,7 @@ class DeviceActionsController(private val context: Context) {
      */
     private fun tapGuardConfirm(): Boolean {
         val svc = net.kuafuai.andee.ScreenBodyService.get() ?: return false
-        val allowTexts = setOf("允许", "始终允许", "允许一次", "Allow", "Always allow", "Allow once")
+        val allowTexts = setOf("Allow", "Always allow", "Allow once", "Allow", "Always allow", "Allow once")
         var found = false
         // Two passes: the dialog is animating in when the guard package first
         // shows up, and its buttons may not be in the tree yet.
@@ -345,8 +345,8 @@ class DeviceActionsController(private val context: Context) {
             opened -> JSONObject().put("opened", url).put("via", "pad")
             guardShown -> JSONObject().put(
                 "error",
-                "小米安全中心的链式启动确认框挡在屏幕上（正在询问是否允许打开这个链接），自动点击「允许」" +
-                    "没有成功 —— 请用户在弹窗上点一下「允许」，点完重新打开即可。不要反复重试空转。",
+                "Xiaomi Security Center's chained-launch confirmation dialog is blocking the screen (asking whether to allow opening this link) — tap Allow automatically" +
+                    "Didn't work — ask the user to tap Allow on the dialog, then reopen it. Don't keep retrying in a loop.",
             )
             else -> JSONObject().put(
                 "error",

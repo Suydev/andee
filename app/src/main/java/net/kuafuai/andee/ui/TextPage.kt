@@ -120,7 +120,7 @@ object TextPage {
   html,body { margin:0; padding:0; background:#0F172A; color:#F8FAFC;
     font-family:-apple-system,"PingFang SC","Noto Sans CJK SC",system-ui,sans-serif;
     font-size:16px; line-height:1.6; -webkit-text-size-adjust:100%; }
-  /* 88px of top padding clears the ✕完成 pill the page floats there. */
+  /* 88px of top padding clears the ✕Done pill the page floats there. */
   .wrap { padding:88px 20px 40px; }
   .who { margin:0 0 16px; font-size:13px; color:#94A3B8; }
   .card + .who { margin-top:20px; }

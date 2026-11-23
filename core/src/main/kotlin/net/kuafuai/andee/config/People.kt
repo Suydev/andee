@@ -624,7 +624,7 @@ class People(
         const val SECTION = "people"
 
         /** The owner record's name until the user gives one. */
-        const val OWNER_PLACEHOLDER = "用户"
+        const val OWNER_PLACEHOLDER = "User"
         const val MAX_PEOPLE = 300
         const val MAX_TEXT = 300
         const val MAX_RELATION = 400
@@ -661,8 +661,8 @@ class People(
         }
 
         private val SENSITIVE = listOf(
-            Regex("""(身份证|护照号|银行卡|信用卡|卡号|社保|住址|家庭住址|家住|门牌)"""),
-            Regex("""(病|诊断|手术|抑郁|癌|怀孕|药|用药|心理咨询|离婚|出轨|债|欠款|工资|收入|薪水|存款)"""),
+            Regex("""(ID card|passport number|bank card|credit card|card number|social security|home address|address|lives at|house number)"""),
+            Regex("""(illness|diagnosis|surgery|depression|cancer|pregnancy|medication|dosage|counseling|divorce|affair|debt|arrears|salary|income|paycheck|savings)"""),
             Regex("""(passport|ssn\b|credit card|home address|diagnos|surgery|depress|pregnan|divorce|salary|debt|affair)""", RegexOption.IGNORE_CASE),
             Regex("""\b\d{15,19}\b"""),
         )

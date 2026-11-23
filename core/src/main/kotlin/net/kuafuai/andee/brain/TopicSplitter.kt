@@ -297,16 +297,16 @@ fun renderTopicText(history: List<JSONObject>, from: Int, until: Int): String {
     for (i in from.coerceAtLeast(0) until until.coerceAtMost(history.size)) {
         val m = history[i]
         when (m.optString("role")) {
-            "user" -> sb.append("我：").append(TopicSplitter.spokenText(m.opt("content") as? String)).append('\n')
+            "user" -> sb.append("Me: ").append(TopicSplitter.spokenText(m.opt("content") as? String)).append('\n')
             "assistant" -> {
                 val text = m.opt("content") as? String
-                if (!text.isNullOrBlank()) sb.append("他：").append(text.trim()).append('\n')
+                if (!text.isNullOrBlank()) sb.append("Him: ").append(text.trim()).append('\n')
                 val calls = m.optJSONArray("tool_calls")
                 if (calls != null && calls.length() > 0) {
                     val names = (0 until calls.length()).mapNotNull {
                         calls.optJSONObject(it)?.optJSONObject("function")?.optString("name")
                     }.filter { it.isNotBlank() }
-                    if (names.isNotEmpty()) sb.append("（用了：").append(names.joinToString("、")).append("）\n")
+                    if (names.isNotEmpty()) sb.append("(used: ").append(names.joinToString("、")).append("）\n")
                 }
             }
             "tool" -> {
@@ -320,7 +320,7 @@ fun renderTopicText(history: List<JSONObject>, from: Int, until: Int): String {
                     }
                     else -> 0
                 }
-                if (len > 0) sb.append("（工具返回 ").append(len).append(" 字）\n")
+                if (len > 0) sb.append("(tool returned ").append(len).append(" chars)\n")
             }
         }
         sb.append('\n')

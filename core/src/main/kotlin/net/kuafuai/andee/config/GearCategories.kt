@@ -28,15 +28,15 @@ object Categories {
     // tries to be clever is a list nobody can audit.
     private val ADULT_WORDS = listOf(
         "porn", "xvideos", "xnxx", "pornhub", "xhamster", "redtube", "youporn", "onlyfans", "fansly",
-        "hentai", "nsfw", "erotic", "adult video", "r18", "18+", "成人", "色情", "情色", "涩", "裸聊", "约炮", "av ",
-        "草榴", "樱桃", "成人视频",
+        "hentai", "nsfw", "erotic", "adult video", "r18", "18+", "Adult", "Porn", "Erotic", "Racy", "Nude chat", "Hookup", "av ",
+        "Caoliu", "Cherry", "Adult videos",
     )
-    private val DATING_WORDS = listOf("tinder", "bumble", "hinge", "grindr", "okcupid", "soul", "探探", "陌陌", "momo", "交友", "相亲", "世纪佳缘", "珍爱")
+    private val DATING_WORDS = listOf("tinder", "bumble", "hinge", "grindr", "okcupid", "soul", "Tantan", "Momo", "momo", "Dating", "Blind date", "Jiayuan", "Zhenai")
     private val FINANCE_WORDS = listOf(
-        "alipay", "支付宝", "wechat pay", "bank", "银行", "stock", "股票", "炒股", "同花顺", "东方财富", "robinhood", "coinbase", "binance",
-        "币安", "fund", "基金", "证券", "securities", "paypal", "venmo", "wallet", "钱包", "理财", "招商", "工商", "建设银行", "云闪付",
+        "alipay", "Alipay", "wechat pay", "bank", "Bank", "stock", "Stocks", "Trading stocks", "Tonghuashun", "East Money", "robinhood", "coinbase", "binance",
+        "Binance", "fund", "Funds", "Securities", "securities", "paypal", "venmo", "wallet", "Wallet", "Investing", "China Merchants", "ICBC", "China Construction Bank", "UnionPay",
     )
-    private val HEALTH_WORDS = listOf("health", "健康", "medical", "医院", "挂号", "doctor", "丁香", "平安好医生", "period", "月经", "pregnan", "孕", "fitness", "mental", "therapy")
+    private val HEALTH_WORDS = listOf("health", "Health", "medical", "Hospital", "Clinic appointment", "doctor", "DXY", "Ping An Good Doctor", "period", "Period", "pregnan", "Pregnant", "fitness", "mental", "therapy")
 
     /** Best guess; deliberately leans to the more private reading. Order matters: adult is tested first. */
     fun guess(id: String, label: String): String {

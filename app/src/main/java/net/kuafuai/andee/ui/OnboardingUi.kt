@@ -398,8 +398,8 @@ class OnboardingUi(
         val lang = VoiceConfig.uiLanguage(context)
         body.addView(LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
-            listOf(VoiceConfig.LANG_ZH to "中文", VoiceConfig.LANG_EN to "English").forEachIndexed { i, (code, name) ->
-                addView(modelChoice(name, if (code == VoiceConfig.LANG_ZH) "Chinese" else "英文", code == lang) {
+            listOf(VoiceConfig.LANG_ZH to "Chinese", VoiceConfig.LANG_EN to "English").forEachIndexed { i, (code, name) ->
+                addView(modelChoice(name, if (code == VoiceConfig.LANG_ZH) "Chinese" else "English", code == lang) {
                     if (code == lang) return@modelChoice
                     // The same single write SettingsUi and LangToggle make.
                     VoiceConfig.save(context, mapOf("lang" to code))

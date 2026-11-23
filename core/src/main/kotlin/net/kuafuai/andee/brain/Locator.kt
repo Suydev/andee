@@ -116,10 +116,10 @@ class Locator(cfg: BrainConfig, private val model: String, private val log: (war
          *    costs ~16 output tokens. The `seen` text also goes back to the brain with the tap.
          */
         fun prompt(target: String): String =
-            "这是一张屏幕截图。要找的界面元素：「${target.trim()}」。\n" +
-                "先用一句话写出截图上最符合的那个元素实际显示的文字或图标（<seen>…</seen>），再判断它是不是要找的元素：" +
-                "描述里提到的文字、颜色或图标在它身上都能对上，才算是。是，就输出 <point>x y</point>（中心点，x、y 是相对图片宽高的 0-1000 归一化坐标）；" +
-                "不是或截图里没有，就输出 <none/>。不要把只是作用相近的东西当成它（比如不要把「关闭」当成「删除」）。"
+            "This is a screenshot. The interface element to find: 「${target.trim()}」.\n" +
+                "First write in one sentence what text or icon the best-matching element on the screenshot actually shows (<seen>…</seen>), then judge whether it's the one being looked for: " +
+                "It counts only if the words, color, and icon mentioned in the description all match it. If yes, output <point>x y</point> (center point; x and y are 0–1000 normalized to image width and height); " +
+                "if no, or it isn't in the screenshot, output <none/>. Don't mistake something that merely has a similar function for it (e.g. don't take Cancel for Delete)."
 
         /** `<point>x y</point>`, or a `<bbox>x1 y1 x2 y2</bbox>` (its centre), or `<none/>`; `<seen>` rides along. */
         fun parse(raw: String): Result {

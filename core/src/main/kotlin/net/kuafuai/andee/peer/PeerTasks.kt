@@ -260,9 +260,9 @@ class PeerTasks(private val net: Net) {
     private fun ask(friend: String, task: String): JSONObject {
         val text = task.trim()
         require(text.isNotEmpty()) { "task is empty — write the whole request as one self-contained message" }
-        check(net.enabled()) { "Linking is switched off here. The user can turn it on under Friends (朋友)." }
+        check(net.enabled()) { "Linking is switched off here. The user can turn it on under Friends." }
         val all = net.paired()
-        check(all.isNotEmpty()) { "This Andee has no friends yet. The user adds one under Friends (朋友) by scanning a QR code." }
+        check(all.isNotEmpty()) { "This Andee has no friends yet. The user adds one under Friends by scanning a QR code." }
         val d = friend.trim()
         val to = when {
             d.isEmpty() && all.size == 1 -> all[0]
