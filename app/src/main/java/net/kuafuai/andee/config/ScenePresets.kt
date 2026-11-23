@@ -57,7 +57,7 @@ object ScenePresets {
         val example: String,
     )
 
-    class Preset(val name: String, private val zh: Text, private val en: Text) {
+    class Preset(val name: String, private val zh: Text, private val en: Text, val triggerApps: List<String> = emptyList()) {
         fun text(english: Boolean): Text = if (english) en else zh
     }
 
@@ -77,7 +77,7 @@ object ScenePresets {
             title = t.title,
             summary = t.summary,
             prompt = t.prompt,
-            triggerApps = emptyList(),
+            triggerApps = preset.triggerApps,
         )
     }
 
@@ -325,6 +325,137 @@ object ScenePresets {
         ),
     )
 
+
+    private val WHATSAPP_FAST = Preset(
+        name = "whatsapp_fast",
+        zh = Text(
+            title = "WhatsApp 快速通道",
+            summary = "进来就快：只读通知、短句草稿，发送前先问你。",
+            example = "我在 WhatsApp 里，帮我快点处理消息",
+            prompt = """
+        当我在这个场景中时，用户希望 WhatsApp 里一切从快。用 get_notifications 判断什么到了，不要主动翻开聊天记录。只说要点，一行一人，不要朗读整条消息，不要念验证码。
+
+        用户说「回他…」时，用 type_text 把草稿打好，但除非他明确说「发」，否则不要点发送。任何付款、链接、验证码、删除、转发都先问。语音回应保持一句话。
+            """.trimIndent(),
+        ),
+        en = Text(
+            title = "WhatsApp fast lane",
+            summary = "Fast in WhatsApp: notifications only, short drafts, ask before sending.",
+            example = "I'm in WhatsApp, help me handle messages fast",
+            prompt = """
+        While I am in this scene, the person wants speed in WhatsApp. Use get_notifications to see what arrived; do not dig through chats unprompted. Say only the gist, one line per person, never read a whole message aloud, never read out a verification code.
+
+        When they say "reply ...", draft it with type_text but do not tap send unless they clearly say "send it". Ask first about money, links, codes, deleting, forwarding or payments. Keep my spoken replies to one short sentence.
+            """.trimIndent(),
+        ),
+        triggerApps = listOf("com.whatsapp"),
+    )
+
+    private val TERMUX_SHELL = Preset(
+        name = "termux_shell",
+        zh = Text(
+            title = "Termux 助手",
+            summary = "快速敲命令、看输出；危险操作先确认。",
+            example = "我在 Termux，帮我快速跑个命令",
+            prompt = """
+        当我在这个场景中时，用户在 Termux 里要快。用 type_text 和 tap_screen_element 帮他输入命令，用 take_screenshot 看结果，然后一句话说明发生了什么。删除、覆盖、git 强制操作、装包、改配置之前必须问一句。不要把密钥打印出来。
+            """.trimIndent(),
+        ),
+        en = Text(
+            title = "Termux helper",
+            summary = "Type commands fast, read the output, confirm before danger.",
+            example = "I'm in Termux, help me run a command quickly",
+            prompt = """
+        While I am in this scene, the person wants speed in Termux. Use type_text and tap_screen_element to enter commands, take_screenshot to read the result, then tell them in one sentence what happened. Always ask before deleting, overwriting, force-push, installing packages or changing config. Never print secrets or keys.
+            """.trimIndent(),
+        ),
+        triggerApps = listOf("com.termux"),
+    )
+
+    private val YOUTUBE_QUICK = Preset(
+        name = "youtube_quick",
+        zh = Text(
+            title = "YouTube 快播",
+            summary = "说一句就搜、播、暂停，别啰嗦。",
+            example = "在 YouTube 找个视频放",
+            prompt = """
+        当我在这个场景中时，用 launch_app 打开 YouTube，用 type_text 搜索，按用户的话播放、暂停、调音量。只在用户确认后出声。一句话回复，不念长标题，不给大段介绍。
+            """.trimIndent(),
+        ),
+        en = Text(
+            title = "YouTube quick play",
+            summary = "Search, play and stop by voice, briefly.",
+            example = "Find a video on YouTube and play it",
+            prompt = """
+        While I am in this scene, use launch_app for YouTube, type_text to search, and do what the person says: play, pause, volume, next. Only unmute after they confirm. One short sentence back, no long titles or descriptions.
+            """.trimIndent(),
+        ),
+        triggerApps = listOf("com.google.android.youtube"),
+    )
+
+    private val BRAVE_WEB = Preset(
+        name = "brave_web",
+        zh = Text(
+            title = "Brave 速览",
+            summary = "打开网页、读页面、直接给答案。",
+            example = "用 Brave 打开这个链接并总结",
+            prompt = """
+        当我在这个场景中时，用 launch_app 或 open_url 打开 Brave，用 get_page 读当前页面。用户问什么就答什么，先给结论，细节只在被问到时补。不要朗读整页内容，不要自动填写或提交任何表单。
+            """.trimIndent(),
+        ),
+        en = Text(
+            title = "Brave quick read",
+            summary = "Open pages, read them, answer directly.",
+            example = "Open this link in Brave and summarize it",
+            prompt = """
+        While I am in this scene, use launch_app or open_url for Brave and get_page to read the current page. Answer the actual question first, details only if asked. Never read a whole page aloud, never fill or submit forms without explicit permission.
+            """.trimIndent(),
+        ),
+        triggerApps = listOf("com.brave.browser"),
+    )
+
+    private val NOTES_CAPTURE = Preset(
+        name = "notes_capture",
+        zh = Text(
+            title = "速记",
+            summary = "说一句就记下，删除前先问。",
+            example = "记一下：明天交房租",
+            prompt = """
+        当我在这个场景中时，用 note 或 todo 立刻记下用户说的话，简短确认一句。删除、覆盖笔记前必须问。不要读回整篇笔记，除非用户要求。
+            """.trimIndent(),
+        ),
+        en = Text(
+            title = "Quick notes",
+            summary = "Capture a note in one line, ask before deleting.",
+            example = "Note: pay rent tomorrow",
+            prompt = """
+        While I am in this scene, use note or todo to capture what the person says immediately and confirm in one short line. Ask before deleting or overwriting anything. Do not read back whole notes unless asked.
+            """.trimIndent(),
+        ),
+        triggerApps = listOf("com.yygg.note.app", "com.oneplus.note"),
+    )
+
+    private val CHROME_WEB = Preset(
+        name = "chrome_web",
+        zh = Text(
+            title = "Chrome 速览",
+            summary = "打开网页、读页面、直接给答案。",
+            example = "用 Chrome 打开这个链接并总结",
+            prompt = """
+        当我在这个场景中时，用 launch_app 或 open_url 打开 Chrome，用 get_page 读当前页面。先给结论，别朗读整页，没得到允许不要提交表单。
+            """.trimIndent(),
+        ),
+        en = Text(
+            title = "Chrome quick read",
+            summary = "Open, read and answer in Chrome.",
+            example = "Open this link in Chrome and summarize it",
+            prompt = """
+        While I am in this scene, use launch_app or open_url for Chrome and get_page to read the page. Lead with the answer, never read the whole page aloud, never submit a form without permission.
+            """.trimIndent(),
+        ),
+        triggerApps = listOf("com.android.chrome"),
+    )
+
     /** In the order the card offers them. */
-    val all: List<Preset> = listOf(CHAT_DUTY, SUBSCRIPTION_AUDIT, MEETING_NOTES, TIMED_BOOKING)
+    val all: List<Preset> = listOf(WHATSAPP_FAST, TERMUX_SHELL, YOUTUBE_QUICK, BRAVE_WEB, NOTES_CAPTURE, CHROME_WEB, CHAT_DUTY, SUBSCRIPTION_AUDIT, MEETING_NOTES, TIMED_BOOKING)
 }

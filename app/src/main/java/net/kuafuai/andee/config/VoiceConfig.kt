@@ -182,7 +182,7 @@ object VoiceConfig {
 
         const val DEFAULT_LLM_BASE_URL = "https://api.deepseek.com"
         const val DEFAULT_LLM_MODEL = "deepseek-flash"
-        const val DEFAULT_REASONING_EFFORT = "high"
+        const val DEFAULT_REASONING_EFFORT = "low"
 
         /**
          * The same two defaults for an **English** card, pointing at OpenAI.
@@ -757,7 +757,7 @@ object VoiceConfig {
          * unset case — a saved choice always wins, same as [uiLanguage].
          */
         private fun defaultThinking(): String =
-            if (BuildConfig.DEFAULT_THINKING.trim().lowercase() == "off") "disabled" else "enabled"
+            if (BuildConfig.DEFAULT_THINKING.trim().lowercase() == "enabled") "enabled" else "disabled"
 
         /**
          * Hard cap on tool-call steps per task. A real task is a dozen steps;
