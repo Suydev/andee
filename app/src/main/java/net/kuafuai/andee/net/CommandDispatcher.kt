@@ -3208,7 +3208,7 @@ class CommandDispatcher(
         val r = fastAction(
             listOf("input", "swipe", px.toString(), py.toString(), px.toString(), py.toString(), "150"),
             pointRect(px, py),
-            fallback = { fallbackScreen().tapAim(x, y, null, null) },
+            fallback = { fallbackScreen().tapAim(null, x, y, null, null) },
             permissionReason = "Shizuku permission was requested; nothing was tapped. If it was granted, retry " +
                 "with the same coordinates; if it was refused permanently, use the screen.* tools.",
         )
