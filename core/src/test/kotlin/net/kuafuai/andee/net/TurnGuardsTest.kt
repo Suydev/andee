@@ -93,4 +93,38 @@ class TurnGuardsTest {
             assert(r.contains("stage cannot be changed")) { r }
         }
     }
+
+    private fun refusedKind(method: String, kind: TurnKind): String {
+        try {
+            TurnGuards.check(method, silent = false, untrusted = false, kind = kind)
+        } catch (e: IllegalStateException) {
+            return e.message.orEmpty()
+        }
+        fail("$method should have been refused for turn kind $kind")
+        return ""
+    }
+
+    @Test
+    fun `fast input is reachable only from a user turn`() {
+        val shellWrites = listOf(
+            "device.fast_tap", "device.fast_swipe", "device.fast_text",
+            "device.fast_key", "device.fast_launch", "device.shell",
+        )
+        for (method in shellWrites) {
+            TurnGuards.check(method, silent = false, untrusted = false, kind = TurnKind.USER)
+        }
+        for (kind in listOf(TurnKind.PEER, TurnKind.NOTIFY, TurnKind.WORK, TurnKind.SWEEP, TurnKind.PASSIVE)) {
+            for (method in shellWrites) {
+                val reason = refusedKind(method, kind)
+                assert(reason.contains(method)) { "$method was refused for the wrong reason: $reason" }
+            }
+        }
+    }
+
+    @Test
+    fun `ordinary screen input is not swept up in the fast input rule`() {
+        for (kind in TurnKind.entries) {
+            TurnGuards.check("screen.tap", silent = false, untrusted = false, kind = kind)
+        }
+    }
 }

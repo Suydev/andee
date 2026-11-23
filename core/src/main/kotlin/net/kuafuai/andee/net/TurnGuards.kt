@@ -1,6 +1,21 @@
 package net.kuafuai.andee.net
 
 /**
+ * Where a tool call came from. Only [USER] may use the privileged, shell-backed
+ * device-control methods; every other value is a surface that must fail closed.
+ * [PASSIVE] is the default so a caller that has not been threaded yet grants
+ * nothing by accident.
+ */
+enum class TurnKind {
+    USER,
+    PEER,
+    NOTIFY,
+    WORK,
+    SWEEP,
+    PASSIVE,
+}
+
+/**
  * Which methods a turn may call, decided by **where the turn came from** — not
  * by what the model was told.
  *
@@ -44,6 +59,20 @@ object TurnGuards {
     private val PLAN_WRITES = setOf("note.directions", "note.day_plan")
 
     /**
+     * Every shell-backed method, including the internal `device.shell` that has
+     * no schema. One list shared by every surface: the dispatcher's fold,
+     * passive and kind gates, the hub's name rejection and this guard.
+     */
+    val SHELL_WRITES = setOf(
+        "device.shell",
+        "device.fast_tap",
+        "device.fast_swipe",
+        "device.fast_text",
+        "device.fast_key",
+        "device.fast_launch",
+    )
+
+    /**
      * Who Andee is, what it cares about, who it knows and what it has written. A stranger's words must not be able
      * to rewrite any of it: the narrative is what it wakes up as, a care is what it will get up for, a person's
      * record is what it believes about them, and an article is what it will quote next week as its own research.
@@ -76,7 +105,22 @@ object TurnGuards {
      *   this device — a notification, a todo that was set on such a turn, or a
      *   request from a friend's Andee.
      */
-    fun check(method: String, silent: Boolean, untrusted: Boolean) {
+    fun check(
+        method: String,
+        silent: Boolean,
+        untrusted: Boolean,
+        kind: TurnKind = TurnKind.PASSIVE,
+    ) {
+        // Privileged device control is bound to a live turn the user started on
+        // this device. Every other surface — hub, peer, notification, sweep,
+        // work, wake, passive viewer — is refused here before any other rule
+        // runs, and PASSIVE is the default so an unthreaded caller gets nothing.
+        if (kind != TurnKind.USER && method in SHELL_WRITES) {
+            throw IllegalStateException(
+                "This is not a user turn on this device, so it cannot use privileged device control: $method. " +
+                    "Do it with the screen.* tools or tell the user what you could not do.",
+            )
+        }
         // The quiet-hour sweep may think and write to the notebook, but must not
         // touch the device.
         if (silent && !method.startsWith("note.") && method !in GEAR_SILENT_OK && method !in STAGE_SILENT_OK) {

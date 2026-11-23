@@ -1,5 +1,6 @@
 package net.kuafuai.andee.brain
 
+import net.kuafuai.andee.net.TurnKind
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -48,12 +49,22 @@ class GuestHost(private val inner: BrainHost) : BrainHost by inner {
 
     override fun methodOf(toolName: String): String? = inner.methodOf(toolName)?.takeIf(::allowed)
 
-    override fun dispatch(method: String, params: JSONObject, callId: String, silent: Boolean, untrusted: Boolean): Any? {
+    override fun dispatch(
+        method: String,
+        params: JSONObject,
+        callId: String,
+        silent: Boolean,
+        untrusted: Boolean,
+        kind: TurnKind = TurnKind.PASSIVE,
+    ): Any? {
         check(allowed(method)) {
             "This is a request from a friend's Andee, so only the screen, asking the owner and showing a page are open: " +
                 "$method is not. Say in your report what you could not do."
         }
-        return inner.dispatch(method, params, callId, silent, untrusted = true)
+        // Never hand the owner's USER standing to a guest: the guest's own kind
+        // is PEER, so even a future widening of the allowlist cannot reach a
+        // privileged shell method from this surface.
+        return inner.dispatch(method, params, callId, silent, untrusted = true, kind = TurnKind.PEER)
     }
 
     override fun traceDir(): File = inner.traceDir()

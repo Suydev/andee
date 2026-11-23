@@ -16,6 +16,8 @@ import android.os.StatFs
 import android.provider.Settings
 import androidx.annotation.StringRes
 import net.kuafuai.andee.R
+import net.kuafuai.andee.shell.ShellStatus
+import net.kuafuai.andee.shell.ShizukuDevice
 import net.kuafuai.andee.config.VoiceConfig
 import net.kuafuai.andee.BuildConfig
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -186,6 +188,9 @@ object SelfCheck {
          */
         data class Adb(val command: String) : Fix
 
+        /** Shizuku's own app: the only place to grant our binder or restart its service. */
+        object ShizukuApp : Fix
+
         /** Ours to fix, in our own settings card. Needs the service to be up. */
         object OurSettings : Fix
 
@@ -211,7 +216,7 @@ object SelfCheck {
         /** Whether there is a button to press, as opposed to words to read. */
         val actionable: Boolean
             get() = fix is Fix.Screen || fix is Fix.Link || fix is Fix.Grant ||
-                fix is Fix.OurSettings
+                fix is Fix.OurSettings || fix is Fix.ShizukuApp
     }
 
     /** What may interrupt the user. See the class doc for why NOTE does not. */
@@ -247,6 +252,7 @@ object SelfCheck {
             // the one worth putting in front of them first.
             overlay(context),
             accessibility(context),
+            shizuku(context),
             network(online),
             brain(context),
             backend(context, probe, online),
@@ -866,6 +872,32 @@ object SelfCheck {
             } else {
                 Fix.Adb("adb shell pm grant ${context.packageName} $WRITE_SECURE_SETTINGS")
             },
+        )
+    }
+
+    private fun shizuku(context: Context): Finding {
+        val installed = runCatching {
+            context.packageManager.getApplicationInfo(SHIZUKU_PKG, 0)
+        }.isSuccess
+        val status = runCatching { ShizukuDevice.status() }.getOrNull()
+        val state: Triple<Level, Int, Fix> = when {
+            !installed -> Triple(
+                Level.WARN, R.string.check_detail_shizuku_missing, Fix.Link(SHIZUKU_RELEASES)
+            )
+            status == null || status == ShellStatus.UNAVAILABLE -> Triple(
+                Level.WARN, R.string.check_detail_shizuku_dead, Fix.ShizukuApp
+            )
+            status == ShellStatus.PERMISSION_NEEDED -> Triple(
+                Level.WARN, R.string.check_detail_shizuku_permission, Fix.ShizukuApp
+            )
+            else -> Triple(Level.OK, R.string.check_detail_shizuku_ready, Fix.Nothing)
+        }
+        return Finding(
+            id = "shizuku",
+            title = R.string.check_title_shizuku,
+            level = state.first,
+            detail = state.second,
+            fix = state.third,
         )
     }
 
@@ -1498,6 +1530,9 @@ object SelfCheck {
      */
     private const val ADB_KEYBOARD_APK =
         "https://github.com/senzhk/ADBKeyBoard/releases/download/v2.5-dev/keyboardservice-debug.apk"
+
+    const val SHIZUKU_PKG = "moe.shizuku.privileged.api"
+    private const val SHIZUKU_RELEASES = "https://github.com/RikkaApps/Shizuku/releases"
 
     private const val VOICE_HOST = "openspeech.bytedance.com"
 

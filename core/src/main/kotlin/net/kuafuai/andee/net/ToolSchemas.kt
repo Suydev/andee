@@ -60,7 +60,7 @@ object ToolSchemas {
      */
     fun forHub(): JSONArray {
         val arr = JSONArray()
-        for (t in TOOLS) if (!t.optBoolean("localOnly", false)) arr.put(t)
+        for (t in TOOLS) if (!isLocalOnly(t.optString("method"))) arr.put(t)
         return arr
     }
 
@@ -2778,12 +2778,112 @@ object ToolSchemas {
             required = emptyList(),
             props = emptyMap(),
         ),
+        tool(
+            localOnly = true,
+            name = "fast_tap",
+            method = "device.fast_tap",
+            description = """
+        Tap one exact point on the screen, in 0-1000 relative coordinates, through the fast on-device input path.
+        The device falls back to accessibility when that path is unavailable. Prefer tap_screen_element whenever
+        you have an e-number from a fresh get_screen_element; use this only for a point you can justify from what
+        you just saw. Coordinates are relative, never pixels.
+    """.trimIndent(),
+            required = listOf("x", "y"),
+            props = mapOf(
+                "x" to prop("integer", "0-1000 horizontal centre of the point to tap."),
+                "y" to prop("integer", "0-1000 vertical centre of the point to tap."),
+            ),
+        ),
+        tool(
+            localOnly = true,
+            name = "fast_swipe",
+            method = "device.fast_swipe",
+            description = """
+        Swipe between two points in 0-1000 relative coordinates through the fast on-device input path, with the
+        accessibility path as fallback. This is ONE stroke of a fixed duration given by `duration_ms`: there is no
+        `fling` and no `screens` parameter here, so a long list needs repeated calls. Momentum and multi-screen
+        scrolling belong to screen.swipe only; this call cannot deliver them. A gesture that has to grab a slider
+        or drag a row is a different action; this one only moves the screen.
+    """.trimIndent(),
+            required = listOf("x1", "y1", "x2", "y2"),
+            props = mapOf(
+                "x1" to prop("integer", "0-1000 horizontal start."),
+                "y1" to prop("integer", "0-1000 vertical start."),
+                "x2" to prop("integer", "0-1000 horizontal end."),
+                "y2" to prop("integer", "0-1000 vertical end."),
+                "duration_ms" to prop("integer", "How long the move takes in milliseconds. Default 300.", default = 300),
+            ),
+        ),
+        tool(
+            localOnly = true,
+            name = "fast_text",
+            method = "device.fast_text",
+            description = """
+        Type text into the focused field through the fast on-device input path, with the accessibility keyboard
+        as fallback. Set `secret` for a password or any other value that must not be echoed back. The fast path
+        handles ASCII only: non-ASCII text is refused there and uses the keyboard fallback when it is available.
+        Always check the screen afterwards — a tool reporting that it typed is not proof that the field holds it.
+    """.trimIndent(),
+            required = listOf("text"),
+            props = mapOf(
+                "text" to prop("string", "The text to type. ASCII only on the fast input path."),
+                "secret" to prop("boolean", "true when the text is a secret; the value is scrubbed from results and logs. Default false.", default = false),
+            ),
+        ),
+        tool(
+            localOnly = true,
+            name = "fast_key",
+            method = "device.fast_key",
+            description = """
+        Send one key event through the fast on-device input path. Give either a named `key` or a numeric Android
+        `keycode`. The accessibility fallback exists ONLY for back, home and recents (keycodes 4, 3 and 187):
+        every other named key and every other keycode needs Shizuku and returns a typed error saying nothing was
+        sent when the fast path is unavailable. Do not use this to leave an app when the user asked for something
+        inside it.
+    """.trimIndent(),
+            required = emptyList(),
+            props = mapOf(
+                "keycode" to prop("integer", "Numeric Android keycode, e.g. 3 for home or 4 for back."),
+                "key" to propEnum(
+                    "Named key, used when no keycode is given.",
+                    listOf("home", "back", "recents", "power", "volume_up", "volume_down", "enter", "tab", "delete"),
+                ),
+            ),
+        ),
+        tool(
+            localOnly = true,
+            name = "fast_launch",
+            method = "device.fast_launch",
+            description = """
+        Open an installed app by package name through the fast on-device input path, with the accessibility
+        path as fallback. Get the package from list_installed_apps instead of guessing it. This opens the app;
+        it does not perform any action inside it, so look at the screen before the next step.
+    """.trimIndent(),
+            required = listOf("pkg"),
+            props = mapOf(
+                "pkg" to prop("string", "Exact installed package name, e.g. com.android.settings."),
+            ),
+        ),
     )
 
     /** Server-side lookup: given a hub-facing tool name, return the method
      *  string CommandDispatcher expects. */
     fun methodOf(toolName: String): String? =
         TOOLS.firstOrNull { it.getString("name") == toolName }?.optString("method")?.ifEmpty { null }
+
+    /**
+     * Whether a method must never leave this device. Kept as a method-level
+     * predicate so every caller filters on the same rule: `forHub()` uses it
+     * for advertisement, and the hub-facing dispatcher uses it to refuse a
+     * name that was guessed rather than advertised.
+     *
+     * `device.shell` is internal-only and deliberately has no schema, so it
+     * cannot be looked up in [TOOLS] — it is listed here explicitly.
+     */
+    fun isLocalOnly(method: String): Boolean =
+        method == "device.shell" || TOOLS.any {
+            it.optString("method") == method && it.optBoolean("localOnly", false)
+        }
 
     /**
      * The entries whose internal method [keep] accepts, for a body that only

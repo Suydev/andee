@@ -166,6 +166,13 @@ class CommandDispatcher(
      * `run_flow` and must not be able to impersonate a user card press.
      */
     private val onCardFlowRun: (net.kuafuai.andee.config.Flow) -> Unit = {},
+
+    /**
+     * The privileged side, by interface so tests can hand it a stub. Null means
+     * this device has no Shizuku support wired in: every `device.fast_*` call
+     * then fails closed to accessibility instead of pretending it used a shell.
+     */
+    private val shell: net.kuafuai.andee.shell.ShellProvider? = null,
 ) {
     private val ui = Handler(Looper.getMainLooper())
 
@@ -353,11 +360,28 @@ class CommandDispatcher(
         driving: Boolean = true,
         silent: Boolean = false,
         untrusted: Boolean = false,
+        kind: TurnKind = TurnKind.PASSIVE,
     ): Any? {
         // Where the turn came from decides what it may call — see [TurnGuards].
         // Checked before the fold below, so a refused call cannot so much as
-        // move the card.
-        TurnGuards.check(method, silent, untrusted)
+        // move the card. Fast control is USER-only by construction; PASSIVE is
+        // the fail-closed default for callers that have not been threaded yet.
+        TurnGuards.check(method, silent, untrusted, kind = kind)
+        if (kind != TurnKind.USER && method in SHELL_WRITES) {
+            throw IllegalStateException(
+                "This is not a user turn on this device, so it cannot use privileged device control: $method. " +
+                    "Do it with the screen.* tools or tell the user what you could not do.",
+            )
+        }
+        // The viewer socket on 9008 and the hub cannot reach the shell path even
+        // if a caller forgets to pass a non-USER kind: a passive caller has no
+        // standing to move the device by any transport.
+        if (!driving && method in SHELL_WRITES) {
+            throw IllegalStateException(
+                "This call came from a passive viewer, so it cannot operate the device: $method. " +
+                    "Only a user turn on this tablet may do that.",
+            )
+        }
         // The lock screen is a wall around the screen, and unlike every other
         // wall in this file it is one that fails *silently*. A gesture aimed at
         // a locked device is dropped by the input pipeline — `dispatchGesture`
@@ -394,7 +418,7 @@ class CommandDispatcher(
         // two-file edit it already was ([ToolSchemas] + here) — at the cost of
         // anything new under `screen.*` inheriting the fold, which is right
         // only as long as everything in that namespace drives the device.
-        if (driving && method.startsWith("screen.")) {
+        if (driving && (method.startsWith("screen.") || method in SHELL_WRITES)) {
             ensureCompact()
             // Unconditional among drivers, unlike [touchBusy]: "a tool just
             // ran" is true whoever asked, and a ball that nods when the top bar
@@ -407,9 +431,32 @@ class CommandDispatcher(
         // own WeChat until they clear its data and log in again. So the operation is refused before it is sent, not
         // after the damage. Checked after the fold so [ScreenController.foregroundPackage] reads the app, not our card;
         // reads and system navigation are not in [WECHAT_WRITE_METHODS]. See that set for the measurement.
-        if (method in WECHAT_WRITE_METHODS &&
-            runCatching { screenOrNull()?.foregroundPackage() }.getOrNull() == WECHAT_PKG
-        ) {
+        // A shell keyevent of BACK / HOME / RECENTS is system navigation, the
+        // same act `screen.global` performs — and the measured rule below
+        // deliberately leaves that alone so Andee can get out of WeChat. Do not
+        // turn a fast_key into the one gesture that is banned here.
+        val wechatWrite = method in WECHAT_WRITE_METHODS &&
+            !(method == "device.fast_key" && isSystemNavKeycode(resolveKeycode(params)))
+        // The a11y-based foreground read is null on a Shizuku-only device — the
+        // exact case where a shell tap could otherwise enter WeChat. For shell
+        // methods, ask the shell who is on top instead of treating "unknown" as
+        // "safe".
+        // Do not spend 1.5s on dumpsys for a method the WeChat rule does not
+        // cover (fast_launch, or a fast_key that is only system navigation).
+        val foreground = if (!wechatWrite) {
+            null
+        } else if (method in SHELL_WRITES) {
+            runCatching { screenOrNull()?.foregroundPackage() }.getOrNull()?.takeIf { it.isNotBlank() }
+                ?: shellForegroundPackage()?.takeIf { it.isNotBlank() }
+                ?: throw IllegalStateException(
+                    "I cannot tell which app is in front, so I will not send an injected touch or key " +
+                        "through the shell: $method. Turn on Settings → Accessibility → Andee so the " +
+                        "foreground can be read, then ask again. Nothing was sent.",
+                )
+        } else {
+            runCatching { screenOrNull()?.foregroundPackage() }.getOrNull()
+        }
+        if (wechatWrite && foreground == WECHAT_PKG) {
             throw IllegalStateException(
                 "I won't operate WeChat on the phone — not because I can't tap, but because WeChat treats an " +
                     "automated tap as an intrusion: the moment I touch it, it blanks its own screen and I (and you) " +
@@ -457,6 +504,15 @@ class CommandDispatcher(
                 // when the system has not been allowed to say what the user opens.
                 params?.optString("pkg")?.ifEmpty { null }?.let { gearShelf.noteLaunched(it) }
             }
+            // ---- privileged fast control: USER turns on this device only ----
+            // The six names are internal: no schema advertises them, and the
+            // guards above refuse them from every passive/remote/untrusted turn.
+            "device.shell" -> shellInternal(params)
+            "device.fast_tap" -> fastTap(params)
+            "device.fast_swipe" -> fastSwipe(params)
+            "device.fast_text" -> fastText(params)
+            "device.fast_key" -> fastKey(params)
+            "device.fast_launch" -> fastLaunch(params)
             // The gear shelf: what is installed and what each thing is for. Not `screen.`, so none of these
             // fold the card — reading a shelf is not driving the screen.
             "gear.list" -> {
@@ -2904,6 +2960,429 @@ class CommandDispatcher(
         }
     }
 
+    // ---- Shizuku-backed fast control ---------------------------------------
+    //
+    // A command that reached the shell is final: a timeout (ShellOutcome.Unknown)
+    // means it may already have moved the screen, so it is never handed to
+    // accessibility as well. Falling back is only safe *before* anything was
+    // sent — absent/unauthorised Shizuku, or non-ASCII text that needs a real
+    // IME. That split is the whole reason [fastAction] exists.
+
+    private enum class ShellGate { NO_SHELL, PERMISSION_REQUESTED, READY }
+
+    private fun isSystemNavKeycode(code: Int): Boolean = code in SYSTEM_NAV_KEYCODES
+
+    private fun shellGate(): Pair<ShellGate, net.kuafuai.andee.shell.ShellProvider?> {
+        val provider = shell ?: return ShellGate.NO_SHELL to null
+        val status = runCatching { provider.status() }.getOrNull() ?: return ShellGate.NO_SHELL to null
+        return when (status) {
+            net.kuafuai.andee.shell.ShellStatus.READY -> ShellGate.READY to provider
+            net.kuafuai.andee.shell.ShellStatus.PERMISSION_NEEDED -> {
+                // ShizukuDevice owns the "don't ask again" rule and the sticky
+                // result listener; all we do here is ask once and tell the brain.
+                provider.requestPermission(null)
+                ShellGate.PERMISSION_REQUESTED to null
+            }
+            net.kuafuai.andee.shell.ShellStatus.UNAVAILABLE -> ShellGate.NO_SHELL to null
+        }
+    }
+
+    /**
+     * Foreground package without accessibility, for the WeChat guard only.
+     * `dumpsys activity activities` prints the resumed record as
+     * `... u0 com.example/.MainActivity t123`; parsing that line is enough to
+     * recognise the one package this guard protects. Never asks for permission
+     * — a guard must not start a dialog.
+     */
+    private fun shellForegroundPackage(): String? {
+        val provider = shell ?: return null
+        if (runCatching { provider.status() }.getOrNull() !=
+            net.kuafuai.andee.shell.ShellStatus.READY
+        ) return null
+        val r = runCatching {
+            provider.exec(listOf("dumpsys", "activity", "activities"), 1_500L)
+        }.getOrNull() ?: return null
+        if (r.outcome !is net.kuafuai.andee.shell.ShellOutcome.Success) return null
+        val line = r.stdout.lineSequence().firstOrNull {
+            it.contains("ResumedActivity", ignoreCase = true) ||
+                it.contains("topResumedActivity", ignoreCase = true) ||
+                it.contains("mResumedActivity", ignoreCase = true)
+        } ?: return null
+        return Regex("([A-Za-z0-9_.]+)/[.A-Za-z0-9_]+").find(line)?.groupValues?.get(1)
+    }
+
+    /** Full display, not the accessibility-owned bounds — `input` uses these pixels. */
+    private fun displayPixels(): IntArray {
+        val b = net.kuafuai.andee.compat.WindowMetricsCompat.maxBounds(
+            appContext.getSystemService(android.view.WindowManager::class.java)
+        )
+        return intArrayOf(b.width(), b.height())
+    }
+
+    private fun toPixel(norm: Int, max: Int): Int = norm * max / 1000
+
+    private fun pointRect(px: Int, py: Int): android.graphics.Rect =
+        android.graphics.Rect(px - 4, py - 4, px + 4, py + 4)
+
+    private fun lineRect(a: android.graphics.Rect, b: android.graphics.Rect): android.graphics.Rect =
+        android.graphics.Rect(
+            minOf(a.left, b.left), minOf(a.top, b.top),
+            maxOf(a.right, b.right), maxOf(a.bottom, b.bottom),
+        )
+
+    /**
+     * The a11y gesture guard (park the ball off-screen when it covers the
+     * target) plus [passthroughForGesture]. A shell-injected input is not
+     * flagged as an a11y gesture, so ScreenController's own guard never runs
+     * for it — doing it here is what stops an obscured tap being dropped by
+     * payment apps and stops our card eating the touch.
+     */
+    private inline fun <T> shellGesture(target: android.graphics.Rect?, body: () -> T): T =
+        passthroughForGesture {
+            val wraps = target != null &&
+                (window.windowBounds()?.let { android.graphics.Rect.intersects(it, target) } ?: false)
+            if (wraps) window.parkForGesture()
+            try {
+                body()
+            } finally {
+                if (wraps) window.unparkForGesture()
+            }
+        }
+
+    /** The accessibility controller, or a loud reason why there is none. */
+    private fun fallbackScreen(): ScreenController = screenOrNull() ?: throw IllegalStateException(
+        "Shizuku could not do this and accessibility is off, so there is no way to operate the screen right now. " +
+            "Turn on Settings → Accessibility → Andee, or fix Shizuku, then ask again. Nothing was done.",
+    )
+
+    private fun fallbackResult(reason: String, body: () -> JSONObject): JSONObject {
+        val r = body()
+        return JSONObject().apply {
+            for (k in r.keys()) put(k, r.get(k))
+            put("transport", "accessibility")
+            put("fallback_reason", reason)
+            if (!has("ok")) put("ok", r.optBoolean("performed", true))
+            if (!has("performed")) put("performed", r.optBoolean("performed", true))
+            if (!has("verified")) put("verified", false)
+        }
+    }
+
+    /** An exit code is an input-pipeline fact, not an observed UI effect. */
+    private fun shellResult(r: net.kuafuai.andee.shell.ShellResult): JSONObject = when (r.outcome) {
+        net.kuafuai.andee.shell.ShellOutcome.Success -> JSONObject()
+            .put("ok", true)
+            .put("performed", true)
+            // False until an actual before/after observation upgrades it; see
+            // [withVerifiedShot]. Exit 0 alone never proves the app reacted.
+            .put("verified", false)
+            .put("exit_code", r.exitCode ?: 0)
+            .put(
+                "note",
+                "The shell command exited 0: the input was injected, but exit 0 does not prove a UI effect. " +
+                    "Look at the screen before claiming success or building on this.",
+            )
+        is net.kuafuai.andee.shell.ShellOutcome.Failed -> JSONObject()
+            .put("ok", false)
+            .put("performed", false)
+            .put("verified", false)
+            .put("exit_code", r.exitCode)
+            .put("error", r.detail ?: r.stderr.ifBlank { "the shell command failed" })
+        net.kuafuai.andee.shell.ShellOutcome.Unknown -> JSONObject()
+            .put("ok", false)
+            .put("performed", false)
+            .put("verified", false)
+            .put("exit_code", r.exitCode)
+            .put("do_not_retry", true)
+            .put(
+                "error",
+                r.detail ?: "the command may already have happened — do not send it again",
+            )
+            .put(
+                "note",
+                "This action may already have happened. DO NOT retry it and DO NOT use an accessibility fallback. " +
+                    "Tell the user honestly that the result is unknown.",
+            )
+        net.kuafuai.andee.shell.ShellOutcome.Unavailable -> JSONObject()
+            .put("ok", false)
+            .put("performed", false)
+            .put("verified", false)
+            .put("exit_code", r.exitCode)
+            .put("error", r.detail ?: "the shell was not available, so no input was sent")
+    }.put("transport", "shizuku")
+        .put("truncated", r.truncated)
+        .also { out ->
+            if (r.stdout.isNotBlank()) out.put("stdout", r.stdout.take(2000))
+            if (r.stderr.isNotBlank()) out.put("stderr", r.stderr.take(2000))
+        }
+
+    /** Attach a post-action capture and only report verification from two real observations. */
+    private fun withVerifiedShot(result: JSONObject, before: JSONObject?) {
+        val after = runCatching { blankedForCapture { captureFallback("fast.after") } }.getOrNull()
+        if (after != null) {
+            result.put("after_shot", after)
+            result.put(
+                "after_shot_note",
+                "A plain screen capture: no aim grid and no element list. Look at it, but do not aim from it.",
+            )
+        }
+        val prior = result.optString("note")
+        val lead = prior.ifEmpty { null }?.plus(" ") ?: ""
+        if (before == null || after == null) {
+            result.put(
+                "note",
+                lead + "Andee could not observe the screen; look before continuing.",
+            )
+            return
+        }
+        val changed = before.optString("png_base64") != after.optString("png_base64")
+        result.put("verified", changed)
+        result.put(
+            "note",
+            lead + if (changed) {
+                "A screen change was observed after the input."
+            } else {
+                "The screen was unchanged after the input; the action may not have landed."
+            },
+        )
+    }
+
+    /**
+     * Send one input through the shell, or, only when nothing was sent, through
+     * accessibility. [fallback] must never be called after an exec attempt.
+     */
+    /**
+     * Only two exec outcomes mean nothing reached the input pipeline:
+     * [ShellOutcome.Unavailable] (the service died after the status preflight)
+     * and the lock-contention [ShellOutcome.Unknown] ("shell is busy"), where
+     * exec returns before spawning a child. Every other Unknown is a submitted
+     * but unconfirmed command and must never be retried — least of all through
+     * accessibility, which would perform the action a second time.
+     */
+    private fun safeFallbackReason(r: net.kuafuai.andee.shell.ShellResult): String? = when {
+        r.outcome is net.kuafuai.andee.shell.ShellOutcome.Unavailable ->
+            "the shell service became unavailable before the input was sent"
+        r.outcome == net.kuafuai.andee.shell.ShellOutcome.Unknown && r.detail == "shell is busy" ->
+            "the shell was busy, so the command was never submitted"
+        else -> null
+    }
+
+    private fun fastAction(
+        argv: List<String>,
+        target: android.graphics.Rect?,
+        fallback: () -> JSONObject,
+        permissionReason: String,
+        timeoutMs: Long = 5_000L,
+    ): JSONObject {
+        val (gate, provider) = shellGate()
+        if (gate == ShellGate.PERMISSION_REQUESTED) {
+            // The dialog is up and nothing was sent. A11y is still safe here;
+            // if it is off, fallbackScreen() throws the honest reason.
+            return fallbackResult(permissionReason, fallback)
+        }
+        if (provider == null) return fallbackResult("Shizuku is unavailable on this device", fallback)
+        val before = runCatching { blankedForCapture { captureFallback("fast.before") } }.getOrNull()
+        val raw = shellGesture(target) { provider.exec(argv, timeoutMs) }
+        val reason = safeFallbackReason(raw)
+        if (reason != null) return fallbackResult(reason, fallback)
+        val result = shellResult(raw)
+        if (raw.outcome is net.kuafuai.andee.shell.ShellOutcome.Success) {
+            withVerifiedShot(result, before)
+        } else {
+            // No submitted-and-completed action to verify: never report a
+            // byte-difference as evidence of an effect that may not exist.
+            result.remove("verified")
+        }
+        return result
+    }
+
+    private fun fastTap(params: JSONObject?): JSONObject {
+        val x = params?.optInt("x", -1) ?: -1
+        val y = params?.optInt("y", -1) ?: -1
+        require(x in 0..1000 && y in 0..1000) { "fast_tap needs x and y in 0..1000" }
+        val (w, h) = displayPixels()
+        val px = toPixel(x, w)
+        val py = toPixel(y, h)
+        // A 150 ms held stroke, not `input tap`: a ~10 ms injection is ignored by
+        // touch-filtering apps (measured in ScreenController.tap), which would
+        // report success while the screen never moved.
+        val r = fastAction(
+            listOf("input", "swipe", px.toString(), py.toString(), px.toString(), py.toString(), "150"),
+            pointRect(px, py),
+            fallback = { fallbackScreen().tapAim(x, y, null, null) },
+            permissionReason = "Shizuku permission was requested; nothing was tapped. If it was granted, retry " +
+                "with the same coordinates; if it was refused permanently, use the screen.* tools.",
+        )
+        if (!r.has("x")) r.put("x", px)
+        if (!r.has("y")) r.put("y", py)
+        if (!r.has("norm")) r.put("norm", "$x,$y")
+        if (flowRecorder.isActive() && r.optBoolean("ok")) {
+            flowRecorder.noteTap(r, hold = false, w = w, h = h)
+        }
+        return r
+    }
+
+    private fun fastSwipe(params: JSONObject?): JSONObject {
+        requireNotNull(params) { "fast_swipe requires params" }
+        val x1 = params.optInt("x1", -1)
+        val y1 = params.optInt("y1", -1)
+        val x2 = params.optInt("x2", -1)
+        val y2 = params.optInt("y2", -1)
+        require(listOf(x1, y1, x2, y2).all { it in 0..1000 }) { "fast_swipe needs x1/y1/x2/y2 in 0..1000" }
+        val dur = params.optLong("duration_ms", 300L).coerceIn(50L, 5_000L)
+        val (w, h) = displayPixels()
+        val p1x = toPixel(x1, w); val p1y = toPixel(y1, h)
+        val p2x = toPixel(x2, w); val p2y = toPixel(y2, h)
+        val r = fastAction(
+            listOf("input", "swipe", p1x.toString(), p1y.toString(), p2x.toString(), p2y.toString(), dur.toString()),
+            lineRect(pointRect(p1x, p1y), pointRect(p2x, p2y)),
+            fallback = { fallbackScreen().swipeNorm(x1, y1, x2, y2, dur, false, 0) },
+            permissionReason = "Shizuku permission was requested; nothing was swiped. If it was granted, retry " +
+                "with the same coordinates; if refused permanently, use the screen.* tools.",
+        )
+        if (flowRecorder.isActive() && r.optBoolean("ok")) {
+            flowRecorder.noteSwipe(x1, y1, x2, y2, dur, r, w, h)
+        }
+        return r
+    }
+
+    private fun fastText(params: JSONObject?): JSONObject {
+        val text = params?.optString("text").orEmpty()
+        require(text.isNotEmpty()) { "fast_text needs text" }
+        val secret = params?.optBoolean("secret", false) == true
+        // `input text` only owns ASCII; a newline or any non-ASCII code point
+        // needs the accessibility IME swap, and must fail loudly when that is off.
+        if (text.any { it.code !in 32..126 }) {
+            // The shell input channel is ASCII-only by design; this is not a
+            // Shizuku failure. Name the service that is actually missing.
+            val scr = screenOrNull() ?: throw IllegalStateException(
+                "Non-ASCII or control characters cannot go through the fast input path: its shell command " +
+                    "accepts printable ASCII only. The accessibility service, which is the keyboard route for " +
+                    "those characters, is off. Turn on Settings → Accessibility → Andee and use type_text again. " +
+                    "Nothing was typed.",
+            )
+            val r = fallbackResult("non-ASCII text needs the accessibility IME") {
+                scr.typeText(text, null, secret)
+            }
+            withVerifiedShot(r, null)
+            return r
+        }
+        // `input text` reads %s as a space and %% as a literal percent, so
+        // escape existing percent signs before substituting spaces.
+        val shellText = text.replace("%", "%%").replace(" ", "%s")
+        val r = fastAction(
+            listOf("input", "text", shellText),
+            target = null,
+            fallback = { fallbackScreen().typeText(text, null, secret) },
+            permissionReason = "Shizuku permission was requested; nothing was typed. If it was granted, retry " +
+                "with the same text; if refused permanently, use the screen.* tools.",
+        )
+        if (secret) {
+            // Never echo the value into the tool message, a log, or a note.
+            for (key in listOf("stdout", "stderr", "error", "note", "detail")) {
+                val value = r.optString(key)
+                if (value.isNotEmpty()) r.put(key, value.replace(text, "[redacted]"))
+            }
+        }
+        if (flowRecorder.isActive() && r.optBoolean("ok")) {
+            flowRecorder.noteType(if (secret) "[redacted]" else text, "")
+        }
+        return r
+    }
+
+    /**
+     * One resolution for both the WeChat nav exemption and the handler, so a
+     * `{"key":"back"}` call gets exactly the same standing as `{"keycode":4}`.
+     * An explicit numeric keycode wins; otherwise the advertised names map to
+     * their Android keycodes before any 0..300 validation.
+     */
+    private fun resolveKeycode(params: JSONObject?): Int {
+        val explicit = params?.optInt("keycode", -1) ?: -1
+        if (explicit >= 0) return explicit
+        val name = params?.optString("key").orEmpty()
+        if (name.isBlank()) {
+            throw IllegalArgumentException(
+                "fast_key needs a keycode, or a key name from: ${KEY_NAMES.keys.sorted().joinToString(", ")}.",
+            )
+        }
+        return KEY_NAMES[name]
+            ?: throw IllegalArgumentException(
+                "Unknown key '$name'. Use one of: ${KEY_NAMES.keys.sorted().joinToString(", ")}.",
+            )
+    }
+
+    private fun fastKey(params: JSONObject?): JSONObject {
+        val code = resolveKeycode(params)
+        require(code in 0..300) { "fast_key needs a valid keycode (0..300), got $code" }
+        val navAction = when (code) {
+            3 -> "home"
+            4 -> "back"
+            187 -> "recents"
+            else -> null
+        }
+        val argv = listOf("input", "keyevent", code.toString())
+        val r = if (navAction != null) {
+            fastAction(
+                argv, null,
+                fallback = { fallbackScreen().globalAction(navAction) },
+                permissionReason = "Shizuku permission was requested; no key was sent. If it was granted, retry " +
+                    "the same key; if refused permanently, use the screen.* tools.",
+            )
+        } else {
+            // No silent substitution: only the three mapped keys have an a11y
+            // equivalent. ENTER, volume, media and everything else are typed errors.
+            fastAction(
+                argv, null,
+                fallback = {
+                    throw IllegalStateException(
+                        "Keycode $code has no accessibility equivalent on this device; only back, home and " +
+                            "recents can fall back. Nothing was sent.",
+                    )
+                },
+                permissionReason = "Shizuku permission was requested; no key was sent. If it was granted, retry " +
+                    "the same key; if refused permanently, use the screen.* tools.",
+            )
+        }
+        return r.put("keycode", code)
+    }
+
+    private fun fastLaunch(params: JSONObject?): JSONObject {
+        val pkg = params?.optString("pkg").orEmpty()
+        require(pkg.isNotBlank() && pkg.matches(Regex("[A-Za-z0-9_.]+"))) {
+            "fast_launch needs a valid package name"
+        }
+        val r = fastAction(
+            listOf(
+                "am", "start", "-a", "android.intent.action.MAIN",
+                "-c", "android.intent.category.LAUNCHER", "-p", pkg,
+            ),
+            target = null,
+            fallback = { deviceActions.launchApp(pkg, null) },
+            permissionReason = "Shizuku permission was requested; nothing was launched. If it was granted, retry " +
+                "the same package; if refused permanently, use launch_app.",
+        )
+        if (r.optBoolean("ok")) {
+            r.put("launched", pkg)
+            if (flowRecorder.isActive()) flowRecorder.noteLaunch(pkg, "")
+        }
+        return r
+    }
+
+    /** Internal only: no schema, no advertisement, USER+driving+kguard+WeChat gated above. */
+    private fun shellInternal(params: JSONObject?): JSONObject {
+        requireNotNull(params) { "device.shell requires params with argv[]" }
+        val arr = params.optJSONArray("argv")
+        require(arr != null && arr.length() > 0) { "device.shell requires a non-empty argv[]" }
+        val argv = (0 until arr.length()).map { arr.optString(it) }
+        val timeout = params.optLong("timeout_ms", 5_000L).coerceIn(100L, 30_000L)
+        val (_, provider) = shellGate()
+        if (provider == null) {
+            throw IllegalStateException(
+                "Shizuku shell is not available on this device, so the internal command was not run.",
+            )
+        }
+        return shellResult(provider.exec(argv, timeout))
+    }
+
     private companion object {
         /**
          * What the brain is told when it asks for the screen and there is no
@@ -2964,6 +3443,12 @@ class CommandDispatcher(
             "device.scan",
             "device.look",
             "device.permissions.request",
+            "device.shell",
+            "device.fast_tap",
+            "device.fast_swipe",
+            "device.fast_text",
+            "device.fast_key",
+            "device.fast_launch",
             "ui.ask",
             "ui.alert",
             // Not `ui.show_html`: a locked page is kept as a card in the
@@ -2992,7 +3477,29 @@ class CommandDispatcher(
             "screen.tap", "screen.tap_id", "screen.tap_target",
             "screen.long_press", "screen.long_press_id",
             "screen.swipe", "screen.type", "screen.submit_input",
+            // Injected touch/text from the shell is the same hazard by another
+            // road. fast_launch is deliberately absent: starting an app is not
+            // a gesture into WeChat. fast_key is exempted at the guard for
+            // BACK / HOME / RECENTS, which are system navigation.
+            "device.shell", "device.fast_tap", "device.fast_swipe",
+            "device.fast_text", "device.fast_key",
         )
+
+        /** Every privileged method, for the fold, the passive gate and the kind gate. */
+        val SHELL_WRITES = setOf(
+            "device.shell", "device.fast_tap", "device.fast_swipe",
+            "device.fast_text", "device.fast_key", "device.fast_launch",
+        )
+
+        /** The key names advertised by the fast_key schema, mapped before 0..300 validation. */
+        private val KEY_NAMES = mapOf(
+            "home" to 3, "back" to 4, "recents" to 187,
+            "power" to 26, "volume_up" to 24, "volume_down" to 25,
+            "enter" to 66, "tab" to 61, "delete" to 67,
+        )
+
+        /** The keycodes whose shell keyevent is system navigation, not a gesture into an app. */
+        private val SYSTEM_NAV_KEYCODES = setOf(3, 4, 187)
 
         /**
          * And how long to then let the *system* take to notice it — see

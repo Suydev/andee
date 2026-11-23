@@ -812,6 +812,7 @@ class SelfCheckUi(
             is SelfCheck.Fix.Link -> R.string.check_fix_download
             is SelfCheck.Fix.Grant -> R.string.check_fix_allow
             is SelfCheck.Fix.OurSettings -> R.string.check_fix_app_settings
+            is SelfCheck.Fix.ShizukuApp -> R.string.check_fix_shizuku_open
             else -> return null
         }
         return TextView(context).apply {
@@ -887,6 +888,16 @@ class SelfCheckUi(
                 val there = intentFor(fix)
                 onErrand?.let { hand -> hand(there); return }
                 launch(there)
+            }
+
+            SelfCheck.Fix.ShizukuApp -> {
+                val there = context.packageManager.getLaunchIntentForPackage(SelfCheck.SHIZUKU_PKG)
+                if (there == null) {
+                    toastNoScreen()
+                } else {
+                    onErrand?.let { hand -> hand(there); return }
+                    launch(there)
+                }
             }
 
             is SelfCheck.Fix.Adb, SelfCheck.Fix.Nothing -> Unit

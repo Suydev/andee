@@ -540,6 +540,13 @@ class SelfCheckActivity : StageActivity() {
                 .putExtra("permissions", fix.permissions.toTypedArray())
 
             is SelfCheck.Fix.Link -> Intent(Intent.ACTION_VIEW, Uri.parse(fix.url))
+
+            is SelfCheck.Fix.ShizukuApp ->
+                packageManager.getLaunchIntentForPackage(SelfCheck.SHIZUKU_PKG) ?: run {
+                    Toast.makeText(this, getString(R.string.check_fix_no_screen), Toast.LENGTH_LONG).show()
+                    return
+                }
+
             else -> return
         }
         openErrand(there)

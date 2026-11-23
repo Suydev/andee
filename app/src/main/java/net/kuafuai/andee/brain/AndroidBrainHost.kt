@@ -11,6 +11,7 @@ import net.kuafuai.andee.market.MarketTools
 import net.kuafuai.andee.net.CallExtensionRegistry
 import net.kuafuai.andee.net.CommandDispatcher
 import net.kuafuai.andee.net.ToolSchemas
+import net.kuafuai.andee.net.TurnKind
 import net.kuafuai.andee.ui.ChatHistory
 import net.kuafuai.andee.ui.ball.BallLooks
 import org.json.JSONArray
@@ -153,19 +154,26 @@ class AndroidBrainHost(
             ?: net.kuafuai.andee.peer.PeerTasks.methodOf(toolName)
             ?: net.kuafuai.andee.peer.RemoteAgentTools.methodOf(toolName)?.takeIf { agentDevice() != null }
 
-    override fun dispatch(method: String, params: JSONObject, callId: String, silent: Boolean, untrusted: Boolean): Any? {
+    override fun dispatch(
+        method: String,
+        params: JSONObject,
+        callId: String,
+        silent: Boolean,
+        untrusted: Boolean,
+        kind: TurnKind = TurnKind.PASSIVE,
+    ): Any? {
         Notebook.callBeingRun = callId
         // Not the dispatcher's: the link to the other devices is not part of this body, and the hub must never
         // see it. The turn guard still runs first — it is what keeps a stranger's notification from handing work on.
         if (method.startsWith("peer.")) {
-            net.kuafuai.andee.net.TurnGuards.check(method, silent, untrusted)
+            net.kuafuai.andee.net.TurnGuards.check(method, silent, untrusted, kind = kind)
             return peers.tasks.dispatch(method, params)
             }
             if (method.startsWith("dsh.")) {
-                net.kuafuai.andee.net.TurnGuards.check(method, silent, untrusted)
+                net.kuafuai.andee.net.TurnGuards.check(method, silent, untrusted, kind = kind)
                 return agentHost.dispatch(method, params, fromUser = userTurn)
             }
-        return dispatcher.dispatch(method, params, driving = true, silent = silent, untrusted = untrusted)
+        return dispatcher.dispatch(method, params, driving = true, silent = silent, untrusted = untrusted, kind = kind)
     }
 
     override fun traceDir(): File = ctx.filesDir

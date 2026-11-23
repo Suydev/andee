@@ -118,6 +118,13 @@
          See device/SelfCheck.batteryFix. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
+    <!-- Shizuku is discovered by package name on API 30+; without this query the
+         package is invisible to PackageManager and the fast-control path would
+         always report the manager as absent. -->
+    <queries>
+        <package android:name="moe.shizuku.privileged.api" />
+    </queries>
+
     <application
         android:name=".AndeeApp"
         android:allowBackup="false"
@@ -131,6 +138,17 @@
         android:theme="@style/Theme.Body"
         android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="33">
+
+        <!-- Supplies the binder to every process that uses the Shizuku API.
+             Declared in the manifest, so Android loads it in :shell too; the
+             application gate in AndeeApp keeps our own listeners out of that
+             process. No android:process: the provider must live in each
+             process that requests the binder. -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
         <service
             android:name=".ScreenBodyService"

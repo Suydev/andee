@@ -157,10 +157,24 @@ class BodyWsClient(
         // Extension tools don't play this game — the schema they registered
         // carries one name, and that same name goes straight to the dispatcher,
         // which will hand it back to the extension over the reverse channel.
-        val method = ToolSchemas.methodOf(toolName)
+        // Site 1: a built-in name that maps to a privileged method is refused
+        // even though methodOf() itself ignores localOnly.
+        val builtin = ToolSchemas.methodOf(toolName)
+        if (builtin != null && ToolSchemas.isLocalOnly(builtin)) {
+            respondError(id, "not available over the hub: $toolName")
+            return
+        }
+        val method = builtin
             ?: if (registry.hasMethod(toolName)) toolName else null
         if (method == null) {
             respondError(id, "unknown tool: $toolName")
+            return
+        }
+        // Site 2: an extension may register an arbitrary tool NAME — including
+        // "device.shell" — so the fallback must be checked on the resolved
+        // method too, not just against the built-in localOnly list.
+        if (ToolSchemas.isLocalOnly(method)) {
+            respondError(id, "not available over the hub: $toolName")
             return
         }
         // A request on *this* socket is the brain driving, which is what the
@@ -172,7 +186,7 @@ class BodyWsClient(
         dispatcher.beginTask()
         worker.execute {
             val response = try {
-                val result = dispatcher.dispatch(method, params)
+                val result = dispatcher.dispatch(method, params, kind = TurnKind.PASSIVE)
                 JSONObject()
                     .put("type", "response")
                     .put("id", id)

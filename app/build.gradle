@@ -124,6 +124,8 @@ android {
     buildFeatures {
         // AGP 8 默认关掉了。开出来就能用 BuildConfig.XXX。
         buildConfig true
+        // The shell UserService binder interface lives in app/src/main/aidl.
+        aidl true
     }
 
     defaultConfig {
@@ -262,6 +264,11 @@ dependencies {
     implementation 'com.google.zxing:core:3.5.3'
 
     implementation project(':core')
+
+    // Shizuku-backed fast device control. `api` is the binder API used by the
+    // main process; `provider` obtains that binder across our processes.
+    implementation 'dev.rikka.shizuku:api:13.1.5'
+    implementation 'dev.rikka.shizuku:provider:13.1.5'
 
     testImplementation libs.junit
     // Unit tests run against android.jar's stubs, whose org.json throws

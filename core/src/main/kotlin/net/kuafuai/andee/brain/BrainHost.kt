@@ -1,6 +1,7 @@
 package net.kuafuai.andee.brain
 
 import net.kuafuai.andee.config.Scene
+import net.kuafuai.andee.net.TurnKind
 import org.json.JSONArray
 import java.io.File
 import java.util.Locale
@@ -171,8 +172,18 @@ interface BrainHost {
     /**
      * Dispatch a tool call to the host's handler. [callId] is the tool_call_id from the LLM; it must be
      * recorded on any write operation so diary entries and care logs can point at what did it.
+     * [kind] is the turn's origin, snapshotted by the loop thread before the tool pool runs the call:
+     * only [TurnKind.USER] may reach a privileged shell-backed method. The default is [TurnKind.PASSIVE]
+     * so an implementation or caller that has not been threaded yet grants nothing.
      */
-    fun dispatch(method: String, params: org.json.JSONObject, callId: String, silent: Boolean, untrusted: Boolean): Any?
+    fun dispatch(
+        method: String,
+        params: org.json.JSONObject,
+        callId: String,
+        silent: Boolean,
+        untrusted: Boolean,
+        kind: TurnKind = TurnKind.PASSIVE,
+    ): Any?
 
     /**
      * Why the current turn is running, set by the brain before its tools run.

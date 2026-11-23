@@ -1,5 +1,6 @@
 package net.kuafuai.andee.brain
 
+import net.kuafuai.andee.net.TurnKind
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -22,7 +23,12 @@ class GuestHostTest {
             "toolLists" -> listOf(JSONArray(listOf("screen.tap", "device.vault.fill", "note.recall", "shell.run", "ui.ask", "device.sms.read", "peer.ask")
                 .map { JSONObject().put("name", it.replace('.', '_')).put("method", it) }))
             "methodOf" -> (args[0] as String).replaceFirst('_', '.')
-            "dispatch" -> { calls += (args[0] as String) to (args[4] as Boolean); "ok" }
+            "dispatch" -> {
+                val invoked = args[0] as String
+                val wasUntrusted = args.filterIsInstance<Boolean>().lastOrNull() ?: false
+                calls += invoked to wasUntrusted
+                "ok"
+            }
             "scrollback" -> listOf(ScrollRow(true, false, "my secret", 0, null, null))
             else -> null
         }
@@ -54,5 +60,18 @@ class GuestHostTest {
             try { guest.dispatch(m, JSONObject(), "t2", false, false); fail("$m reached the owner's device") } catch (e: IllegalStateException) { }
         }
         assertFalse(calls.any { it.first != "screen.tap" })
+    }
+
+    @Test fun fastInputNeverReachesTheGuestSurface() {
+        for (m in listOf(
+            "device.fast_tap", "device.fast_swipe", "device.fast_text",
+            "device.fast_key", "device.fast_launch", "device.shell",
+        )) {
+            try {
+                guest.dispatch(m, JSONObject(), "t3", false, false, kind = TurnKind.PEER)
+                fail("$m reached the owner's device from a guest turn")
+            } catch (e: IllegalStateException) { }
+        }
+        assertFalse(calls.any { it.first.startsWith("device.fast_") || it.first == "device.shell" })
     }
 }

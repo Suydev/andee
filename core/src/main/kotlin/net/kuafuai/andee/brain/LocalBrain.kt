@@ -1362,8 +1362,26 @@ class LocalBrain(
 
         // A work turn gets the territory's set, not all ~80: it is cheaper and, more to the point, a stranger-facing
         // errand has no business holding the vault or the shell. Everyone else is unchanged.
-        val tools = if (quiet) LlmClient.toolSpecs(*host.workTools(workTerritory).toTypedArray())
-        else LlmClient.toolSpecs(*host.toolLists().toTypedArray())
+        val source = if (quiet) host.workTools(workTerritory) else host.toolLists()
+        // Privileged input is a USER-turn capability. A model on any other turn
+        // must not even be shown those tools: an advertised tool it cannot call
+        // only buys a refusal it has no way to act on. The guard in
+        // [net.kuafuai.andee.net.TurnGuards] stays the authority — this is only
+        // what the model is told it has.
+        val visible = if (guardKind(kind) == net.kuafuai.andee.net.TurnKind.USER) source
+        else source.map { list ->
+            JSONArray().also { out ->
+                for (i in 0 until list.length()) {
+                    val t = list.optJSONObject(i)
+                    if (t != null) {
+                        val declared = t.optString("method")
+                        val method = declared.ifEmpty { host.methodOf(t.optString("name")).orEmpty() }
+                        if (method !in net.kuafuai.andee.net.TurnGuards.SHELL_WRITES) out.put(t)
+                    }
+                }
+            }
+        }
+        val tools = LlmClient.toolSpecs(*visible.toTypedArray())
         locatorOffered = (0 until tools.length()).any { tools.optJSONObject(it)?.optJSONObject("function")?.optString("name") == "tap_target" }
         var lastSignature = ""
         var repeats = 0
@@ -1501,7 +1519,7 @@ class LocalBrain(
                 val t0 = System.nanoTime() / 1_000_000L
                 acted = true
                 turnActed = true
-                val msg = runTool(tc, images, internal, kind.untrusted || turnUntrusted)
+                val msg = runTool(tc, images, internal, kind.untrusted || turnUntrusted, guardKind(kind))
                 BrainTrace.tool(
                     gen, tc.name, host.methodOf(tc.name), tc.argumentsRaw,
                     msg.optString("content"), System.nanoTime() / 1_000_000L - t0,
@@ -1534,6 +1552,21 @@ class LocalBrain(
     }
 
     /**
+     * Map this brain's local turn kind to the cross-surface kind the guards use.
+     * A todo that came due is not a live request from the user, so it fails
+     * closed at [net.kuafuai.andee.net.TurnKind.PASSIVE] rather than inheriting
+     * the owner's standing.
+     */
+    private fun guardKind(kind: TurnKind): net.kuafuai.andee.net.TurnKind = when (kind) {
+        TurnKind.USER -> net.kuafuai.andee.net.TurnKind.USER
+        TurnKind.NOTIFY -> net.kuafuai.andee.net.TurnKind.NOTIFY
+        TurnKind.PEER -> net.kuafuai.andee.net.TurnKind.PEER
+        TurnKind.WORK -> net.kuafuai.andee.net.TurnKind.WORK
+        TurnKind.SWEEP, TurnKind.HARVEST -> net.kuafuai.andee.net.TurnKind.SWEEP
+        TurnKind.WAKE -> net.kuafuai.andee.net.TurnKind.PASSIVE
+    }
+
+    /**
      * Run one tool call and build the `tool` message that answers it.
      *
      * Never throws: the API requires a `tool` message for every `tool_call_id`
@@ -1558,6 +1591,7 @@ class LocalBrain(
         images: MutableList<String>,
         silent: Boolean,
         untrusted: Boolean,
+        kind: net.kuafuai.andee.net.TurnKind = net.kuafuai.andee.net.TurnKind.PASSIVE,
     ): JSONObject {
         val body: String = try {
             val args = tc.argumentsOrNull()
@@ -1617,7 +1651,7 @@ class LocalBrain(
                 deviceFields(args, untrusted)
                 if (method == "note.task") turnTasked = true
             }
-            val result = dispatchWithTimeout(method, args, tc.id, silent, untrusted)
+            val result = dispatchWithTimeout(method, args, tc.id, silent, untrusted, kind)
             if (method == "dsh.delegate" && result is JSONObject && result.optBoolean("handed_over")) net.kuafuai.andee.peer.HandedJobs.note(result.optString("worker"))
             if (landed(result)) noteSent(method)
             if (currentKind == TurnKind.WORK) workCalls += WorkCall(method, args.optString("action"), tc.id, landed(result))
@@ -1660,10 +1694,17 @@ class LocalBrain(
         runCatching { host.event(e) }.onFailure { host.logWarn(TAG, "event ${e.kind} not shown", it) }
     }
 
-    private fun dispatchWithTimeout(method: String, params: JSONObject, callId: String, silent: Boolean, untrusted: Boolean): Any? {
+    private fun dispatchWithTimeout(
+        method: String,
+        params: JSONObject,
+        callId: String,
+        silent: Boolean,
+        untrusted: Boolean,
+        kind: net.kuafuai.andee.net.TurnKind = net.kuafuai.andee.net.TurnKind.PASSIVE,
+    ): Any? {
         val declared = params.optLong("timeout_ms", 0L)
         val budget = if (declared > 0) declared + TIMEOUT_SLACK_MS else DEFAULT_TOOL_TIMEOUT_MS
-        val f = toolExec.submit<Any?> { host.dispatch(method, params, callId, silent, untrusted) }
+        val f = toolExec.submit<Any?> { host.dispatch(method, params, callId, silent, untrusted, kind) }
         return try {
             f.get(budget, TimeUnit.MILLISECONDS)
         } catch (e: TimeoutException) {

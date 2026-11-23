@@ -8,6 +8,7 @@ import net.kuafuai.andee.brain.ScrollRow
 import net.kuafuai.andee.config.Scene
 import net.kuafuai.andee.net.ToolSchemas
 import net.kuafuai.andee.net.TurnGuards
+import net.kuafuai.andee.net.TurnKind
 import net.kuafuai.andee.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
@@ -114,8 +115,15 @@ class DesktopBrainHost(
         ToolSchemas.methodOf(toolName)?.takeIf { m -> providers.any { it.handles(m) } }
             ?: providers.firstNotNullOfOrNull { it.methodOfExtra(toolName) }
 
-    override fun dispatch(method: String, params: JSONObject, callId: String, silent: Boolean, untrusted: Boolean): Any? {
-        TurnGuards.check(method, silent, untrusted)
+    override fun dispatch(
+        method: String,
+        params: JSONObject,
+        callId: String,
+        silent: Boolean,
+        untrusted: Boolean,
+        kind: TurnKind = TurnKind.PASSIVE,
+    ): Any? {
+        TurnGuards.check(method, silent, untrusted, kind = kind)
         val p = providers.firstOrNull { it.handles(method) }
             ?: throw IllegalArgumentException("unknown method $method")
         // The phone nods for every `screen.*` call: a hand moved. On the Mac the

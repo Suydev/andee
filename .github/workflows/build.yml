@@ -32,14 +32,16 @@ jobs:
 
       - run: ./gradlew --no-daemon :app:assembleDebug
 
-      # Host-side tests are template-only today, so this is a tripwire for the
-      # day someone writes a real one rather than a meaningful gate now.
+      # Host-side tests are a real gate: the app's golden snapshots pin the
+      # model-facing prompt and tool schemas, and :core:test carries the
+      # turn-kind guards that keep shell writes on a local user turn. A failure
+      # here also skips the upload below, so no APK is published from a red build.
       - run: ./gradlew --no-daemon :app:testDebugUnitTest
-        continue-on-error: true
+      - run: ./gradlew --no-daemon :core:test
 
       - uses: actions/upload-artifact@v4
         with:
-          name: app-debug
+          name: app-arm64-v8a-debug
           # One APK per ABI, so the glob replaces what used to be a single
           # `app-debug.apk`: ML Kit's barhopper .so is ~4 MB and the fat APK
           # carried four copies of it. See the `splits` block in app/build.gradle.

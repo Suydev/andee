@@ -22,6 +22,7 @@ import net.kuafuai.andee.i18n.AppLocale
 import net.kuafuai.andee.net.BodyWsServer
 import net.kuafuai.andee.net.CommandDispatcher
 import net.kuafuai.andee.screen.ScreenController
+import net.kuafuai.andee.shell.ShizukuDevice
 import net.kuafuai.andee.text.stripMarkdown
 import net.kuafuai.andee.tts.TtsController
 import net.kuafuai.andee.ui.EdgeRippleUi
@@ -817,6 +818,9 @@ class BodyCoreService : Service() {
             }
         }
         dogMotion = net.kuafuai.andee.dog.DogMotion(dogLink, dogSense)
+        // Idempotent: Application.onCreate already installed the sticky
+        // listeners. A body restart only needs the shell service bound again.
+        ShizukuDevice.start(this)
         // A *provider*, not the controller: the screen half can be taken away
         // and handed back at any time, and the dispatcher outlives both. See
         // `CommandDispatcher.requireScreen`, which turns its absence into a
@@ -861,6 +865,9 @@ class BodyCoreService : Service() {
             // The card's Run button lives here (it needs the brain to wake
             // on a stop); the dispatcher only forwards the call.
             onCardFlowRun = { flow -> runFlowFromUi(flow) },
+            // Privileged fast-control provider. The dispatcher owns the gates;
+            // the manager owns the binder lifecycle. See ShizukuDevice.
+            shell = ShizukuDevice,
         )
         // Extension coming or going invalidates the hub's cached tool list; the
         // hub has no incremental protocol, so we bounce the outbound client and
@@ -1885,6 +1892,9 @@ class BodyCoreService : Service() {
         if (::dogMotion.isInitialized) dogMotion.shutdown()
         if (::dogLink.isInitialized) dogLink.close()
         stopBrain()
+        // No new tools after this point; release the privileged shell service
+        // before the process goes. ShizukuDevice guards the unbind call.
+        ShizukuDevice.stop()
         stopWsServer()
         net.kuafuai.andee.wake.WakeWord.stop()
         runCatching { unregisterReceiver(screenReceiver) }
