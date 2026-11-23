@@ -918,7 +918,7 @@
     <string name="check_detail_shizuku_ready">Ready. Fast tap, swipe, text, key and launch work even when accessibility is off.</string>
     <string name="check_detail_shizuku_missing">Shizuku is not installed, so fast device control is unavailable. The accessibility screen tools still work. Download it with the button below.</string>
     <string name="check_detail_shizuku_permission">Shizuku is installed but has not granted Andee access. Open it with the button below and allow Andee; until then fast device control is unavailable.</string>
-    <string name="check_detail_shizuku_dead">Shizuku's service is not running, so fast device control is unavailable. Open Shizuku with the button below and start it again.</string>
+    <string name="check_detail_shizuku_dead">Shizuku\'s service is not running, so fast device control is unavailable. Open Shizuku with the button below and start it again.</string>
     <string name="check_detail_mic_on">Allowed.</string>
     <string name="check_detail_mic_off">Not allowed. I can’t hear you, so tapping the ball won’t start listening; double-tap it to type to me instead.</string>
     <string name="check_detail_voice_key_ok">Set. Recognition and synthesis use it to reach the provider.</string>
