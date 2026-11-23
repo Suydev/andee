@@ -219,7 +219,7 @@ class ScenesUi(
         body.addView(habitsInput, matchWrap().apply { bottomMargin = dp(6) })
         body.addView(shortcutsInput, matchWrap().apply { bottomMargin = dp(8) })
         body.addView(
-            action(lctx.getString(R.string.playbooks_save)) {
+            action(lctx.getString(R.string.playbooks_save), Glass.ACCENT) {
                 val pkg = pkgInput.text.toString().trim()
                 if (pkg.isEmpty()) return@action
                 fun split(s: String) = s.split(',').map { it.trim() }.filter { it.isNotEmpty() }
@@ -266,7 +266,7 @@ class ScenesUi(
         row.addView(
             action(
                 lctx.getString(if (armed) R.string.playbooks_confirm_delete else R.string.playbooks_delete),
-                if (armed) Color.parseColor(Glass.WARN) else Glass.ACCENT,
+                Color.parseColor(if (armed) Glass.WARN else Glass.ACCENT),
             ) {
                 if (armed) {
                     Notebook.deletePlaybook(context, pkg)
