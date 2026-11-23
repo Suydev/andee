@@ -24,7 +24,7 @@ class Drive(
 
     data class Thought(val at: Long, val text: String)
 
-    /** The last work turn, for the next heartbeat to read and for the 日记 tab to show. */
+    /** The last work turn, for the next heartbeat to read and for the journal tab to show. */
     data class LastWork(val at: Long, val careId: String, val what: String, val effect: String, val summary: String)
 
     private val lock = Any()

@@ -125,8 +125,8 @@ class MarketTools(
      *
      * **The server's own message is the payload here.** baas validates arguments
      * against the market tool's schema before spending the upstream call, and
-     * says so in the same words a person could act on ("参数 speaker 取值不合法:
-     * zh_female_9，可选值: [...]"). Swallowing that into a generic "the call
+     * says so in the same words a person could act on ("invalid value for parameter speaker:
+     * zh_female_9; available values: [...]"). Swallowing that into a generic "the call
      * failed" would throw away the one sentence that lets the model retry
      * correctly — and a market call that reaches the upstream and fails is
      * charged for anyway.

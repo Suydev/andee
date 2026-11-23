@@ -1059,7 +1059,7 @@ object ToolSchemas {
                 "html" to prop("string", "Complete HTML document."),
                 // Same reason as `buttons` above: the fallback is
                 // `html_default_title`, resolved in the interface language, and
-                // `default = "AI 界面"` used to sit here as a literal.
+                // `default = "AI interface"` used to sit here as a literal.
                 "title" to prop("string", "Short page title — carried into the conversation record, and quoted back to you if a page is already open. Omit it and the page is named in the interface language."),
                 "revise" to prop(
                     "integer",
@@ -1075,9 +1075,9 @@ object ToolSchemas {
         //
         // Read-back for the one piece of its own work the brain cannot
         // otherwise see. `show_html` draws a page and the device keeps it (the
-        // 产物 panel lists them), but nothing carries that record into the
+        // artifact panel lists them), but nothing carries that record into the
         // context, so before these existed a page built yesterday did not exist
-        // to the brain that built it — which is how "改一下上次那个表格" got an
+        // to the brain that built it — which is how "change the spreadsheet from last time" got an
         // answer about a page that was never made.
         //
         // Neither one draws anything, which is why they are not under `screen.`
@@ -1131,7 +1131,7 @@ object ToolSchemas {
             required = listOf("html"),
             props = mapOf(
                 "html" to prop("string", "The content of the stage: HTML for the inside of <body>, with any <style>/<script> it needs."),
-                "title" to prop("string", "A short name for what is on the stage now, e.g. 「This week's weather in three cities」. Shown to you in later turns."),
+                "title" to prop("string", "A short name for what is on the stage now, e.g. \u300CThis week's weather in three cities\u300D. Shown to you in later turns."),
             ),
             localOnly = true,
         ),
@@ -1262,7 +1262,7 @@ object ToolSchemas {
             props = mapOf(
                 // The fallback is `meeting_default_title` (see `MeetingRecorder`
                 // and `BodyCoreService.meetingMinutesQuery`), resolved in the
-                // interface language. It used to be spelled out here as 会议记录,
+                // interface language. It used to be spelled out here as "meeting notes",
                 // which is the one string above that reaches the screen.
                 "title" to prop("string", "What this meeting is, e.g. 'weekly sync'. Becomes the title the minutes page is laid out under. Omit it and the meeting is named in the interface language."),
             ),
@@ -2421,7 +2421,7 @@ object ToolSchemas {
             name = "enter_scene",
             method = "scene.enter",
             description = """
-        Step into a scene: its instructions take effect from your next reply on. Leaves any scene you were in. Say one sentence when you do it (「OK, entering English practice」).
+        Step into a scene: its instructions take effect from your next reply on. Leaves any scene you were in. Say one sentence when you do it ("OK, entering English practice").
     """.trimIndent(),
             required = listOf("name"),
             props = mapOf("name" to prop("string", "The scene's name, from list_scenes")),
@@ -2539,7 +2539,7 @@ object ToolSchemas {
         `handoff_to_ai` instead: that step pauses the replay and wakes you to do the job yourself.
     """.trimIndent(),
             required = listOf("note"),
-            props = mapOf("note" to prop("string", "What the user must do, in their language, e.g. 「confirm payment with your fingerprint」")),
+            props = mapOf("note" to prop("string", "What the user must do, in their language, e.g. \u300Cconfirm payment with your fingerprint\u300D")),
         ),
         tool(
             localOnly = true,

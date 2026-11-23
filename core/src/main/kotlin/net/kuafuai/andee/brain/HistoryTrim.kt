@@ -14,7 +14,7 @@ object HistoryTrim {
      * @param boundary one flag per message, true for a plain `user` message (the only place a conversation
      *   may be cut). Index 0 is the system message and is never dropped.
      * @param keepFrom nothing at or after this index is dropped either — the start of a task that stopped at
-     *   the step limit, which another turn may have pushed out of "newest" before the user says 继续.
+     *   the step limit, which another turn may have pushed out of "newest" before the user says "continue".
      * @return indexes to remove. Whole turns from the front, oldest first, and never the newest turn: it
      *   stays intact however long it has grown, because it is the one the conversation is still in.
      */

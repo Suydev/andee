@@ -13,7 +13,7 @@ import java.time.ZoneId
  * and did, what is owed each way, and what it wants to ask. And the limits are the device's, not the model's:
  * how many people it may reach out to in a day, how soon it may reach the same one again.
  *
- * **Named 「认识的人」, not 通讯录.** README and `device.contacts` already use that word for the *system* contact
+ * **Named "people I know", not "contacts".** README and `device.contacts` already use that word for the *system* contact
  * book permission, and two meanings of it would have the user wondering whether Andee read their contacts. It
  * does not: it records only people it actually met, and never imports anyone.
  *
@@ -31,9 +31,9 @@ class People(
 
     /**
      * Where to find someone. [chat] is the conversation a display name belongs to, blank for a handle that means the
-     * same person everywhere (an email address, a phone number, a WeChat 私聊 name). WeChat has no stable id, and a
-     * 群昵称 is one person's name *in that group*: 「小王」 in B群 and 「小王」 in C群 may be two people, and the same
-     * person shows up as 「小王」 in B群 and 「王小明」 in 私聊. So a group name is only ever matched inside its group.
+     * same person everywhere (an email address, a phone number, a WeChat private chat name). WeChat has no stable id, and a
+     * group nickname is one person's name *in that group*: "Xiao Wang" in group B and "Xiao Wang" in group C may be two people, and the same
+     * person shows up as "Xiao Wang" in group B and "Wang Xiaoming" in private chat. So a group name is only ever matched inside its group.
      */
     data class Channel(val kind: String, val handle: String, val chat: String = "") {
         fun same(o: Channel) = kind == o.kind && handle.trim().equals(o.handle.trim(), true) && chat.trim().equals(o.chat.trim(), true)
@@ -534,7 +534,7 @@ class People(
 
     /**
      * One line per person, for the user message: who this turn is about (the sender it came from) and whoever an open
-     * task waits on or is for. Not everyone — 「人」 can be hundreds, and the point is the few this turn may touch.
+     * task waits on or is for. Not everyone — "people" can be hundreds, and the point is the few this turn may touch.
      */
     fun indexForPrompt(ids: List<String>, now: Long = clock()): String =
         ids.distinct().mapNotNull { get(it) }.distinctBy { it.id }.take(6).joinToString("\n") { p ->

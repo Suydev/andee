@@ -44,7 +44,7 @@ class WikiBook(
      * known id returns that one. Ordered by how many words matched, then by how recently it was touched.
      */
     fun search(query: String, kind: String? = null, limit: Int = 8): List<Meta> {
-        val words = query.lowercase().split(Regex("[\\s,，、;；]+")).filter { it.isNotEmpty() }
+        val words = query.lowercase().split(Regex("[\\s,\uFF0C\u3001;\uFF1B]+")).filter { it.isNotEmpty() }
         val pool = all().filter { kind == null || it.kind == kind }
         meta(query.trim())?.takeIf { it.status != Status.ARCHIVED }?.let { return listOf(it) }
         if (words.isEmpty()) return pool.sortedByDescending { it.updated }.take(limit)
@@ -189,7 +189,7 @@ class WikiBook(
         val live = all().filter { it.status == Status.ACTIVE || it.status == Status.DRAFT }
         if (live.isEmpty()) return ""
         val top = live.sortedByDescending { it.updated }.take(max)
-        "Your wiki: ${live.size} article(s). Newest: " + top.joinToString("; ") { "「${it.title}」(${it.kind}, ${it.status.key}, v${it.version}, ${it.level.key}) #${it.id}" } + ". wiki_search before you write anything."
+        "Your wiki: ${live.size} article(s). Newest: " + top.joinToString("; ") { "\u300C${it.title}\u300D(${it.kind}, ${it.status.key}, v${it.version}, ${it.level.key}) #${it.id}" } + ". wiki_search before you write anything."
     }
 
     /** The auto-maintained contents page: all live articles by kind. Written to the wiki folder as `INDEX.md`. */
@@ -259,7 +259,7 @@ class WikiBook(
             return sa.intersect(sb).size.toDouble() / maxOf(sa.size, sb.size) >= 0.8
         }
 
-        private fun norm(s: String) = s.lowercase().replace(Regex("[\\s\\p{Punct}，。、：；！？（）《》「」『』【】—·v\\d]+"), "")
+        private fun norm(s: String) = s.lowercase().replace(Regex("[\\s\\p{Punct}\uFF0C\u3002\u3001\uFF1A\uFF1B\uFF01\uFF1F\uFF08\uFF09\u300A\u300B\u300C\u300D\u300E\u300F\u3010\u3011—·v\\d]+"), "")
 
         fun withHeader(title: String, kind: String, level: Level, source: String, version: Int, body: String): String =
             "---\ntitle: $title\nkind: $kind\nconfidentiality: ${level.key}\nsource: ${oneLine(source, 160)}\nversion: $version\n---\n\n${body.trim()}\n"

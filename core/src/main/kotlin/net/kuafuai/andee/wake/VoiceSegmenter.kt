@@ -18,7 +18,7 @@ import kotlin.math.sqrt
  *
  * Pre-roll ([PREROLL_FRAMES]) matters more than it looks: a voice crosses the
  * threshold a few frames *after* it starts, and the missing onset is the
- * consonant — the 'h' of "嘿" — which is most of what distinguishes the wake
+ * consonant — the 'h' of "hey" — which is most of what distinguishes the wake
  * phrase from every other short utterance. It is also what buys the start
  * *decision* its slowness without costing the user a syllable: the detector may
  * take 80 ms to make up its mind ([START_FRAMES]) because those 80 ms are still
@@ -233,7 +233,7 @@ class VoiceSegmenter(private val onSegment: (ShortArray) -> Unit) {
          * 300 ms of run-up, and it is load-bearing twice over.
          *
          * The original reason: a voice crosses the line a few frames *after* it
-         * starts, and the missing onset is the consonant — the 'h' of "嘿" —
+         * starts, and the missing onset is the consonant — the 'h' of "hey" —
          * which is most of what tells the wake phrase from every other short
          * utterance. 150 ms was judged enough for that.
          *

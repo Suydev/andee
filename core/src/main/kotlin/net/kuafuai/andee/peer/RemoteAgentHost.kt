@@ -14,7 +14,7 @@ import java.io.FileOutputStream
  */
 class RemoteAgentHost(
 private val client: PeerRemote.Client,
-/** The 「事」 side of a job handed over; null runs jobs unattached (tests). */
+/** The "task" side of a job handed over; null runs jobs unattached (tests). */
 private val tasks: RemoteAgentTasks? = null,
     /** The paired device whose agent this is: the one that said it offers it. Null when none does. */
     private val device: () -> String?,
@@ -42,7 +42,7 @@ private val tasks: RemoteAgentTasks? = null,
     }
 
     /**
-     * A job: its 「事」 first (the model's named one, else the continued worker's, else a new one), then the call; the task waits
+     * A job: its "task" first (the model's named one, else the continued worker's, else a new one), then the call; the task waits
      * on the worker that comes back. A call that fails leaves a task it opened itself closed again, so a job that never started
      * is not left looking like one in hand.
      */

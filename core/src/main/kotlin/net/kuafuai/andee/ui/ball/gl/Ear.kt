@@ -42,7 +42,7 @@ object Ear {
      *   Higher is a *rabbit*. The exponent decides where along the length the
      *   narrowing happens: at 2 the flap is already down to 87% of its base
      *   width halfway up and 44% at nine tenths, which is a cone — stand one of
-     *   those up and it reads as a horn, which is what the first 贱贱兔 shipped
+     *   those up and it reads as a horn, which is what the first Cheeky Bunny shipped
      *   as. At 6 the same two points are 99% and 76%, so the flap runs parallel
      *   for most of its length and does all its rounding in the last fifth,
      *   which is the shape a rabbit's ear actually is.

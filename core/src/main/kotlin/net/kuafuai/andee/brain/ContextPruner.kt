@@ -18,7 +18,7 @@ import org.json.JSONObject
  *    (the core recorded when it was built — see `LocalBrain.userCore`).
  *
  * The user's words and the assistant's are never touched; nor is anything at or after [until] (the newest turn,
- * and a task the user may still say 继续 to). Changing a message in the middle costs DeepSeek's prefix cache
+ * and a task the user may still say "continue" to). Changing a message in the middle costs DeepSeek's prefix cache
  * from that point, so this runs once when the budget is crossed — not a little every turn.
  *
  * The originals are handed to [keep] before they are replaced, so the archive written when this stretch is

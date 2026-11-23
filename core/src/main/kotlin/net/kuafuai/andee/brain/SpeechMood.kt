@@ -5,7 +5,7 @@ import net.kuafuai.andee.ui.ball.Mood
 /**
  * Emotion markers the model writes into its own reply.
  *
- * `[happy] 找到了，在第三页。[calm] 要我打开吗？`
+ * `[happy] Found it, on the third page. [calm] Shall I open it?`
  *
  * The ball has had six "emotions the model picks from" since it was written —
  * see [Mood]'s own KDoc — and nothing has ever picked one: four of the six were
@@ -24,7 +24,7 @@ import net.kuafuai.andee.ui.ball.Mood
  *    on screen and read aloud as a word. The model is picking a *feeling*, so
  *    every ordinary name for one maps to the nearest of the six — in English
  *    and in Chinese, because this device mostly answers in Chinese.
- *  - **A bracket is only eaten when it is clearly not words.** `[12条]` out of
+ *  - **A bracket is only eaten when it is clearly not words.** `[12 messages]` out of
  *    a notification summary, `[END]` out of our own prompt, and the label half
  *    of every markdown link all have to survive. Letters-only excludes the
  *    first, SHOUTING excludes the second and a following `(` excludes the
@@ -34,7 +34,7 @@ import net.kuafuai.andee.ui.ball.Mood
  *    which is what a reply with one marker does anyway.
  *  - **Parsing happens before the text is logged or spoken, never after.** A
  *    marker that reaches [net.kuafuai.andee.ui.ChatHistory] is visible junk in
- *    the user's scrollback, and one that reaches 火山 gets read out loud as
+ *    the user's scrollback, and one that reaches Volcano gets read out loud as
  *    "happy". Both failures are silent in the code and obvious on the device.
  */
 object SpeechMood {
@@ -65,7 +65,7 @@ object SpeechMood {
      * than the word itself in the user's ear.
      *
      * Chinese is in here for the same reason. This device answers in Chinese
-     * most of the time, and a model writing Chinese reaches for 「生气」 well
+     * most of the time, and a model writing Chinese reaches for "angry" well
      * before it reaches for `tense` no matter what the prompt lists.
      *
      * The voice-pipeline and work moods (LISTENING, SEARCHING, …) are
@@ -129,8 +129,8 @@ object SpeechMood {
      * really is one is [parse]'s job — this only has to be cheap and to
      * exclude the shapes that obviously are not.
      *
-     * Letters only, so `[12条]` from a notification summary can never match.
-     * Three bracket families: ASCII, fullwidth `［］`, and 【】, which a model
+     * Letters only, so `[12 messages]` from a notification summary can never match.
+     * Three bracket families: ASCII, fullwidth square brackets, and fullwidth lenticular brackets, which a model
      * writing Chinese types about as readily as either.
      */
     /**
@@ -172,7 +172,7 @@ object SpeechMood {
      *
      * The fiddly part is the whitespace the model typed *around* the tag, and
      * it has to be fiddly because the two languages want opposite things.
-     * `[happy] 找到了` must not keep a leading space (it is audible as a pause
+     * `[happy] Found it` must not keep a leading space (it is audible as a pause
      * at the top of the reply), and `ok [happy] yes` must not lose the one
      * between the words. So: whitespace on either side of a removed marker
      * collapses to exactly one space, and to nothing at all when the marker
@@ -211,7 +211,7 @@ object SpeechMood {
                 out.setLength(out.length - 1)
             }
             // The space is a *separator*, so it is only owed when there is
-            // something on both sides. `好的 [calm]` ends the reply and must
+            // something on both sides. `OK [calm]` ends the reply and must
             // not end it on a space.
             if (out.isNotEmpty() && cursor < raw.length && (spaceBefore || spaceAfter)) {
                 out.append(' ')

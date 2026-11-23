@@ -43,8 +43,8 @@ package net.kuafuai.andee.brain
  * is not: `values/` + `values-en/` cover that, and the header of
  * `values-en/strings.xml` explains the split. The two must not be mixed up.
  * Chinese survives inside the English prompt only where it is not prose — a
- * label that has to be matched on screen (设为壁纸, 设置), or a specimen of
- * what a Chinese user actually says. Both are load-bearing: translate `设为壁纸`
+ * label that has to be matched on screen (the Chinese labels meaning "Set as wallpaper" and "Settings"), or a specimen of
+ * what a Chinese user actually says. Both are load-bearing: translate the Chinese "Set as wallpaper" label
  * and the model goes looking for an English string that is not on the phone.
  *
  * Lives in Kotlin rather than `assets/`: there is no assets directory in this

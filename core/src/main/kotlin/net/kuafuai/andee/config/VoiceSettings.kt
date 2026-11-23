@@ -43,8 +43,8 @@ data class VoiceSettings(
      * A hint for both directions, or blank for "let Google decide".
      *
      * Blank rather than a fixed `zh-CN`, following the reference gateway: a
-     * Chinese user says "hello 帮我查一下" and an English one says
-     * "帮我查杭州天气", so naming one language does not restrict the other, it
+     * Chinese user says "hello, help me look it up" and an English one says
+     * "help me check the weather in Hangzhou", so naming one language does not restrict the other, it
      * only makes it less accurate.
      */
     val googleLanguage: String,

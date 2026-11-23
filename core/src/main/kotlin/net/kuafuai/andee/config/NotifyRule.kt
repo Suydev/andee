@@ -3,7 +3,7 @@ package net.kuafuai.andee.config
 import org.json.JSONObject
 
 /**
- * How the owner wants notifications handled, in their own words — 「消息都帮我处理一下」, 「群消息别管，私聊都回」.
+ * How the owner wants notifications handled, in their own words — "Help me handle all the messages", "Ignore group messages, reply to private chats".
  *
  * It exists because the notification triage ([net.kuafuai.andee.brain.NotificationTriage]) is a separate, tool-less
  * call that sees none of the conversation: an instruction said to the brain never reached it, so the user asked for

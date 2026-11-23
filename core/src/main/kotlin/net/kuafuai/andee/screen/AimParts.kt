@@ -17,7 +17,7 @@ object AimParts {
      * Both numbers are a measurement, not a taste. On a 1200x2664 screen a
      * cell is 150x222 px, so one *third* of it vertically is 74 px — taller
      * than the things these taps are aimed at. Measured 2026-10-20 in
-     * WeChat's 视频号 点赞 list: the 「谢谢」 button is ~100x50 px, its row's
+     * WeChat's Channels Likes list: the "Thanks" button is ~100x50 px, its row's
      * name is 200 px above it and holds 20x the tappable area, so a single
      * step of 74 px was enough to miss the button and hit the name — which
      * opens a profile card. A fifth is 44 px, inside the button with room.
@@ -42,8 +42,8 @@ object AimParts {
     )
 
     // Aliases are the names a model reaches for when it is not looking at
-    // the schema — a Chinese answer says 右下, not bottom-right. The
-    // nine-name grid the vocabulary used before still parses: 上/中/下 and
+    // the schema — a Chinese answer says the Chinese word for bottom-right, not the English one. The
+    // nine-name grid the vocabulary used before still parses: top / middle / bottom and
     // their corners map to the outer rows, so an old payload aims where it
     // used to.
     private val CELLS: Map<String, IntArray> = buildMap {

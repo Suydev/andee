@@ -76,7 +76,7 @@ class NotebookBook(private val store: NotebookStore) {
      */
     val tasks: Tasks by lazy { Tasks(this).also { it.migrate(selfhood, people); it.reviveRecentDone() } }
 
-    /** 守卫: the user's own paragraph of rules, above everything in the prompt. Written from the notebook card only. */
+    /** guard: the user's own paragraph of rules, above everything in the prompt. Written from the notebook card only. */
     val guard: Guard by lazy { Guard(this) }
 
     /** How the owner wants notifications handled; read by the triage. Written only on a turn the user started. */
@@ -463,7 +463,7 @@ class NotebookBook(private val store: NotebookStore) {
             )
             .take(max)
         if (top.isEmpty()) return ""
-        return top.joinToString("\n") { "- ${it.name}：${it.description}" }
+        return top.joinToString("\n") { "- ${it.name}\uFF1A${it.description}" }
     }
 
     /**
@@ -475,7 +475,7 @@ class NotebookBook(private val store: NotebookStore) {
         val mem = memories().filter { !it.expired(now) }.sortedBy { it.type }
         if (mem.isNotEmpty()) {
             append("Memories (").append(mem.size).append("):\n")
-            mem.forEach { append("- [").append(it.type).append("] ").append(it.name).append("：").append(it.description.take(100)).append('\n') }
+            mem.forEach { append("- [").append(it.type).append("] ").append(it.name).append("\uFF1A").append(it.description.take(100)).append('\n') }
         }
         val td = todos("pending")
         if (td.isNotEmpty()) {
@@ -522,7 +522,7 @@ class NotebookBook(private val store: NotebookStore) {
      * The todos a notebook starts with: the morning ([MORNING_TODO_CRON]: today's plan, and today on the stage) and
      * the evening ([NIGHTLY_PICTURE_CRON]: the day's story and picture). Each is added once per notebook, by **its
      * own** `meta` flag — so a user who drops or pauses one is not overruled at the next start, a notebook seeded
-     * before the morning one existed still gets it, and a wipe (清空小本本, 恢复出厂设置) takes the flags with it.
+     * before the morning one existed still gets it, and a wipe (Clear notebook, Factory reset) takes the flags with it.
      * Not added beside an open todo on the same schedule, which is how it would be set by hand.
      *
      * An earlier wording of the same todo ([NIGHTLY_PICTURE_OLD], [MORNING_TODO_OLD]) is rewritten in place, so a notebook seeded
@@ -1132,8 +1132,8 @@ class NotebookBook(private val store: NotebookStore) {
     fun flowsForPrompt(): String =
         flows().sortedByDescending { it.lastRunAt }.joinToString("\n") { f ->
             val ok = if (f.runs == 0) "never run" else "ok ${f.okRuns}/${f.runs}"
-            val what = f.summary.trim().takeIf { it.isNotEmpty() }?.let { "：${it.take(60)}" } ?: ""
-            "- ${f.name}（${f.title}）$what · ${f.steps.size} steps, $ok"
+            val what = f.summary.trim().takeIf { it.isNotEmpty() }?.let { "\uFF1A${it.take(60)}" } ?: ""
+            "- ${f.name}\uFF08${f.title}\uFF09$what · ${f.steps.size} steps, $ok"
         }
 
     companion object {
@@ -1244,7 +1244,7 @@ class NotebookBook(private val store: NotebookStore) {
                 "it on the screen and say in a sentence or two what it shows. Write the page and speak in the " +
                 "language of your recent conversation with the user; only if there has been none, use the " +
                 "interface language. If nothing much happened today, paint a quiet day rather than inventing one.",
-            "Nightly review: go over today's events (conversations, things done, journal), then draw a 「you and me」 picture with some feeling in it." +
+            "Nightly review: go over today's events (conversations, things done, journal), then draw a \u300Cyou and me\u300D picture with some feeling in it." +
                 "Put it on screen for the user to see, then say in a sentence or two what the picture shows. If little happened today, draw a quiet day — don't force it.",
             "Evening look-back: go over today (the conversation, what you did, your diary) and from it make a " +
                 "picture of \"you and me\" with some mood to it. Put it on the screen for the user and say in a " +
@@ -1256,7 +1256,7 @@ class NotebookBook(private val store: NotebookStore) {
          * cannot be half done — the part that was not is lost when it is closed. Null when it is one thing.
          */
         fun bundledTodo(what: String): String? {
-            val marks = Regex("""(?:^|[\s；;。，,:：])(?:\(?\d{1,2}[).、．.]|[①②③④⑤⑥⑦⑧⑨])""").findAll(what).count()
+            val marks = Regex("""(?:^|[\s\uFF1B;\u3002\uFF0C,:\uFF1A])(?:\(?\d{1,2}[).\u3001\uFF0E.]|[\u2460\u2461\u2462\u2463\u2464\u2465\u2466\u2467\u2468])""").findAll(what).count()
             return if (marks >= 2) "This todo lists several separate things. Set one todo per thing — each comes due, " +
                 "is done and closed on its own." else null
         }

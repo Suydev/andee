@@ -1,7 +1,7 @@
 package net.kuafuai.andee.peer
 
 /**
- * A running worker's status as three short lines, for a row in 在办 on either body: where it is (step and time), where it is
+ * A running worker's status as three short lines, for a row in "in progress" on either body: where it is (step and time), where it is
  * in its own checklist (or its thought, with none), and the newest thing it did. The same words on the Mac and the phone,
  * so the two cannot drift. Lines may be empty (nothing yet); callers cut each to one line with an ellipsis.
  */

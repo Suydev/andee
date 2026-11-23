@@ -16,7 +16,7 @@ import java.util.zip.GZIPOutputStream
 import javax.net.ssl.SSLContext
 
 /**
- * ByteDance Volcano (火山) streaming ASR client.
+ * ByteDance Volcano (ByteDance Volcano Engine) streaming ASR client.
  * Direct Kotlin port of wxBot's ui/mic_asr_stream.py binary protocol.
  *
  * Wire format for each message:
@@ -52,7 +52,7 @@ class HuoshanAsr(
     override val finalWaitMs: Long = 3000L
 
     /**
-     * **火山 never says a turn is over — this is the only thing that ends
+     * **Volcano (ByteDance Volcano Engine) never says a turn is over — this is the only thing that ends
      * one.** Its value is therefore the user-facing pause tolerance, and it is
      * unchanged from what this device has always used.
      */
@@ -60,7 +60,7 @@ class HuoshanAsr(
 
     private var client: WebSocketClient? = null
 
-    // Full client request uses seq=1; audio chunks start at 2 (火山 protocol).
+    // Full client request uses seq=1; audio chunks start at 2 (Volcano (ByteDance Volcano Engine) protocol).
     private val seq = AtomicInteger(2)
 
     /** Guards [pending] — the capture thread appends, the connect drains. */

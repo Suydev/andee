@@ -6,7 +6,7 @@ import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Turns "the 发送 button under the comment box" into a point on a screenshot — the grounding half of a
+ * Turns "the Send button under the comment box" into a point on a screenshot — the grounding half of a
  * planner/grounder split. The brain says *what* to tap; this says *where*.
  *
  * Why it exists: the brain is a general model, and general models place points badly. Measured on the Mac
@@ -109,14 +109,14 @@ class Locator(cfg: BrainConfig, private val model: String, private val log: (war
          *
          *  * **Chinese, whatever language the target is in.** The same twelve targets averaged 6.4 px off (worst
          *    24) in Chinese; the English wording missed by 25–37 px on three of them.
-         *  * **Say what you see before you point.** Asked bare, "红色的删除按钮" on a screen that had none came
+         *  * **Say what you see before you point.** Asked bare, "the red Delete button" on a screen that had none came
          *    back as the ✕ close button — a confident point at something that does a similar job, which in a
          *    real app is the dangerous kind of miss. Made to name the element first (`<seen>`) and to check the
          *    description against it, the same question answered <none/>, every positive still landed, and it
          *    costs ~16 output tokens. The `seen` text also goes back to the brain with the tap.
          */
         fun prompt(target: String): String =
-            "This is a screenshot. The interface element to find: 「${target.trim()}」.\n" +
+            "This is a screenshot. The interface element to find: \u300C${target.trim()}\u300D.\n" +
                 "First write in one sentence what text or icon the best-matching element on the screenshot actually shows (<seen>…</seen>), then judge whether it's the one being looked for: " +
                 "It counts only if the words, color, and icon mentioned in the description all match it. If yes, output <point>x y</point> (center point; x and y are 0–1000 normalized to image width and height); " +
                 "if no, or it isn't in the screenshot, output <none/>. Don't mistake something that merely has a similar function for it (e.g. don't take Cancel for Delete)."

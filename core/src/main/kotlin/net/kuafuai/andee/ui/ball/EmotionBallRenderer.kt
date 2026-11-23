@@ -112,7 +112,7 @@ class EmotionBallRenderer {
      * task begins while the window is still travelling to the ledge, and the
      * cling (half-sunk body, paws, scissor) drawn against a window that is
      * *not yet at the edge* reads as the ball being chopped in half
-     * mid-screen, then teleporting down — exactly the glitch the "帮我看看"
+     * mid-screen, then teleporting down — exactly the glitch the "help me take a look"
      * flow showed. The window owns this flag: it goes true when the perch
      * geometry is applied, false when the ball leaves the ledge or the
      * window is resized away from it.
@@ -370,7 +370,7 @@ class EmotionBallRenderer {
     private val propColor = FloatArray(3)
     private val rimColor = FloatArray(3)
 
-    /** 鼻涕泡用的球体。subdiv 4：水滴靠轮廓圈出形状，边不能是折线。 */
+    /** The sphere used for the snot bubble. subdiv 4: the droplet gets its shape from its outline, so the edge must not be a jagged polyline. */
     private lateinit var bubbleSphere: Mesh
 
     // ---- Dust ----
@@ -1593,23 +1593,29 @@ class EmotionBallRenderer {
     }
 
     /**
-     * 鼻涕泡：一颗**透明的**水滴，不是一颗白球。
+     * The snot bubble: a **transparent** water droplet, not a white ball.
      *
-     * 第一版这里是两个实心圆片（浅色压在深色上），做出来是一坨白 —— 一个实心
-     * 的浅色圆放在浅色球上，除了"一颗球"读不出任何别的东西。水滴之所以是水滴，
-     * 全靠三件跟"实心"相反的事，都在 [BUBBLE_FS] 里：
+     * The first version here was two solid discs (a light one pressed over a dark
+     * one), which came out as a lump of white — a solid light circle sitting on a
+     * light ball, from which nothing reads except "a ball." What makes a droplet a
+     * droplet rests entirely on three things, all the opposite of "solid," and all
+     * of them in [BUBBLE_FS]:
      *
-     *   * **背面被 discard**。泡是一整颗球不是一片，前后两个面会盖到同一个像素
-     *     上，不裁掉背面的话轮廓那一圈会叠成两倍厚。
-     *   * **中间是透的**。只留轮廓上一圈菲涅尔（[BallLook.bubblePow]）加
-     *     [BallLook.bubbleInner] 那点薄雾，球体自己从中间透出来。
-     *   * **一个高光点**，落在左上 —— 和球的主光同一个方向，同一个理由：
-     *     高光落在别处会读成"它看向了别处"。
+     *   * **The back face is discarded.** The bubble is a whole sphere, not a single
+     *     sheet, so its front and back faces cover the same pixels; without cutting
+     *     away the back face, the ring at the outline stacks up twice as thick.
+     *   * **The middle is transparent.** Only a ring of fresnel at the outline
+     *     ([BallLook.bubblePow]) plus that bit of haze from [BallLook.bubbleInner]
+     *     is left, and the sphere itself shows through from the middle.
+     *   * **A single highlight spot**, landing in the upper left — the same direction
+     *     as the ball's key light, and for the same reason: a highlight landing
+     *     somewhere else reads as "it looked somewhere else."
      *
-     * 单独的着色器而不是复用 SOLID：SOLID 是 `vec4(uColor, uAlpha)`，给它一颗
-     * 不透明的球只能得到那颗白球。
+     * A dedicated shader rather than reusing SOLID: SOLID is `vec4(uColor, uAlpha)`,
+     * and handing it an opaque sphere can only get you that white ball.
      *
-     * 画在嘴之后：它贴着鼻子，先画嘴再压上泡，就不会出现"泡被嘴切掉一块"。
+     * Drawn after the mouth: it hugs the nose, and drawing the mouth first and then
+     * pressing the bubble over it avoids "a chunk of the bubble cut off by the mouth."
      */
     private fun drawBubble() {
         val a = state.bubble
@@ -1622,9 +1628,10 @@ class EmotionBallRenderer {
         Matrix.multiplyMM(mv, 0, view, 0, model, 0)
         Matrix.multiplyMM(mvp, 0, proj, 0, mv, 0)
 
-        // 透明，所以不写深度；但深度**测试**照旧开着 —— 正是它挡住球体的
-        // 后半颗，不让它从身体里透出来。画完把 mask 恢复，因为上面那一段
-        // 是按"面是不透明的"写的。
+        // Transparent, so it doesn't write depth; but the depth **test** stays on as
+        // before — that's what blocks the sphere's back half from showing through the
+        // body. Restore the mask once drawing is done, because the section above was
+        // written assuming surfaces are opaque.
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
         GLES20.glDepthMask(false)
         bubbleShader.use()

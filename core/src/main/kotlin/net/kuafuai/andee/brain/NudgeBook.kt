@@ -19,7 +19,7 @@ data class Nudge(
     val expiresAt: Long,
     /**
      * The turn that wrote it was [LocalBrain.TurnKind.NOTIFY]. The turn a tap on it starts runs as one too —
-     * otherwise a stranger's message could put a 「好」 button in front of the user and get a trusted turn back
+     * otherwise a stranger's message could put an "OK" button in front of the user and get a trusted turn back
      * for it, the same laundering `Todo.untrusted` closes for the alarm clock.
      */
     val untrusted: Boolean,

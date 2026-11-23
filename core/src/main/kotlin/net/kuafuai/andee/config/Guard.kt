@@ -3,7 +3,7 @@ package net.kuafuai.andee.config
 import org.json.JSONObject
 
 /**
- * 守卫: a paragraph the user writes in the notebook and the model is told to put above everything else in its
+ * guard: a paragraph the user writes in the notebook and the model is told to put above everything else in its
  * prompt ([net.kuafuai.andee.brain.LocalPrompt.withPersona], the last section).
  *
  * **Only the user writes it.** There is no tool that changes it — not for the model, not for a review, not for a

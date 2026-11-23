@@ -5,10 +5,10 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Things Andee took on and has not finished — 「事」. See `docs/design/tasks.zh-CN.md` §3.
+ * Things Andee took on and has not finished — "task/matter". See `docs/design/tasks.zh-CN.md` §3.
  *
  * A todo is an alarm clock: at a time, wake me. A task is a thing with a beginning and an end that can outlive the
- * turn it started in: A asked in B群, Andee went to ask the leader in C群, the turn ended, and the leader's answer
+ * turn it started in: A asked in group B, Andee went to ask the leader in group C, the turn ended, and the leader's answer
  * arrives after three other things happened. Before this, all that survived was a paragraph of history that the
  * next turns pushed out of reach.
  *
@@ -66,7 +66,7 @@ class Tasks(
         val id: String,
         val what: String,
         val from: Source,
-        /** Who gets the result. Defaults to [from]: asked in B群, answered in B群; asked by the user, told the user. */
+        /** Who gets the result. Defaults to [from]: asked in group B, answered in group B; asked by the user, told the user. */
         val deliverTo: Source,
         val waits: List<Wait>,
         val next: String,
@@ -181,7 +181,7 @@ class Tasks(
     /**
      * The model's `done`: it says it delivered. The task stays in hand as `delivered` until the user confirms ([confirm])
      * or says it is not over ([reopen]) — whether a thing the user handed over is finished is the user's to say (11-12:
-     * the model closed two of the user's tasks in a turn about something else, and they vanished from 在办). A time-wait
+     * the model closed two of the user's tasks in a turn about something else, and they vanished from In progress). A time-wait
      * alarm is cancelled: nothing is to be come back to.
      */
     fun deliver(id: String, result: String): Result<Change> = update(id) { t ->
@@ -191,7 +191,7 @@ class Tasks(
         Change(t.copy(waits = seen(t.waits), status = DELIVERED, result = result.trim().take(MAX_TEXT), touchedAt = now), cancel = cancel)
     }
 
-    /** The user's 办完了: a delivered (or any open) task is closed as done, keeping what was delivered as its result. */
+    /** The user's "Done": a delivered (or any open) task is closed as done, keeping what was delivered as its result. */
     fun confirm(id: String): Result<Change> {
         val t = get(id) ?: return Result.failure(IllegalArgumentException("no task $id"))
         return close(id, "done", t.result)
@@ -341,7 +341,7 @@ class Tasks(
         val t = derive(raw)
         Selfhood.Care(
             id = t.id, what = t.what, why = "for ${t.deliverTo.short()}" + (if (t.next.isNotBlank()) "; next: ${t.next}" else "") +
-                (if (t.status == "ready") "; an answer came: 「${t.waits.last { !it.open }.answer.take(80)}」" else "") +
+                (if (t.status == "ready") "; an answer came: \u300C${t.waits.last { !it.open }.answer.take(80)}\u300D" else "") +
                 (if (t.status == "waiting") "; waiting on ${t.waits.filter { it.open }.joinToString(", ") { it.short() }}" else ""),
             kind = KIND, intervalMs = OPEN_STALE_MS, due = t.due, lastTouched = t.touchedAt, source = t.from.short(),
             status = "active", note = t.steps.lastOrNull()?.text.orEmpty(), idleRuns = 0, byUser = false, createdAt = t.createdAt,
@@ -370,7 +370,7 @@ class Tasks(
         t.waits.filter { it.open }.takeIf { it.isNotEmpty() }?.let { w ->
             append(" · waiting on ").append(w.joinToString(", ") { it.short() + " " + ago(now - it.at) })
         }
-        t.waits.filter { !it.open && !it.seen }.forEach { append(" · ").append(it.short()).append(" answered: 「").append(it.answer.take(60)).append("」") }
+        t.waits.filter { !it.open && !it.seen }.forEach { append(" · ").append(it.short()).append(" answered: \u300C").append(it.answer.take(60)).append("\u300D") }
         if (t.due > 0) append(" · due ").append(stamp(t.due))
         if (t.next.isNotBlank()) append(" · next: ").append(t.next.take(80))
     }
@@ -383,18 +383,18 @@ class Tasks(
         if (t.status == DELIVERED) append(" — you delivered (").append(t.result.take(200)).append("); the user has not yet confirmed it is done")
         if (t.untrusted) append(" · started from a stranger's words, and runs that way")
         append("\nfrom: ").append(t.from.short())
-        if (t.from.quote.isNotBlank()) append(" — 「").append(t.from.quote.take(Source.QUOTE_MAX)).append("」")
+        if (t.from.quote.isNotBlank()) append(" — \u300C").append(t.from.quote.take(Source.QUOTE_MAX)).append("\u300D")
         append("\ndeliver to: ").append(t.deliverTo.short())
         if (t.deliverTo.group == true) {
-            append(" — in 「").append(t.deliverTo.conversation).append("」: find their message")
-            if (t.deliverTo.quote.isNotBlank()) append(" 「").append(t.deliverTo.quote.take(60)).append("」")
-            append(" and quote-reply it; if you @ anyone it is 「").append(t.deliverTo.sender).append("」")
+            append(" — in \u300C").append(t.deliverTo.conversation).append("\u300D: find their message")
+            if (t.deliverTo.quote.isNotBlank()) append(" \u300C").append(t.deliverTo.quote.take(60)).append("\u300D")
+            append(" and quote-reply it; if you @ anyone it is \u300C").append(t.deliverTo.sender).append("\u300D")
         }
         t.waits.forEach { w ->
             append("\n").append(if (w.open) "waiting on " else "answered by ").append(w.short())
             if (w.asked.isNotBlank()) append(" (asked: ").append(w.asked.take(120)).append(")")
             if (w.open && w.kind != "time") append(" since ").append(ago(now - w.at))
-            if (!w.open) append(": 「").append(w.answer).append("」")
+            if (!w.open) append(": \u300C").append(w.answer).append("\u300D")
         }
         t.steps.takeLast(6).forEach { append("\n- ").append(stamp(it.at)).append(" ").append(it.text) }
         if (t.next.isNotBlank()) append("\nnext: ").append(t.next)
@@ -404,7 +404,7 @@ class Tasks(
     }
 
     /**
-     * The turn the user starts from 在办 (接着办, or their own words about the task): what they said, which task it is —
+     * The turn the user starts from In progress (keep working on it, or their own words about the task): what they said, which task it is —
      * named by the device, never left to the model to guess from "that one" — and its whole record. One text for both
      * bodies.
      */
@@ -519,7 +519,7 @@ class Tasks(
         private const val MIGRATED = "tasks_migrated_v1"
         /** Meta flag: [reviveRecentDone] ran. */
         private const val REVIVED = "tasks_revived_delivered"
-        /** The model said it delivered; the user has not confirmed. Active: it stays in 在办. */
+        /** The model said it delivered; the user has not confirmed. Active: it stays in In progress. */
         const val DELIVERED = "delivered"
         const val HOUR_MS = 3_600_000L
         /** Nobody has answered for this long: the heartbeat brings it up, and the model decides whether to chase. */

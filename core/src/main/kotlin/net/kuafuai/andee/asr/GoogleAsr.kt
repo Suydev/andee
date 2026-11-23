@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  *    an empty array is. The two look identical until the upstream changes.
  *
  * **Two results per utterance, and only one of them ends the turn.** The
- * upstream finals *at every pause* — "查一下……杭州的天气" arrives in two
+ * upstream finals *at every pause* — "check... the weather in Hangzhou" arrives in two
  * pieces — so its finals are accumulated and shown as [AsrEngine.Listener]
  * `onPartial`, never reported as the finished transcript. The turn ends when
  * the *caller* says the user has stopped, which is what `AsrController`'s
@@ -66,7 +66,7 @@ class GoogleAsr(
     override val finalWaitMs: Long = EMIT_GRACE_MS + 2000L
 
     /**
-     * **This is what ends a turn here, the same as for 火山** — see
+     * **This is what ends a turn here, the same as for Volcano (ByteDance Volcano Engine)** — see
      * [VAD_SILENCE_MS] for the experiment that established there is nothing
      * else. [AsrEngine]'s note explains why the caller can rely on a plain
      * silence window at all.

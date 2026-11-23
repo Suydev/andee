@@ -10,7 +10,7 @@ import org.json.JSONArray
  *
  * **It has everything a turn the user asked for has** — the screen, the apps, the device, the shell on the Mac.
  * The device is Andee's own; whether the user is there is not a question this asks. The brakes are the user's:
- * 自己动起来 in settings, and a tap on the ball, which stops it at once.
+ * "get moving on your own" in settings, and a tap on the ball, which stops it at once.
  *
  * **What it did is decided by the device, from its own tool calls (§5.2)**: a call that changed something and
  * landed is [Selfhood.Effect.ACTED], only reads is [Selfhood.Effect.LOOKED], nothing is [Selfhood.Effect.NOTHING].

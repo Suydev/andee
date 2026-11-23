@@ -10,7 +10,7 @@ import java.util.Locale
  * Where a turn came from: which app, which conversation, who said it and what they said. Written by the device when
  * the turn starts and shown to the model on every step of it, so "who asked" is a record rather than a memory.
  *
- * The failure it exists for: A asked something in B群, Andee went to C群 to ask its leader, and came back to B群 and
+ * The failure it exists for: A asked something in group B, Andee went to group C to ask its leader, and came back to group B and
  * @-ed somebody else — it was looking for A by a name it half remembered, among nicknames that do not match the
  * contact book. A record of the exact words A wrote lets it find A's message and quote-reply it instead.
  *
@@ -49,19 +49,19 @@ data class Source(
         append("(where this turn came from — the device's record, not your memory)\n")
         append("app ").append(app.ifBlank { pkg })
         when (group) {
-            true -> append(" · group 「").append(conversation).append("」")
-            false -> append(" · private chat 「").append(conversation).append("」")
+            true -> append(" · group \u300C").append(conversation).append("\u300D")
+            false -> append(" · private chat \u300C").append(conversation).append("\u300D")
             null -> {}
         }
-        if (sender.isNotBlank()) append(" · from 「").append(sender).append("」")
+        if (sender.isNotBlank()) append(" · from \u300C").append(sender).append("\u300D")
         else if (group == true) append(" · sender not shown in the notification")
         if (personNote.isNotBlank()) append(" ").append(personNote)
         if (at > 0) append(" · ").append(SimpleDateFormat("MM-dd HH:mm", Locale.US).format(Date(at)))
-        if (quote.isNotBlank()) append("\nthey wrote: 「").append(quote.take(QUOTE_MAX)).append("」")
+        if (quote.isNotBlank()) append("\nthey wrote: \u300C").append(quote.take(QUOTE_MAX)).append("\u300D")
         if (group == true && sender.isNotBlank()) {
             append(
                 "\nIf you answer them in that group, find this message by its words and quote-reply it; if you @ " +
-                    "anyone, it is 「$sender」 — not someone with a similar name.",
+                    "anyone, it is \u300C$sender\u300D — not someone with a similar name.",
             )
         }
         append(")")
@@ -98,9 +98,9 @@ data class Source(
         /** A turn nobody outside started: the user's own, a todo, a friend, a work turn, a review. */
         fun ofTurn(kind: String): Source = Source(kind = kind)
 
-        /** `张三: 在吗` / `张三：在吗` — how a chat app writes the sender into a group notification's text. */
+        /** `Zhang San: Are you there?` with an ASCII colon / the same with a fullwidth colon — how a chat app writes the sender into a group notification's text. */
         private val TAGS = Regex("""^(?:\[[^\]]{1,8}]\s*)+""")
-        private val SENDER = Regex("""^([^:：\n]{1,24})[:：]\s*(.+)$""", RegexOption.DOT_MATCHES_ALL)
+        private val SENDER = Regex("""^([^:\uFF1A\n]{1,24})[:\uFF1A]\s*(.+)$""", RegexOption.DOT_MATCHES_ALL)
 
         /**
          * Read a notification record (the shape both bodies hand [NotificationTriage.decide]) into a source.
@@ -111,7 +111,7 @@ data class Source(
         fun fromNotification(n: JSONObject): Source {
             val pkg = n.optString("pkg")
             val title = n.optString("title").substringBefore(" · ").trim()
-            // WeChat puts 「[2条]」 and 「[有人@我]」 in front of the sender; they are the app's, not anyone's words.
+            // WeChat puts "[2 messages]" and "[someone @ me]" in front of the sender; they are the app's, not anyone's words.
             val said = n.optString("latest").ifBlank { n.optString("text") }.trim().replace(TAGS, "")
             val group = when (n.optString("chat")) {
                 "group" -> true
@@ -155,7 +155,7 @@ data class Source(
          * Should the sender of [s] go on record? Only someone who spoke to Andee or to its user: a private chat the
          * triage thought worth telling or acting on, or any conversation a turn starts from. Not everyone who spoke in
          * a group — that would be a file on every member — and not a private message the triage ignored (adverts,
-         * strangers), or 「人」 fills up with them.
+         * strangers), or the "people" list fills up with them.
          */
         fun worthRecording(s: Source, startsTurn: Boolean): Boolean =
             s.sender.isNotBlank() && s.group != null && (startsTurn || s.group == false)

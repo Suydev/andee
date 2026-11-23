@@ -67,7 +67,7 @@ class Selfhood(
     // ---- name ------------------------------------------------------------------
 
     /**
-     * What this person calls me, given at first run (「安迪」). Andee is what I am; this is my name with them.
+     * What this person calls me, given at first run ("Andee"). Andee is what I am; this is my name with them.
      * Null when nobody has named me, and then I am simply Andee.
      */
     fun name(): String? = synchronized(lock) { load().optString("name").trim().ifEmpty { null } }
@@ -439,11 +439,11 @@ class Selfhood(
 
         /**
          * The diary is a person's page, not a report. Turns the worst offenders back with the reason: a line
-         * that is only "完成了 N 项" / "completed N tasks", or a page made of bullet points and no sentence.
+         * that is only "completed N items" / "completed N tasks", or a page made of bullet points and no sentence.
          */
         fun reportVoice(t: String): String? {
             val lines = t.lines().map { it.trim() }.filter { it.isNotEmpty() }
-            val bullets = lines.count { it.startsWith("-") || it.startsWith("*") || it.startsWith("•") || Regex("""^\d+[.、)]""").containsMatchIn(it) }
+            val bullets = lines.count { it.startsWith("-") || it.startsWith("*") || it.startsWith("•") || Regex("""^\d+[.\u3001)]""").containsMatchIn(it) }
             if (lines.size >= 3 && bullets * 2 > lines.size) {
                 return "This reads as a list of items done. A diary page is in your own voice: what stayed with you, what you are unsure about, what you think of someone now, why you want to do X tomorrow. Write sentences."
             }

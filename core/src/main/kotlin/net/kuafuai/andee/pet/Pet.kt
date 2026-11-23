@@ -71,7 +71,7 @@ object PetCharacters {
     /**
      * Five characters (2026-11-05). Andee itself — the plush ball of the brand illustrations — is first and is the
      * default; the cream girl is plain Andee drawn as a girl. The cobalt pair that used to be here were the same two
-     * drawn in blue, and the quiet girl after them was replaced by 大肥鱼, a whale girl, and she on 2026-11-06 by Andee娘 — the plush ball itself as a girl; a saved `blue-girl` / `lady` / `fish` reads as Andee娘 and `blue-boy` / `beau` (the gentle boyfriend, replaced by the kitten) as the kitten ([byId]).
+     * drawn in blue, and the quiet girl after them was replaced by Big Fat Fish, a whale girl, and she on 2026-11-06 by Andee-chan — the plush ball itself as a girl; a saved `blue-girl` / `lady` / `fish` reads as Andee-chan and `blue-boy` / `beau` (the gentle boyfriend, replaced by the kitten) as the kitten ([byId]).
      */
     val PRESETS = listOf(
         PetCharacter("andee", "Andee", "Andee", baseHeight = 120),
@@ -123,7 +123,7 @@ object PetMind {
         }
     }
 
-    /** The face the model wrote for a line (`[happy]`, `[生气]` …, see `SpeechMood`), as a drawing. */
+    /** The face the model wrote for a line (`[happy]`, `[angry]` …, see `SpeechMood`), as a drawing. */
     fun emotionPose(m: Mood): PetPose = when (m) {
         Mood.HAPPY, Mood.WAVE -> PetPose.HAPPY
         Mood.CURIOUS -> PetPose.CURIOUS

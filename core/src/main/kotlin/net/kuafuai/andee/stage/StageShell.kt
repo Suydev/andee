@@ -76,7 +76,7 @@ object StageLine {
 
     /** A reply cut where a reader would pause: Chinese and English sentence ends, and line breaks. */
     fun sentences(text: String): List<String> =
-        Regex("""[^。！？!?；;\n]+[。！？!?；;]*|(?<=[.!?])\s+""").findAll(text.trim())
+        Regex("""[^\u3002\uFF01\uFF1F!?\uFF1B;\n]+[\u3002\uFF01\uFF1F!?\uFF1B;]*|(?<=[.!?])\s+""").findAll(text.trim())
             .map { it.value.trim() }
             .flatMap { piece -> piece.split(Regex("""(?<=[.!?])\s+(?=[A-Z0-9"“‘(])""")).asSequence() }
             .map { it.trim() }

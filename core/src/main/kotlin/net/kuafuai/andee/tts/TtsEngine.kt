@@ -3,13 +3,13 @@ package net.kuafuai.andee.tts
 /**
  * One utterance, whichever backend speaks it.
  *
- * The call sequence is 火山's and both backends honour it: [open], then
+ * The call sequence is Volcano (ByteDance Volcano Engine)'s and both backends honour it: [open], then
  * [push] with the text (once, from the driver's `onOpen`) — for a backend that
  * synthesises on demand, however many times — then [finish]. Audio comes back
  * through [Listener.onAudio] as raw 16-bit little-endian PCM.
  *
  * **What a backend cannot promise is when the text — or the sample rate —
- * arrives relative to the network call.** 火山 accepts text into an open
+ * arrives relative to the network call.** Volcano (ByteDance Volcano Engine) accepts text into an open
  * socket, so it can report its sample rate before it has seen a word; Google
  * declares a constant. A system engine only learns its rate after writing the
  * WAV, so it opens at `0` and reports the real number through
@@ -36,7 +36,7 @@ interface TtsEngine {
          * name it in [onOpen] because it only learns it after synthesising.
          * Called at most once, after [onOpen] and before the first [onAudio].
          *
-         * Streaming backends (火山, Google) already declared their rate in
+         * Streaming backends (Volcano (ByteDance Volcano Engine), Google) already declared their rate in
          * [onOpen], so this is a no-op for them and they do not override it.
          */
         fun onRate(sampleRate: Int) {}
@@ -81,6 +81,6 @@ interface TtsEngine {
  * they read the same terminators rather than drift apart.
  */
 fun splitSentences(text: String): List<String> =
-    text.split(Regex("(?<=[。！？!?\\n])|(?<=\\. )"))
+    text.split(Regex("(?<=[\u3002\uFF01\uFF1F!?\\n])|(?<=\\. )"))
         .map { it.trim() }
         .filter { it.isNotEmpty() && it.any { ch -> ch.isLetterOrDigit() } }

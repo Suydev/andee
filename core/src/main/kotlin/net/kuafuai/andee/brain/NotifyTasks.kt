@@ -27,7 +27,7 @@ object NotifyTasks {
     class Turn(val source: Source, val extra: String, val answered: List<net.kuafuai.andee.config.Tasks.Task>)
 
     /**
-     * A turn starts from [n] (the triage said `act`, or the user tapped 看看): the sender goes on record, the waits it
+     * A turn starts from [n] (the triage said `act`, or the user tapped "Take a look"): the sender goes on record, the waits it
      * answers are marked answered with its words, and those tasks' records ride on the turn so it can pick them up
      * and deliver — to the person who asked in the first place, not to whoever is talking now.
      */

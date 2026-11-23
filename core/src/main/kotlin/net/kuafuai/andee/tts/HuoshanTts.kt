@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
 
 /**
- * ByteDance 火山 bidirectional TTS client (seed-tts-2.0).
+ * ByteDance Volcano (ByteDance Volcano Engine) bidirectional TTS client (seed-tts-2.0).
  * Direct Kotlin port of electron-vite's src/main/ttsBidi.ts.
  *
  * Session lifecycle (event-driven):
@@ -163,7 +163,7 @@ class HuoshanTts(
      *
      * TCP preserves order of push→finish frames on the same connection, so no race.
      * The ttsBidi.ts "wait for first audio" trick is only needed when you want to
-     * confirm the server ingested pushes before finalizing — but with 火山's
+     * confirm the server ingested pushes before finalizing — but with Volcano (ByteDance Volcano Engine)'s
      * seed-tts-2.0, some speakers don't emit audio until they see FinishSession,
      * causing a mutual wait deadlock. Send immediately.
      */

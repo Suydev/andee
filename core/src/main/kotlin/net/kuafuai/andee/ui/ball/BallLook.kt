@@ -36,7 +36,7 @@ package net.kuafuai.andee.ui.ball
  *    shape instead of two and cannot go invisible the way a mark can.
  *  - [RABBIT] — white, long swept ears, big eyes, two front teeth and a crooked
  *    mouth. The first look whose face is *asymmetric* ([mouthTilt]), which is
- *    where its whole 贱 read lives, and the first one to use a different
+ *    where its whole cheap/naughty read lives, and the first one to use a different
  *    accessory for a shape the renderer could nearly already draw ([buckW],
  *    against [toothCount] — see the field note for why two is not a row of two).
  *    It is also the one look whose numbers were set from a *reference picture*
@@ -142,24 +142,28 @@ class BallLook(
     val bubbleR: Float,
 
     /**
-     * 水滴的颜色：轮廓那一圈，以及内部那层薄雾。
+     * The colour of the droplet: the ring of its outline, and the thin mist inside.
      *
-     * 按 look 给，因为它决定的是"边比球体暗还是亮"。奶油球是浅色，水滴的边
-     * 读作**折射**（暗）；果冻球本身就是近黑，暗边没有对手，只能反过来用亮边。
+     * Given per look, because it decides whether the edge is darker or lighter
+     * than the ball. A cream ball is pale, so the droplet's edge reads as
+     * **refraction** (dark); a jelly ball is itself near-black, where a dark edge
+     * has nothing to contrast against, so it has to use a bright edge instead.
      */
     val bubbleColor: FloatArray,
 
-    /** 边缘收紧程度。小 = 一圈宽晕，大 = 一条细线。 */
+    /** How tightly the edge is drawn. Small = a wide halo, large = a thin line. */
     val bubblePow: Float,
 
-    /** 高光点的收紧程度。 */
+    /** How tightly the highlight point is drawn. */
     val bubbleShine: Float,
 
     /**
-     * 内部那层很薄的雾，0 = 完全透明。
+     * The very thin layer of mist inside; 0 = completely transparent.
      *
-     * 故意留一点点而不是 0：一个只有轮廓的水滴在缩略图尺寸下会读成一个圆环，
-     * 而带一点厚度才读成"一颗"。0.10 大约等于球体亮度被压掉 1.7%。
+     * Deliberately left at a little rather than 0: a droplet with only an outline
+     * reads as a ring at thumbnail size, while a bit of thickness is what makes
+     * it read as "one drop". 0.10 is roughly equivalent to the ball's brightness
+     * being knocked down by 1.7%.
      */
     val bubbleInner: Float,
 
@@ -611,7 +615,7 @@ class BallLook(
      *    In 8-bit on an ink body that is a ~7/255 difference: invisible. The
      *    brow's ends and its top edge, the parts that cross the *body* rather
      *    than the eye, disappeared; all that survived was the notch it cut out
-     *    of the white eye. Hence the report "眉毛和脸部颜色接近，看不清".
+     *    of the white eye. Hence the report "the brow and the face are close in colour, hard to make out".
      *
      * The fix is to aim at the **middle of the range the brow has to work in**,
      * not at the body:
@@ -740,7 +744,7 @@ class BallLook(
      * so a look that does not mention this is drawn exactly as it was. Raise it
      * for a rabbit: at 2 a flap is a cone with a blunt end, and standing a cone
      * up gets you a horn however long you make it — which is how the first
-     * 贱贱兔 shipped. The length and the lean were both already right; this was
+     * Cheeky Bunny shipped. The length and the lean were both already right; this was
      * the parameter that was missing.
      */
     val earTaper: Float = 2f,
@@ -789,7 +793,7 @@ class BallLook(
     // but `R` and its own `gl`, so there is no cycle to walk into.
 
     /**
-     * 火山 TTS speaker id this character speaks with, or blank for the fallback
+     * Volcano TTS speaker id this character speaks with, or blank for the fallback
      * in `VoiceConfig.lookSpeaker` (the compiled-in [VoiceConfig.TTS_SPEAKER]).
      *
      * Blank is **not** "silent" — it means *this look has no opinion* and the
@@ -843,7 +847,7 @@ class BallLook(
  * a look by scanning for the first `\n)`, so prose living inside the
  * parentheses can truncate the parameter check.
  *
- * **The brief is "粗俗大大咧咧" — a loud, crude, sloppy workman — and the
+ * **The brief is "crude and sloppy" — a loud, crude, sloppy workman — and the
  * emphasis stays on the second half of every bullet.** The reason each bullet
  * fences the character in is the same one that fences the imp's mischief: a
  * model will read "loves to complain" as permission to drag its feet, half-do
@@ -899,7 +903,7 @@ private val BAJIE_PERSONA = """
  *
  * The first version of this look was a pastel-pink piglet and the user read it
  * exactly that way: blush, gloss, bead eyes, and ears that were technically
- * drawn but never *seen*. 猪八戒 is a **coarse adult male**, and the signals
+ * drawn but never *seen*. Zhu Bajie is a **coarse adult male**, and the signals
  * for that are specific:
  *
  * * **Hide, not lacquer.** [bodyGloss] is matte and [bodyBase] is an earthy
@@ -957,7 +961,7 @@ val BAJIE = BallLook(
     // belongs to. This one is 0.092 — three quarters — hence 0.77. [ANDEE] carries
     // 1.5 at 0.175 for the same reason, in the other direction.
     arcScale = 0.77f,
-    // A grin stretched to the corners of the face: 大大咧咧 is a mouth shape
+    // A grin stretched to the corners of the face: "sloppy" is a mouth shape
     // before it is anything else. Still under the muzzle, so the snout keeps
     // the middle of the face.
     mouthR = 0.220f,
@@ -1205,7 +1209,7 @@ val ANDEE = BallLook(
  * has to live inside, and `LocalPrompt.personaBlock` for the wrapper that states
  * them to the model.
  *
- * **The brief is 撩人 / 黏糊 / 主动, and the trap is that all three are ways of
+ * **The brief is flirty / clingy / proactive, and the trap is that all three are ways of
  * taking something from the user.** Clingy can become needy (making the person
  * manage the device's feelings), teasing can become withholding, and proactive
  * can become acting on its own say-so. So every bullet pairs the trait with the
@@ -1311,7 +1315,7 @@ val CREAM = BallLook(
     //
     // Upright, and that is the whole of the change: BAJIE's ears flop down past
     // a right angle and IMP's horns rake back, so the one silhouette in the set
-    // with something *standing up* on it is the one that reads as alert. 机灵
+    // with something *standing up* on it is the one that reads as alert. Alertness
     // is a shape before it is a material, and this is the cheapest shape that
     // says it.
     //
@@ -1377,7 +1381,7 @@ val CREAM = BallLook(
     // deliberate: it is what "inner-down" means on a boar, and it is the reason
     // its brows read as a scowl rather than as a stroke floating on the face.)
     //
-    // 机灵 now rests on the ears alone, which is the half that was doing the
+    // Alertness now rests on the ears alone, which is the half that was doing the
     // real work anyway: [earH] is a *silhouette* that crosses the body outline,
     // while a brow is only ever a mark on the face plane, and a mark can only
     // be as strong as the contrast it is drawn in. If the face now reads flat,
@@ -1387,7 +1391,7 @@ val CREAM = BallLook(
     // [BAJIE]: a cut is only visible where the *white* of an eye survives it.
     // This eye is the dark disc itself, so a cut does not draw a brow — it just
     // makes the disc smaller.
-    // 柔美女友: soft and close, which is the kitten's whole manner. Same
+    // Soft Beauty Girlfriend: soft and close, which is the kitten's whole manner. Same
     // `*_uranus_bigtts` family as the fallback, so no `tts_resource_id` change.
     voice = "zh_female_roumeinvyou_uranus_bigtts",
     persona = CREAM_PERSONA,
@@ -1711,10 +1715,10 @@ val IMP = BallLook(
  * declarations read as a table of values, and `tools/check_look_sync.py` slices a
  * look by scanning for the first `\n)`.
  *
- * **The brief is 贱, and the trap in it is different from the imp's.** "A little
- * bit evil" tempts a model into withholding; 贱 tempts it into *contempt* —
+ * **The brief is "cheap/naughty", and the trap in it is different from the imp's.** "A little
+ * bit evil" tempts a model into withholding; "cheap/naughty" tempts it into *contempt* —
  * sarcasm aimed at the person holding the device, pet names that are really
- * insults, "I told you so" with the knife in. That is not what makes a 贱贱兔
+ * insults, "I told you so" with the knife in. That is not what makes a Cheeky Bunny
  * funny. What makes it funny is that it is **shameless rather than superior**:
  * it preens, it fishes for a thank-you, it takes credit for an errand that took
  * one tool call, and it is pleased with itself in a way nobody could be
@@ -1761,9 +1765,9 @@ private val RABBIT_PERSONA = """
 """.trimIndent()
 
 /**
- * 贱贱兔: long narrow ears, two front teeth, a crooked little smirk.
+ * Cheeky Bunny: long narrow ears, two front teeth, a crooked little smirk.
  *
- * The brief was 「表情和性格」 for a named character, so the two halves are
+ * The brief was "expression and personality" for a named character, so the two halves are
  * [persona] and everything above it — and the face half is three signals,
  * ordered the way the imp's are, strongest first.
  *
@@ -1812,7 +1816,7 @@ private val RABBIT_PERSONA = """
  *   the only asymmetric feature on any ball here, and the smug read lives in
  *   it: the ears and the teeth say *rabbit*, the tilted mouth and a pair of
  *   barely-lowered lids ([eyeCut] 0.16 — enough to flatten the top of the eye,
- *   nowhere near the imp's glare) say 贱. A level mouth is a face that is only
+ *   nowhere near the imp's glare) say "cheap/naughty". A level mouth is a face that is only
  *   being pleasant.
  *
  * **Why white is three numbers and not one.** The reference is a snow-white
@@ -2036,7 +2040,7 @@ val RABBIT = BallLook(
     // this character — and that argument was about the wrong axis. Bright and
     // young is the *house* manner: it is the voice this device uses when it has
     // no character at all, so a look wearing it is a look that sounds like the
-    // tablet. 贱贱兔 is a bit, and a bit has to be audible the moment it opens
+    // tablet. Cheeky Bunny is a bit, and a bit has to be audible the moment it opens
     // its mouth. Same `*_uranus_bigtts` family as the fallback, so it needs no
     // change to `tts_resource_id`.
     voice = "zh_female_peiqi_uranus_bigtts",
@@ -2048,7 +2052,7 @@ val RABBIT = BallLook(
  * has to live inside, and `LocalPrompt.personaBlock` for the wrapper that states
  * them to the model.
  *
- * **The brief is 憨 — simple-hearted, not simple-minded — and that distinction
+ * **The brief is "simple-hearted" — simple-hearted, not simple-minded — and that distinction
  * is the entire thing this text has to defend.** Every other persona here fences
  * off a way of being *unpleasant*: the pig must not be lazy, the imp must not
  * withhold, the rabbit must not sneer. This one has the opposite failure mode,
@@ -2059,7 +2063,7 @@ val RABBIT = BallLook(
  * That is a broken device wearing a costume, and the user cannot tell it from a
  * real fault, which is the one thing no persona here is allowed to cost them.
  *
- * So the warmth is in the *wording* and the competence is never touched. 憨 here
+ * So the warmth is in the *wording* and the competence is never touched. "Simple-hearted" here
  * means plain speech, no cleverness, enthusiasm about small things, and taking
  * people at their word. It does not mean slow tools or soft facts.
  *

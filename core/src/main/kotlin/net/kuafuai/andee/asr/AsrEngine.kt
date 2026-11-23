@@ -3,13 +3,13 @@ package net.kuafuai.andee.asr
 /**
  * One speech-recognition session, whichever backend is behind it.
  *
- * The shape is 火山's, because 火山 was here first: open a session, push PCM
+ * The shape is Volcano (ByteDance Volcano Engine)'s, because Volcano (ByteDance Volcano Engine) was here first: open a session, push PCM
  * into it as it arrives, ask it to finish, wait for the final line. Both
  * backends fit it and neither had to be reshaped to fit the other, which is
  * the only reason this interface exists rather than a branch inside
  * [AsrController].
  *
- * Both backends are streaming ones — 火山 over its own binary protocol, Google
+ * Both backends are streaming ones — Volcano (ByteDance Volcano Engine) over its own binary protocol, Google
  * over the Gemini Live API — which is why they reduce to the same five calls.
  * **The caller's silence rule reads [Listener.onPartial] and nothing else**,
  * which is what makes the two engines interchangeable rather than merely
@@ -24,7 +24,7 @@ interface AsrEngine {
      * included**.
      *
      * Asked of the engine rather than fixed by the caller, because the two
-     * differ by more than a fudge factor and the reason is structural. 火山
+     * differ by more than a fudge factor and the reason is structural. Volcano (ByteDance Volcano Engine)
      * produces a final *only* in response to being told the utterance is over,
      * so its answer is on its way as soon as the question is asked and half a
      * second covers it. The Gemini Live API ends turns on its own voice
@@ -34,7 +34,7 @@ interface AsrEngine {
      *
      * One shared number therefore cannot be right for both, and the earlier
      * version of this was exactly that mistake in reverse: raising the shared
-     * value to suit Google quietly made 火山 slower to give up on a server that
+     * value to suit Google quietly made Volcano (ByteDance Volcano Engine) slower to give up on a server that
      * had stopped answering.
      */
     val finalWaitMs: Long
@@ -44,7 +44,7 @@ interface AsrEngine {
      * itself.
      *
      * **Two meanings, and which one applies depends on the engine.** For one
-     * that never announces an end of turn this *is* what ends the turn — 火山
+     * that never announces an end of turn this *is* what ends the turn — Volcano (ByteDance Volcano Engine)
      * has no such signal, so a pause is all there is. For one that does
      * (the Live API reports `turnComplete` from its own voice detector), this
      * is the backstop for when that report does not arrive, and the only thing
@@ -123,7 +123,7 @@ interface AsrEngine {
      * Block until the final line has been delivered, or [timeoutMs] passes.
      *
      * The timeout is the caller's because the two backends need very different
-     * ones: 火山 answers in ~500 ms, while a Google request carries the whole
+     * ones: Volcano (ByteDance Volcano Engine) answers in ~500 ms, while a Google request carries the whole
      * utterance and has a network round trip of its own.
      */
     fun waitFinished(timeoutMs: Long): Boolean

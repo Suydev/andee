@@ -21,7 +21,7 @@ import java.time.ZoneId
  * spent in its first two hours.
  *
  * **Nothing here asks whether the user is there, or what time of day it is.** The device is Andee's own; it gets up
- * when something it cares about needs it, and the user turns that off in settings (自己动起来) or stops it by
+ * when something it cares about needs it, and the user turns that off in settings ("get moving on your own") or stops it by
  * tapping the ball. The budgets are the brake.
  *
  * **Fails closed: no key, a failed call, an unreadable answer → sleep.** Not acting is always safe here.

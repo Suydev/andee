@@ -52,7 +52,7 @@ class Plans(
         val id: String,
         /** `HH:mm`, or blank when the item has only a [slot]. */
         val time: String,
-        /** A loose time ("午饭前", "when they first talk to me"), for items without a clock time. */
+        /** A loose time ("before lunch", "when they first talk to me"), for items without a clock time. */
         val slot: String,
         /** `remind` / `ask` / `prepare` / `follow_up`. */
         val kind: String,
@@ -121,7 +121,7 @@ class Plans(
      * `note.directions` and `note.day_plan`. Throws [IllegalArgumentException] with a sentence for the model
      * on a malformed call; refusals that are the user's limits come back as results that say why.
      *
-     * @param bubblesPerDay how many bubbles the user's 主动招呼 level allows a day, so a plan can be told it
+     * @param bubblesPerDay how many bubbles the user's proactive greeting level allows a day, so a plan can be told it
      *   asked for more than will ever be shown.
      */
     fun handle(method: String, p: JSONObject?, bubblesPerDay: Int): JSONObject = when (method) {

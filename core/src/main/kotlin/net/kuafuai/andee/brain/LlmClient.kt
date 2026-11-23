@@ -240,15 +240,15 @@ class LlmClient(
             assistantMessage = sanitizeAssistant(msg),
             promptTokens = usage?.optInt("prompt_tokens") ?: 0,
             completionTokens = usage?.optInt("completion_tokens") ?: 0,
-            // 命中缓存的 prompt 有多少。火山方舟（现在的上游）把它放在
-            // usage.prompt_tokens_details.cached_tokens 里，扁平的
-            // prompt_cache_hit_tokens 是 DeepSeek 自家 API 的字段 —— 方舟不发。
-            // optInt 取不到就是 0，所以之前每一行日志都写 cached 0，
-            // 看着像缓存没生效，其实是根本没读对地方。
-            // 两个都认，以后换上游不用再动这里。
+            // How much of the prompt hit the cache. Volcano/Ark (the current upstream) puts it in
+            // usage.prompt_tokens_details.cached_tokens; the flat
+            // prompt_cache_hit_tokens is a field of DeepSeek's own API — Ark doesn't send it.
+            // optInt returns 0 when it can't find the key, so every log line used to read cached 0,
+            // which looked like the cache wasn't working when in fact we were simply reading the wrong place.
+            // Recognize both, so a future change of upstream won't need edits here.
             cachedTokens = usage?.let { u ->
-                // optInt 对「key 不存在」和「值是 0」返回的一样，所以先 has 再取 ——
-                // 否则嵌套块在但缺 cached_tokens 时不会回落到扁平字段。
+                // optInt returns the same thing for "key absent" and "value is 0", so check has before reading —
+                // otherwise, when the nested block is present but cached_tokens is missing, it won't fall back to the flat field.
                 val details = u.optJSONObject("prompt_tokens_details")
                 if (details != null && details.has("cached_tokens")) details.optInt("cached_tokens")
                 else u.optInt("prompt_cache_hit_tokens")

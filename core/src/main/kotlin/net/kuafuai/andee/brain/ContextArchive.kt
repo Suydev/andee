@@ -20,7 +20,7 @@ import java.util.Locale
  * stands in for it names its id, and `read_earlier` reads it back.
  *
  * **What it keeps.** The words both ways, which tool was used, and each tool result up to [TOOL_CHARS] — the
- * result is often the thing asked about later (「那个价格是多少」). Not screenshots, and **not the results of the
+ * result is often the thing asked about later (e.g. "How much was that price?"). Not screenshots, and **not the results of the
  * tools [render]'s `sensitive` names** (the vault, text messages): these files are plain text, and a verification
  * code or an account field has no business outliving the turn it was read in.
  *
@@ -94,7 +94,7 @@ class ContextArchive(private val dir: File) {
         all.takeLast(LIST_MAX).reversed().joinToString("\n") { o ->
             val span = if (o.optLong("from") > 0) "${f.format(Date(o.optLong("from")))}–${f.format(Date(o.optLong("to")))}"
             else f.format(Date(o.optLong("at")))
-            "#${o.optLong("id")} $span · ${o.optInt("messages")} msgs · ${o.optInt("chars")} chars · 「${o.optString("first")}」"
+            "#${o.optLong("id")} $span · ${o.optInt("messages")} msgs · ${o.optInt("chars")} chars · \u300C${o.optString("first")}\u300D"
         }
     }
 
@@ -181,17 +181,17 @@ class ContextArchive(private val dir: File) {
                         if (calls != null) for (k in 0 until calls.length()) {
                             val f = calls.optJSONObject(k)?.optJSONObject("function") ?: continue
                             sb.append("(calling ").append(f.optString("name")).append(' ')
-                                .append(f.optString("arguments").take(300)).append("）\n")
+                                .append(f.optString("arguments").take(300)).append("\uFF09\n")
                         }
                     }
                     "tool" -> {
                         val name = names[m.optString("tool_call_id")].orEmpty()
                         val body = raw.orEmpty()
                         when {
-                            sensitive(name) -> sb.append("（").append(name).append(" — result not kept)\n")
+                            sensitive(name) -> sb.append("\uFF08").append(name).append(" — result not kept)\n")
                             body.isBlank() -> {}
-                            body.length <= TOOL_CHARS -> sb.append("（").append(name).append(" returned)").append(body).append('\n')
-                            else -> sb.append("（").append(name).append(" returned, first ").append(TOOL_CHARS).append(" chars / ")
+                            body.length <= TOOL_CHARS -> sb.append("\uFF08").append(name).append(" returned)").append(body).append('\n')
+                            else -> sb.append("\uFF08").append(name).append(" returned, first ").append(TOOL_CHARS).append(" chars / ")
                                 .append(body.length).append(" chars total)").append(body.take(TOOL_CHARS)).append('\n')
                         }
                     }

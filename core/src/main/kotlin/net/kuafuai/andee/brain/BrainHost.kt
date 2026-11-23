@@ -53,7 +53,7 @@ interface BrainHost {
     fun platformPrompt(): String = ""
 
     /**
-     * 守卫: the paragraph the user wrote in the notebook, placed last in the system prompt and above everything
+     * Guard: the paragraph the user wrote in the notebook, placed last in the system prompt and above everything
      * else in it. Empty for none — and for a host that runs someone else's request ([GuestHost]), whose owner
      * did not write it for them.
      */

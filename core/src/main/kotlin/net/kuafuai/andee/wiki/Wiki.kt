@@ -55,7 +55,7 @@ data class Meta(
     val where: String,
     /** How to reach it on that backend: a relative path, a URL. */
     val ref: String,
-    /** "查到的 / 他说的 / 我推断的", and from what. Never blank. */
+    /** "looked up / he said / I inferred", and from what. Never blank. */
     val source: String,
     /** One or two lines of what it says, refreshed whenever the body is read or written. */
     val summary: String,

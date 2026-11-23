@@ -84,7 +84,7 @@ class GoogleTts(
      * [TtsEngine]'s call order: the driver pushes its text from `onOpen`, so
      * `onOpen` has to come before the request that would tell us the real
      * rate. Gemini's speech output is L16 at 24 kHz, which is also what the
-     * 火山 speaker reports, so the two backends hand the player the same
+     * Volcano (ByteDance Volcano Engine) speaker reports, so the two backends hand the player the same
      * number. [checkRate] verifies it against the response and says so loudly
      * if a future model disagrees.
      */

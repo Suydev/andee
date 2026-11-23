@@ -3,7 +3,7 @@ package net.kuafuai.andee.brain
 /**
  * What a turn is doing, as it happens — for the body to show, so a turn that is waiting on the model or working
  * through an app does not look stuck. Not conversation and not an event: nothing here is kept by the brain or
- * read back into the model. The body decides what to keep (a collapsed "做了 6 步 · 38 秒" row when the turn ends).
+ * read back into the model. The body decides what to keep (a collapsed "6 steps done · 38 seconds" row when the turn ends).
  *
  * Emitted on the loop thread, for every turn that answers someone (not the silent reviews, not a work turn,
  * which has its own timeline rows). Each body must hand it off quickly; nothing here may block.
@@ -18,7 +18,7 @@ sealed class WorkStep {
     /** The model's reasoning for [step], whole; the body cuts it into lines. Only when thinking is on. */
     data class Thought(val step: Int, val text: String) : WorkStep()
 
-    /** What the model wrote before calling its tools ("我看一下屏幕"), markers already stripped. */
+    /** What the model wrote before calling its tools ("let me take a look at the screen"), markers already stripped. */
     data class Said(val step: Int, val text: String) : WorkStep()
 
     /** One tool call, as a line a person can read. */

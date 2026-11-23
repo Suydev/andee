@@ -22,7 +22,7 @@ object PetPersonas {
     """.trimIndent()
 
     /**
-     * Andee娘 (2026-11-06, replacing 大肥鱼): the plush ball itself turned into a catgirl — its blue felt, two tiny horns
+     * Andee-chan (2026-11-06, replacing Big Fat Fish): the plush ball itself turned into a catgirl — its blue felt, two tiny horns
      * in front of cat ears, a puffy plush hoodie with paw mittens, a cat tail, the core worn like a bell. Soft, a bit shy, earnest about her work.
      * She is Andee, not someone Andee is playing: the manner is a softer register of the same individual.
      */
@@ -49,7 +49,7 @@ object PetPersonas {
     """.trimIndent()
 
     /**
-     * 小猫 (2026-11-05, replacing the gentle boyfriend): a round little kitten — playful, a bit proud, affectionate.
+     * Kitten (2026-11-05, replacing the gentle boyfriend): a round little kitten — playful, a bit proud, affectionate.
      */
     val CAT = """
         You are wearing the kitten today — a round, fluffy little cat with small horns and a glowing charm on its

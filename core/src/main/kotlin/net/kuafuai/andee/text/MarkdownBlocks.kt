@@ -117,7 +117,7 @@ object Md {
 
     /**
      * A single newline inside a paragraph stays a line break — GitHub-comment style, not strict Markdown. What the
-     * model writes is mostly one point per line (「我是 Andee。\n最近在忙：…」), and joining those lines, as strict
+     * model writes is mostly one point per line (e.g. "I am Andee.\nLately I've been busy with: …"), and joining those lines, as strict
      * Markdown does, ran its self-description together into one sentence.
      */
     private fun joinLines(lines: List<String>): String = lines.joinToString("\n") { it.removeSuffix("\\") }

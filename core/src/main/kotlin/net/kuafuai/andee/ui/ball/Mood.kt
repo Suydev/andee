@@ -74,11 +74,12 @@ class Face(
      */
     val gape: Float = 0f,
     /**
-     * 鼻涕泡的浓度，0 = 没有。
+     * The density of the snot bubble, 0 = none.
      *
-     * 只有 SLEEPING 用。它不是装饰性的加法：一颗睡着的球和一颗静止的球在
-     * 缩略图尺寸下几乎分不出来（都是深色弧 + 一点腮红），而一个在自己呼吸的
-     * 泡是**动**的，动的东西在小尺寸下比颜色更容易被认出来。
+     * Only SLEEPING uses it. It is not a decorative add-on: a sleeping ball and
+     * a still ball are almost indistinguishable at thumbnail size (both a dark
+     * arc plus a little blush), whereas a bubble breathing on its own is
+     * **moving**, and motion is easier to recognize at small sizes than colour.
      */
     val bubble: Float = 0f,
 )
@@ -186,14 +187,17 @@ val FACE: Map<Mood, Face> = mapOf(
         rgb(0xfb7185), 0.68f, 0.45f, -0.5f, 1.1f, -0.07f, 0.02f, 0.22f,
         blush = 0.42f,
     ),
-    // 和 CALM 同一个颜色 —— 这一条是反过来的决定。
+    // Same colour as CALM — this row is the opposite decision.
     //
-    // 这里原本是全表唯一一行去饱和的（连同脸颊一起褪色），理由是"睡着的球
-    // 应该一眼看出是熄了"。但实际做出来的是**换了一种材质**：奶油球睡着时身体
-    // 转灰、眼睛和嘴跟着转灰，于是"睡着"看起来像被关掉了，而不是它累了。
-    // 睡是一种形状 —— 那条 `^ ^` 眼睛加上鼻子下面那颗水滴 —— 颜色不必替它
-    // 承担这件事，而一旦它承担了，这颗球在一天里最安静的那几个小时里就不是
-    // 它自己了。
+    // This used to be the only desaturated row in the whole table (the cheeks
+    // faded along with it), on the grounds that "a sleeping ball should be
+    // visibly switched off at a glance". But what it actually produced was
+    // **a change of material**: when the creamy ball sleeps, its body turns
+    // grey and the eyes and mouth grey with it, so "asleep" looks like having
+    // been switched off rather than like being tired. Sleep is a shape — that
+    // `^ ^` eye plus the droplet under the nose — and colour does not have to
+    // carry that for it; once it does, the ball stops being itself during the
+    // quietest hours of the day.
     Mood.SLEEPING to Face(
         rgb(0x9db4ff), 0.1f, 0.06f, 0.16f, 0.45f, 0.11f, 0f, 0f,
         eyeArc = 0.85f, spread = 0.9f, blush = 0.16f, bubble = 1f,
@@ -342,13 +346,15 @@ const val CLING_HIDDEN = 0.5f
  * with. This file stays about moods.
  */
 /**
- * 超过这个值，屏幕上那只眼睛就是 `^ ^` 这条弧，圆眼不是主角了。
+ * Past this value, the eye on screen is the `^ ^` arc and the round eye is no
+ * longer the main act.
  *
- * 两处共用一个数、一个意思：
- *   * 渲染器还要不要往眼睛里画瞳孔和高光；
- *   * 状态机还要不要眨眼 —— 眼皮是给睁着的眼睛合上的，当眼睛本身就是一条
- *     "已经合上"的弧时，眨一下只会把弧抽动一下。睡着的球每三秒抖一下就是
- *     这么来的。
+ * Two places share one number and one meaning:
+ *   * whether the renderer still draws a pupil and highlight in the eye;
+ *   * whether the state machine still blinks — a lid is for closing an *open*
+ *     eye, and when the eye is itself an arc that is "already shut", a blink
+ *     only twitches the arc. That is where the sleeping ball flinching every
+ *     three seconds came from.
  */
 const val ARC_EYE_AT = 0.5f
 

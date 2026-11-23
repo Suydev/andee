@@ -5,9 +5,9 @@ import net.kuafuai.andee.config.Tasks
 import org.json.JSONObject
 
 /**
- * A job handed to the agent on another device is a 「事」 on this device until it is delivered, exactly as a job handed to
+ * A job handed to the agent on another device is a "task" on this device until it is delivered, exactly as a job handed to
  * a dsh on this one is (`DshTaskLink` on the Mac): the task waits on the worker, the worker's report answers that wait, and
- * 在办 shows it. The device sets the wait and answers it; the model only names the task.
+ * "in progress" shows it. The device sets the wait and answers it; the model only names the task.
  *
  * The record lives here, on the device whose Andee decided to send the job. The computer holds the worker and its folder,
  * not the task (`Worker.origin`).
@@ -15,7 +15,7 @@ import org.json.JSONObject
 class RemoteAgentTasks(private val tasks: () -> Tasks) {
 
     /**
-     * Before the call: the 「事」 this job is for — the one the model named, else the one the continued worker was on, else
+     * Before the call: the "task" this job is for — the one the model named, else the one the continued worker was on, else
      * a new one. Throws, with the reason the model reads, when it names one that is not open.
      */
     fun forJob(args: JSONObject, fromUser: Boolean): String {

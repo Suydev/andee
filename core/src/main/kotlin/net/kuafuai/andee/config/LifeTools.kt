@@ -219,7 +219,7 @@ class LifeTools(
             "wait" -> {
                 val on = a.optString("on", "person")
                 val t = book.get(id) ?: return fail("no task $id")
-                // The model says "waiting on 他" meaning the user (measured on the phone, 11-09): a person wait the
+                // The model says "waiting on him" meaning the user (measured on the phone, 11-09): a person wait the
                 // device would try to match against notifications forever. The user, by any name, is `user`.
                 val nm = a.optString("name").trim()
                 val isUser = on == "user" || (on == "person" && a.optString("chat").isBlank() &&
@@ -246,7 +246,7 @@ class LifeTools(
                 if (elsewhere && !a.optBoolean(TASK_SENT)) {
                     return fail("Nothing was sent on this turn, and ${t.id} is for ${t.deliverTo.short()}. Deliver it first (reply to them), then mark it done — or task step if it is not finished.")
                 }
-                // Delivered, not closed: whether it is finished is the user's to say (`confirm`, or 在办's 办完了).
+                // Delivered, not closed: whether it is finished is the user's to say (`confirm`, or the "Done" on the "In progress" tab).
                 book.deliver(id, a.optString("result")).fold({
                     changed(it, "delivered").put("note", "Marked delivered. It stays in hand until the user confirms it is done — in In progress, or by telling you so on their own turn (then call confirm).")
                 }, { fail(it.message) })

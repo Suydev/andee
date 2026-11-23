@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * What a worker on another device is doing now: the same facts the Mac shows for its own (step, time, its checklist, the
- * newest actions), sent to the device that handed the job over so 在办 can show them there too.
+ * newest actions), sent to the device that handed the job over so "in progress" can show them there too.
  *
  * A job handed off used to be one row and then nothing for twenty minutes; on the Mac that is fixed by `DshLive`, and this
  * is the same for a phone. Memory only: it describes a process that is alive somewhere else.
@@ -61,7 +61,7 @@ object RemoteProgress {
     /** Everything, when the link to the computer is gone for good (unpaired): nothing here can still be heard from. */
     fun clear() = live.clear()
 
-    /** One line for a task's row in 在办: step, time, then what it is on. The same shape as the Mac's `DshStatus.forTask`. */
+    /** One line for a task's row in "in progress": step, time, then what it is on. The same shape as the Mac's `DshStatus.forTask`. */
     fun line(s: State, now: Long, zh: Boolean): String {
         val sec = ((now - s.startedAt) / 1000).coerceAtLeast(0)
         val head = (if (zh) "Step ${s.step} · " else "step ${s.step} · ") + "%d:%02d".format(sec / 60, sec % 60)

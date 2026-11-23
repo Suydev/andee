@@ -45,12 +45,13 @@ class EmotionState {
     var spread = 1f; private set   // ring belt radius multiplier
 
     /**
-     * 鼻涕泡的浓度，0..1。跟 [blush] 一样是**淡入淡出**的：它决定泡在不在，
-     * 不决定泡多大 —— 大小是 [bubbleScale] 的事。
+     * The density of the snot bubble, 0..1. Like [blush] it **fades in and out**:
+     * it decides whether the bubble is there, not how big it is — its size is
+     * [bubbleScale]'s job.
      */
     var bubble = 0f; private set
 
-    /** 泡自己的一呼一吸，0.30（瘪）..1.00（鼓）。 */
+    /** The bubble's own breathing in and out, 0.30 (deflated)..1.00 (inflated). */
     var bubbleScale = 1f; private set
 
     private var bubblePhase = 0f

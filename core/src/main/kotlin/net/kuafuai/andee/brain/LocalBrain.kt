@@ -321,7 +321,7 @@ class LocalBrain(
          * Andee woke itself: a care of its own came due (design: `docs/design/inner-drive.zh-CN.md` §8). It is
          * the user's own Andee acting on something it was given, so it is **not** [untrusted]; but nobody asked,
          * so it does not speak — no subtitle, no voice, no card of its own accord. Its words go to the diary, a
-         *待批 item or a bubble, never aloud. What it may call is a *set the territory names* (see
+         * pending approval item or a bubble, never aloud. What it may call is a *set the territory names* (see
          * [BrainHost.workTools]), not the whole list.
          */
         WORK,
@@ -900,12 +900,12 @@ class LocalBrain(
 
     /**
      * Loop thread only. A task that stopped before it was done — at the step limit, or cut by the repeat
-     * guard — and the user may yet say 继续 to.
+     * guard — and the user may yet say "continue" to.
      *
      * Without this the stop was invisible to the model and the task fragile. The sentence the user heard was
      * never in the history, so the model did not know it had been cut off; and the trim protects only the
-     * newest turn, so the moment anything else became newest (a todo firing between the stop and 继续 —
-     * measured, 10-22 11:30, 104 messages trimmed to 52) the whole task was dropped and 继续 meant nothing.
+     * newest turn, so the moment anything else became newest (a todo firing between the stop and "continue" —
+     * measured, 10-22 11:30, 104 messages trimmed to 52) the whole task was dropped and "continue" meant nothing.
      * While this is set the task's messages are kept by the trim, the harvest and topic folds alike, and every
      * user message says what was stopped. Cleared by a later turn that acts and finishes, or by [UNFINISHED_TTL_MS].
      */
@@ -927,7 +927,7 @@ class LocalBrain(
     /**
      * End a turn that is not done: the sentence goes into the history as well as to the user, every tool call
      * the model already made is answered (an unanswered `tool_call_id` is a 400 on the next request, which is
-     * how 继续 used to fail outright after the repeat guard), and the task is marked [unfinished].
+     * how "continue" used to fail outright after the repeat guard), and the task is marked [unfinished].
      */
     private fun stopUnfinished(start: JSONObject, request: String, steps: Int, said: String, pending: List<LlmClient.ToolCall>) {
         for (tc in pending) {
@@ -942,7 +942,7 @@ class LocalBrain(
     /**
      * Answer the tool calls a cut-off turn left hanging. A turn the user stopped (or talked over) returns
      * between one tool call and the next, so its last assistant message can name calls that never got a
-     * `tool` reply — and the API refuses the whole next request for it, which is 继续 failing outright.
+     * `tool` reply — and the API refuses the whole next request for it, which is "continue" failing outright.
      * Each missing reply is placed right after that message's own replies, where the API expects it.
      */
     private fun answerDangling() {
@@ -993,7 +993,7 @@ class LocalBrain(
         val clean = SpeechMood.strip(text).replace("[END]", "").trim()
         if (clean.isNotEmpty()) {
             val first = clean.lineSequence().first { it.isNotBlank() }.trim()
-                .let { l -> Regex("^.+?[。！？]|^.+?[.!?](?=\\s|$)").find(l)?.value ?: l }
+                .let { l -> Regex("^.+?[\u3002\uff01\uff1f]|^.+?[.!?](?=\\s|$)").find(l)?.value ?: l }
                 .let { if (it.length > QUIET_HEADLINE) it.take(QUIET_HEADLINE) + "…" else it }
             emit(BrainEvent(BrainEvent.Kind.QUIET, first, if (first == clean) "" else clean))
         }
@@ -1007,11 +1007,11 @@ class LocalBrain(
      * nobody asked about — currently one: the user closed an HTML page. The
      * alternative was to submit it as a user turn, and that is wrong twice
      * over: it costs a model call and a spoken sentence every time a page is
-     * dismissed ("好的，看完了" — noise), and it would arrive as something the
+     * dismissed ("OK, I've finished looking" — noise), and it would arrive as something the
      * user said, which it is not.
      *
      * It lands as a trailing `user` message, the same shape
-     * `ChatHistory.addUser("（…）")` already uses for the meeting transcript, so
+     * `ChatHistory.addUser("(…)")` already uses for the meeting transcript, so
      * the *next* turn reads it as context. Consequence worth knowing: if the
      * user never says anything again, the model never sees it either. That is
      * the intended trade — this is a fact to have on hand, not a prompt.
@@ -1196,7 +1196,7 @@ class LocalBrain(
             val scenes = host.scenesIndex()
             val flows = host.flowsIndex()
             // The pages it has made, the same way and for the same reason: a
-            // tool answers a question the brain thought to ask, and 「上次那个表格」
+            // tool answers a question the brain thought to ask, and "that spreadsheet from last time"
             // is exactly the question it does not know to ask. `list_pages` has
             // the full list; this is the four or five newest, to make the shelf
             // visible at all.
@@ -1218,7 +1218,7 @@ class LocalBrain(
             // reason as the plan line — it changes every time something is taken on, waited for or delivered.
             val tasks = host.tasksIndex()
             // Who this turn may touch: the sender it came from, and whoever an open task waits on or is for. Without
-            // it the model saw 「人」 only when it thought to look — which is how people went unrecorded and twice.
+            // it the model saw "people" only when it thought to look — which is how people went unrecorded and twice.
             val peopleLine = host.peopleIndex(turnSource?.personId)
             // Photos with no words: there is no sentence of the user's to take
             // the language from, so the bracketed fallback comes back for it.
@@ -1306,7 +1306,7 @@ class LocalBrain(
                         // position and the same reason as the other three, plus
                         // one of its own: what is NOT here is the point. A topic
                         // that was folded is gone from this conversation, so a
-                        // model with no index answers 「上次那个比价」 from a
+                        // model with no index answers "that price comparison from last time" from a
                         // one-line summary it half-remembers — or says it never
                         // happened. Seeing the title is what makes it go and read
                         // the real thing instead.
@@ -1348,7 +1348,7 @@ class LocalBrain(
                         } +
                         // Who this turn came from, as the device recorded it. See [Source].
                         (turnSource?.let { "\n\n" + it.forPrompt() } ?: "") +
-                        // A task cut off at the step limit, so 继续 has something to continue. See [Unfinished].
+                        // A task cut off at the step limit, so "continue" has something to continue. See [Unfinished].
                         unfinishedNote(),
                 )
                 // Once this turn is over, the index block is only the newest copy until the next one arrives; the clock,
@@ -1447,7 +1447,7 @@ class LocalBrain(
                     // The turn's closing words are for the log and the care's note, not for the user's ears.
                     workSummary = answer
                 } else if (!internal) {
-                    // A turn that did something and finished means the user has moved on — or that 继续 just
+                    // A turn that did something and finished means the user has moved on — or that "continue" just
                     // finished the job. Either way the stopped task no longer needs keeping.
                     if (acted) unfinished = null
                     if (turnQuiet) {
@@ -1848,12 +1848,12 @@ class LocalBrain(
         val from = history.indexOfFirst { it === fold.first }
         val until = history.indexOfFirst { it === fold.next }
         if (from < 1 || until <= from) {
-            host.logWarn(TAG, "fold of 「${fold.title}」 finished with no live range; dropped")
+            host.logWarn(TAG, "fold of \u300C${fold.title}\u300D finished with no live range; dropped")
             return
         }
         if (keepFrom() < until) {
-            // The stretch reaches into a task stopped before it was done; putting it away would take 继续's context.
-            host.logInfo(TAG, "fold of 「${fold.title}」 skipped: it reaches into an unfinished task")
+            // The stretch reaches into a task stopped before it was done; putting it away would take the "continue" command's context.
+            host.logInfo(TAG, "fold of \u300C${fold.title}\u300D skipped: it reaches into an unfinished task")
             return
         }
         val firstSaid = TopicSplitter.anchorText(fold.first)
@@ -1875,7 +1875,7 @@ class LocalBrain(
         if (rows.isEmpty() || rows.any { it.topicId != null }) {
             host.logWarn(
                 TAG,
-                "fold of 「${fold.title}」 could not be matched to the device rows " +
+                "fold of \u300C${fold.title}\u300D could not be matched to the device rows " +
                     "(first=${firstSaid.take(20)}, next=${nextSaid.take(20)}, rows=${rows.size}); kept as it was",
             )
             return
@@ -1900,7 +1900,7 @@ class LocalBrain(
             .put("role", "assistant")
             .put(
                 "content",
-                "$FOLD_MARKER_PREFIX「${topic.title}」 (topic #${topic.id}). It is finished and has been put " +
+                "$FOLD_MARKER_PREFIX\u300C${topic.title}\u300D (topic #${topic.id}). It is finished and has been put " +
                     "away; the back-and-forth is not in front of you any more. What it came to: " +
                     "${topic.summary} If you need the details, read it back with `get_topic` — do " +
                     "not answer about it from this summary alone, and do not say it never happened.)",
@@ -1918,7 +1918,7 @@ class LocalBrain(
         imageMessages.retainAll { m -> history.any { it === m } }
         photoMessages.retainAll { m -> history.any { it === m } }
         if (internalFromIndex > until) internalFromIndex -= (saved - 1)
-        host.logInfo(TAG, "topic put away: 「${topic.title}」 — $saved msgs, ${rows.size} rows → 1 marker, history now ${history.size}")
+        host.logInfo(TAG, "topic put away: \u300C${topic.title}\u300D — $saved msgs, ${rows.size} rows → 1 marker, history now ${history.size}")
     }
 
     // ------------------------------------------------------------------
@@ -1982,7 +1982,7 @@ class LocalBrain(
      */
     private fun attachUserPhotos(images: List<String>) {
         val content = JSONArray()
-        // "这是什么" next to a photo is exactly the trigger `camera_turn`'s
+        // "What is this" next to a photo is exactly the trigger `camera_turn`'s
         // description names, so say outright that the seeing is already done.
         content.put(
             LlmClient.textBlock(
@@ -2187,7 +2187,7 @@ class LocalBrain(
             host.logInfo(TAG, "harvest skipped: nothing changed since the last one")
             return
         }
-        // Never into a task the user may still say 继续 to — see [Unfinished].
+        // Never into a task the user may still say "continue" to — see [Unfinished].
         val cut = minOf(boundaryAtOrBefore(history.size - KEEP_TAIL_MESSAGES), keepFrom())
         if (cut < MIN_HARVEST_MESSAGES) {
             host.logInfo(TAG, "harvest skipped: only ${cut - 1} messages old enough to fold in")
@@ -2310,7 +2310,7 @@ class LocalBrain(
         msg.optString("role") == "user" && msg.opt("content") is String
 
     /**
-     * Cut back what is old and bulky, before the newest turn and before a task the user may still say 继续 to.
+     * Cut back what is old and bulky, before the newest turn and before a task the user may still say "continue" to.
      * Returns the characters saved. Loop thread only; see [ContextPruner].
      */
     private fun pruneOld(): Int {
@@ -2404,7 +2404,7 @@ class LocalBrain(
      * The clock that rides in on every user message.
      *
      * Follows the device's interface language instead of being pinned to
-     * `Locale.CHINA`. An English interface that stamps its own messages "周一"
+     * `Locale.CHINA`. An English interface that stamps its own messages "Monday"
      * feeds the model a Chinese signal on every single turn — which is exactly
      * the pull [LocalPrompt] §9 is written to resist, and it would be fighting
      * the very rule sitting next to it. The instant is the same either way;
@@ -2487,7 +2487,7 @@ class LocalBrain(
         private val NOT_DONE_KEYS = listOf("written", "added", "changed", "saved", "noted", "linked", "shared", "logged", "settled", "ok", "performed")
 
 
-        /** How long a task stopped at the step limit is kept ready for 继续. See [Unfinished]. */
+        /** How long a task stopped at the step limit is kept ready for "continue". See [Unfinished]. */
         private const val UNFINISHED_TTL_MS = 60 * 60_000L
 
         /**

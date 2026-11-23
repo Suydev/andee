@@ -66,7 +66,7 @@ object TopicSplitter {
      * never got an answer for — an unclosed tool call.
      *
      * A stretch is only foldable when nothing in it is still waiting. This is
-     * the mechanical half of "明确话题已经结束": a `tool_calls` with no matching
+     * the mechanical half of "the topic has clearly ended": a `tool_calls` with no matching
      * `tool` result behind it means the turn was interrupted, and folding a
      * stretch whose last act was an unanswered call would bury the one thing the
      * next turn needs to see.
@@ -92,7 +92,7 @@ object TopicSplitter {
      * The one place a wall-clock time exists in the history is that bracket —
      * see [LocalBrain.stamp] — and **it is not in a fixed format**: the stamp is
      * `yyyy-MM-dd EEE HH:mm` rendered in the *interface language*
-     * (`AppLocale.localeOf`), so a Chinese device writes `2026-10-15 周四 18:30`
+     * (`AppLocale.localeOf`), so a Chinese device writes `2026-10-15 Thu 18:30` with a Chinese weekday
      * and an English one `2026-10-15 Thu 18:30`, and the weekday is three
      * characters of whatever the locale says. Parsing it with one pattern is
      * therefore wrong on half the installs, which is the kind of bug that only
@@ -111,7 +111,7 @@ object TopicSplitter {
         if (open < 0) return 0L
         val close = text.indexOf(']', open)
         if (close < 0) return 0L
-        // `2026-10-15 周四 18:30` / `2026-10-15 Thu 18:30`, optionally followed
+        // `2026-10-15 Thu 18:30` (with a Chinese weekday) / `2026-10-15 Thu 18:30`, optionally followed
         // by ` · ui-language zh`.
         val body = text.substring(open + 5, close)
         val date = body.substringBefore(' ').trim()
@@ -242,14 +242,14 @@ object TopicSplitter {
      * one that opens it ([firstSaid]) and the one that opens the stretch after
      * it ([nextSaid]). Everything between them is the stretch. That is the whole
      * trick, and the reason it is not "first message to last message": the last
-     * thing said in a stretch is usually the assistant's 「好的。」, a sentence
+     * thing said in a stretch is usually the assistant's "OK.", a sentence
      * that occurs all over a conversation. Searching for it matches the final
      * one anywhere — in later stretches, in the one still going — and the fold
      * would mark live rows as belonging to the topic. A user sentence is far
      * more distinctive, and a pair of them bracketing the span leaves nothing to
      * search for in the middle.
      *
-     * A user sentence can still repeat (「继续」, 「好的」), so ties are broken by
+     * A user sentence can still repeat ("continue", "OK"), so ties are broken by
      * the clock: the row nearest the stamp, within [MATCH_TOLERANCE_MS]. With no
      * clock to go on ([firstAt]/[nextAt] ≤ 0, e.g. an unstamped note) the match
      * is accepted only when it is unique.
@@ -306,7 +306,7 @@ fun renderTopicText(history: List<JSONObject>, from: Int, until: Int): String {
                     val names = (0 until calls.length()).mapNotNull {
                         calls.optJSONObject(it)?.optJSONObject("function")?.optString("name")
                     }.filter { it.isNotBlank() }
-                    if (names.isNotEmpty()) sb.append("(used: ").append(names.joinToString("、")).append("）\n")
+                    if (names.isNotEmpty()) sb.append("(used: ").append(names.joinToString("\u3001")).append("\uFF09\n")
                 }
             }
             "tool" -> {
