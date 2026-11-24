@@ -30,12 +30,13 @@ A watched-folder pattern needs bounded ingestion: size cap, per-cycle cap, a set
 - `app/src/main/java/net/kuafuai/andee/net/CommandDispatcher.kt` — implement both tools. There is deliberately no hub bridge: the on-device brain is the default and the only caller.
 - `app/src/main/java/net/kuafuai/andee/ui/DropInboxUi.kt` — the card.
 - `app/src/main/java/net/kuafuai/andee/ui/DropPickerActivity.kt` — the non-launcher picker Activity (registered in `app/src/main/AndroidManifest.xml`), so a `Service` can receive a document result.
-- `app/src/main/java/net/kuafuai/andee/ui/SettingsUi.kt` — one row beside 保险箱/朋友 that opens the card.
+- `app/src/main/java/net/kuafuai/andee/config/VoiceConfig.kt` — `drop_max_bytes` added to `ALLOWED_KEYS`, with `dropMaxBytes()` reading it and falling back to 2 MB.
+- `app/src/main/java/net/kuafuai/andee/ui/SettingsUi.kt` — one drop-inbox row beside 保险箱/朋友 with a cap picker and a button to open the card.
 - `app/src/test/java/net/kuafuai/andee/config/DropInboxTest.kt`, `app/src/test/java/net/kuafuai/andee/config/DropInboxLabelsTest.kt`, `core/src/test/kotlin/net/kuafuai/andee/brain/DropTrustLatchTest.kt`, and `core/src/test/kotlin/net/kuafuai/andee/net/DropToolSchemasTest.kt`.
 
 ### Ingestion limits
 
-- 2 MB per file; larger files are listed with status `too_large` and are never read.
+- File size cap is a user setting, not a fixed limit: `VoiceConfig.dropMaxBytes(context)` returns `drop_max_bytes` (options 2/10/50 MB), defaulting to 2 MB. `DropInbox` takes the cap as a `() -> Long` provider so a settings change takes effect on the next scan without a rebuild. Files above the cap are listed with status `too_large` and are never read.
 - 10 files per scan cycle; the rest are picked up on the next scan.
 - 1.5 s settle after a write event before reading bytes.
 - Hidden files (leading dot) and directories are ignored.
@@ -78,7 +79,7 @@ The card uses only the existing glass vocabulary in `ui/Glass.kt`:
 
 ## Testing and acceptance
 
-- Host unit tests in `DropInboxTest.kt`: folder creation, scan/dedupe by hash+name, 2 MB cap, 10-per-cycle cap, settle handling, hidden-file skip, unsupported type status, corrupt-index rebuild, `markRead`. `DropInboxLabelsTest.kt` pins the size/status strings the card draws; with no Robolectric dependency in `app/`, overlay behaviour is verified on device, not in host tests.
+- Host unit tests in `DropInboxTest.kt`: folder creation, scan/dedupe by hash+name, 2 MB cap, 10-per-cycle cap, settle handling, hidden-file skip, unsupported type status, corrupt-index rebuild, `markRead`. `DropInboxLabelsTest.kt` pins the size/status strings the card draws; a cap-provider test changes the cap between two scans and checks the same file flips from `too_large` to readable. with no Robolectric dependency in `app/`, overlay behaviour is verified on device, not in host tests.
 - `DropTrustLatchTest.kt` (core) drives a scripted model through `drop_read` then `device.vault.list` and asserts both dispatches are untrusted. `DropToolSchemasTest.kt` pins both schemas as local-only and outside `screen.`.
 - Tool contract: `note.drop_list` and `note.drop_read` present in both `ToolSchemas.kt` and `CommandDispatcher.kt`, `localOnly`, outside `screen.`.
 - Build: `./gradlew :core:test :app:testDebugUnitTest assembleDebug`.
