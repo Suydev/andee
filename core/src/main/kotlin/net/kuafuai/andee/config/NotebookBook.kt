@@ -881,8 +881,42 @@ class NotebookBook(private val store: NotebookStore) {
         }
     }.trim()
 
+    private fun upgradeWhatsAppCard() {
+        if (book().optBoolean("whatsapp_card_v2", false)) return
+        val old = playbook("com.whatsapp")
+        val habits = (
+            listOf(
+                "Search a contact, then tap the chat row - never the avatar or contact card",
+                "Message box com.whatsapp:id/entry is at the BOTTOM; Send is com.whatsapp:id/send",
+                "Launch with fast_launch com.whatsapp; a bare am start -p fails here",
+                "Start a new message from the conversation list, not an old chat",
+                "get_screen_element first, then fast_tap/fast_text/fast_key; verify on screen",
+                "ASCII goes through fast_text; non-ASCII needs the accessibility IME",
+                "Read the chat again to confirm the bubble appeared before claiming sent",
+            ) + old?.habits.orEmpty()
+            ).distinct().take(8)
+        val shortcuts = (
+            listOf("open whatsapp", "message <contact>", "search contact", "send message", "attach document", "read latest chats") +
+                old?.shortcuts.orEmpty()
+            ).distinct().take(8)
+        val anchors = (
+            listOf(
+                "com.whatsapp:id/entry|Type a message",
+                "com.whatsapp:id/send|Send",
+                "com.whatsapp:id/search_input|Search",
+                "com.whatsapp:id/contact_row_container|contact row",
+                "com.whatsapp:id/menuitem_search|Search",
+            ) + old?.anchors.orEmpty()
+            ).distinct().take(12)
+        runCatching { savePlaybook("com.whatsapp", old?.label ?: "WhatsApp", habits, shortcuts, anchors) }
+        val seeded = book().let { JSONObject(it.toString()) }
+        seeded.put("whatsapp_card_v2", true)
+        write(seeded)
+    }
+
     /** Seed a few useful app playbooks on a fresh notebook; never overwrite learned ones or resurrect deletions. */
     fun seedPlaybooks() {
+        upgradeWhatsAppCard()
         if (book().optBoolean("playbooks_seeded", false)) return
         val presets = listOf(
             Triple("com.whatsapp", "WhatsApp", listOf("read and reply to chats", "check mentions first")),
