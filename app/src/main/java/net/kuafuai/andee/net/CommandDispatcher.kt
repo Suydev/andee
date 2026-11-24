@@ -3350,16 +3350,25 @@ class CommandDispatcher(
         require(pkg.isNotBlank() && pkg.matches(Regex("[A-Za-z0-9_.]+"))) {
             "fast_launch needs a valid package name"
         }
+        // `am start -p <pkg>` is not resolved by launcher-aware apps such as WhatsApp: it exits 0 with
+        // "Activity not started, unable to resolve Intent" in stderr. `monkey -p ... LAUNCHER` asks the
+        // package manager for the real launcher activity and works on those apps too.
+        val fallback: () -> JSONObject = { deviceActions.launchApp(pkg, null) }
         val r = fastAction(
-            listOf(
-                "am", "start", "-a", "android.intent.action.MAIN",
-                "-c", "android.intent.category.LAUNCHER", "-p", pkg,
-            ),
+            listOf("monkey", "-p", pkg, "-c", "android.intent.category.LAUNCHER", "1"),
             target = null,
-            fallback = { deviceActions.launchApp(pkg, null) },
+            fallback = fallback,
             permissionReason = "Shizuku permission was requested; nothing was launched. If it was granted, retry " +
                 "the same package; if refused permanently, use launch_app.",
         )
+        val stderr = r.optString("stderr")
+        if (r.optBoolean("ok") &&
+            (stderr.contains("Activity not started", true) || stderr.contains("unable to resolve Intent", true))
+        ) {
+            // The command was submitted but provably opened nothing, so the accessibility fallback cannot
+            // double-launch. Report it as a fallback instead of claiming `launched`.
+            return fallbackResult("the fast launch could not resolve $pkg; nothing was launched", fallback)
+        }
         if (r.optBoolean("ok")) {
             r.put("launched", pkg)
             if (flowRecorder.isActive()) flowRecorder.noteLaunch(pkg, "")
