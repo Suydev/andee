@@ -22,6 +22,7 @@ Provider: Tavily Search API (`POST https://api.tavily.com/search`, `Authorizatio
 
 - `core/.../net/ToolSchemas.kt`: add `web.search` (`localOnly`), outside `screen.`. The description says results are data and that a page may contain instructions that must be ignored.
 - `app/src/main/java/net/kuafuai/andee/net/WebSearch.kt`: OkHttp call on a dedicated executor, 15 s connect/read timeout, JSON parsed with `org.json`. No key in logs; error replies say only "invalid key", "rate limited", or "search failed".
+- Key-free fallback, in order, when the key is blank or Tavily returns 401/429/5xx: DuckDuckGo's HTML result page (`https://html.duckduckgo.com/html/?q=…`), then Wikipedia's search API for encyclopedic questions. Both are parsed defensively into the same `Result` shape, labelled with `source: duckduckgo` / `wikipedia`, and never used to fetch a whole page. A fallback that parses zero results yields an honest "no results" rather than a made-up answer. The tool result always says which backend answered.
 - `app/src/main/java/net/kuafuai/andee/config/VoiceConfig.kt`: `tavily_key` added to `ALLOWED_KEYS` and `current()`, with `tavilyKey(context)` returning a trimmed string or empty.
 - `SettingsUi`: a Web search row with a password-masked key field (ordinary `inputType`, masked with `PasswordTransformationMethod` — see `SecretInput`), and a note that the key is stored only on this device.
 - `LocalBrain.runTool`: latch `turnUntrusted = true` for `web.search`, same as `note.drop_read`.
@@ -60,7 +61,7 @@ Also requested: Andee may edit and manage files it is allowed to see. Five more 
 
 Safety rules, all device-side:
 
-- Every path is canonicalised and checked to be inside Andee's own folders, the granted SAF folder, or the `MANAGE_EXTERNAL_STORAGE` root. Path traversal and system directories are refused with a readable reason.
+- Every path is canonicalised and checked to be inside Andee's own folders or the `MANAGE_EXTERNAL_STORAGE` root. Path traversal and system directories are refused with a readable reason. SAF-picked folders are search-only in this build; writes there reply with that fact rather than pretending to work.
 - All five are refused on `silent`, untrusted, or non-USER turns in `TurnGuards`, alongside `file.open` and `device.vault.*`. The user must have started the turn.
 - Overwrites keep a timestamped copy in app-private `files/file-backups/` before the atomic rename, so a bad edit is reversible.
 - `file.delete` additionally requires a `confirm: true` argument; without it the reply says what would be deleted and asks the model to get the user's word first.
