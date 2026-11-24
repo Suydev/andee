@@ -1634,6 +1634,15 @@ class LocalBrain(
                 )
             }
 
+            // Reading somebody else's file makes the rest of this turn untrusted,
+            // including the read itself. turnUntrusted covers later tool calls in
+            // the same turn; callUntrusted covers this one.
+            var callUntrusted = untrusted
+            if (method == "note.drop_read") {
+                turnUntrusted = true
+                callUntrusted = true
+            }
+
             // The wait budget. Watching somebody else's twenty-minute job by waiting and looking is the
             // most expensive thing this loop can do — every look carries a screenshot and the whole tool
             // list — and it fills the history until the conversation itself is what breaks. So the device
@@ -1648,10 +1657,10 @@ class LocalBrain(
             // Where a task came from, how far it is trusted and whether this turn delivered anything: the device's
             // to say, never the model's. Whatever the model put under those names is replaced.
             if (method == "note.task" || method == "note.person") {
-                deviceFields(args, untrusted)
+                deviceFields(args, callUntrusted)
                 if (method == "note.task") turnTasked = true
             }
-            val result = dispatchWithTimeout(method, args, tc.id, silent, untrusted, kind)
+            val result = dispatchWithTimeout(method, args, tc.id, silent, callUntrusted, kind)
             if (method == "dsh.delegate" && result is JSONObject && result.optBoolean("handed_over")) net.kuafuai.andee.peer.HandedJobs.note(result.optString("worker"))
             if (landed(result)) noteSent(method)
             if (currentKind == TurnKind.WORK) workCalls += WorkCall(method, args.optString("action"), tc.id, landed(result))
