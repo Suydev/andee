@@ -738,6 +738,9 @@ object VoiceConfig {
                 "sweep_daily_cap" to p.getString(
                     "sweep_daily_cap", DEFAULT_SWEEP_DAILY_CAP.toString(),
                 )!!,
+                "drop_max_bytes" to p.getString(
+                    "drop_max_bytes", DEFAULT_DROP_MAX_BYTES.toString(),
+                ).toString(),
                 "max_steps" to maxSteps(context).toString(),
             )
         }
@@ -776,10 +779,26 @@ object VoiceConfig {
          */
         const val DEFAULT_MAX_STEPS = 40
 
+        const val DEFAULT_DROP_MAX_BYTES = 2L * 1024 * 1024
+        private const val MIN_DROP_BYTES = 1024L
+        private const val MAX_DROP_BYTES = 1024L * 1024 * 1024
+
         fun maxSteps(context: Context): Int =
             (context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
                 .getString("max_steps", "")?.trim()?.toIntOrNull()
                 ?: DEFAULT_MAX_STEPS).coerceIn(1, 200)
+
+        /**
+         * Largest file the drop inbox will read, in bytes. Unset reads as 2 MB;
+         * a saved value is bounded to 1 GiB so a stray number cannot make the
+         * card hash an unbounded file. The card's picker writes the raw number
+         * as a string, like every other row in [current].
+         */
+        fun dropMaxBytes(context: Context): Long {
+            val saved = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getString("drop_max_bytes", null)?.toLongOrNull() ?: return DEFAULT_DROP_MAX_BYTES
+            return saved.coerceIn(MIN_DROP_BYTES, MAX_DROP_BYTES)
+        }
 
         const val LANG_ZH = "zh"
         const val LANG_EN = "en"
@@ -1098,6 +1117,7 @@ object VoiceConfig {
             "lang",
             "ball",
             "sweep", "sweep_quiet_minutes", "sweep_daily_cap",
+            "drop_max_bytes",
             "max_steps",
         )
 }
