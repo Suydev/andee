@@ -100,9 +100,10 @@ object ToolSchemas {
         on-screen text", call this tool first, then act on what it returned.
 
         HARD RULES:
-        1) To tap an element from this list, use tap_screen_element with its
-           e-number. NEVER re-compute coordinates from the bracket values or
-           from a screenshot when an e-number exists.
+        1) To tap an element from this list, call fast_tap with its e-number
+           ({"eid": "e7"}) — or tap_screen_element when you need its richer result. Both resolve the
+           number on the device against a live node; neither asks you for coordinates. NEVER re-compute
+           coordinates from the bracket values or from a screenshot when an e-number exists.
         2) An icon button with no text and no description (Moments' comment
            bubble, an avatar, a photo) is identified by WHERE IT SITS, not by
            what it says. Read its indent group: the `#comment_btn` sitting
@@ -460,8 +461,10 @@ object ToolSchemas {
         list does not carry.
 
         Do NOT use this for finding controls, tapping buttons, or reading
-        text — get_screen_element is cheaper and more precise. Only call it
-        when:
+        text — get_screen_element is cheaper and more precise. Every call must
+        say WHY pixels are needed in `reason`; while a readable element list is
+        available a call without one is refused with a hint instead of an image.
+        Only call it when:
         1) The content is inherently an image (photo/video/chart/CAPTCHA/map)
         2) get_screen_element returned an empty list (self-drawn pane:
            mini-program, WebView article, game canvas, Moments feed) AND you
@@ -500,8 +503,14 @@ object ToolSchemas {
         never something covering a button. If a button seems hidden, scroll
         it into a clearer spot; do not route around the ball.
     """.trimIndent(),
-            required = emptyList(),
-            props = emptyMap(),
+            required = listOf("reason"),
+            props = mapOf(
+                "reason" to prop(
+                    "string",
+                    "Why pixels are needed now: 'image content', 'canvas/webview with no elements', " +
+                        "'visual judgement', or 'element list just changed'. Required every time.",
+                ),
+            ),
         ),
         tool(
             name = "system_action",
@@ -2783,15 +2792,20 @@ object ToolSchemas {
             name = "fast_tap",
             method = "device.fast_tap",
             description = """
-        Tap one exact point on the screen, in 0-1000 relative coordinates, through the fast on-device input path.
-        The device falls back to accessibility when that path is unavailable. Prefer tap_screen_element whenever
-        you have an e-number from a fresh get_screen_element; use this only for a point you can justify from what
-        you just saw. Coordinates are relative, never pixels.
+        Tap one exact point on the screen in 0-1000 relative coordinates through
+        the fast on-device input path. Prefer the e-number form whenever you have
+        a FRESH get_screen_element list: {"eid": "e7"} resolves the number to a
+        live node on the device and taps its centre, with no coordinate math and
+        no scaling errors. Stale e-numbers fail loudly with "unknown element" —
+        re-dump, do not guess. Use x/y only for a point you can justify from what
+        you just saw. The device falls back to accessibility when the fast path
+        is unavailable.
     """.trimIndent(),
-            required = listOf("x", "y"),
+            required = emptyList(),
             props = mapOf(
-                "x" to prop("integer", "0-1000 horizontal centre of the point to tap."),
-                "y" to prop("integer", "0-1000 vertical centre of the point to tap."),
+                "eid" to prop("string", "Element number from the LATEST get_screen_element, e.g. 'e7'. Resolved on device; use instead of x/y."),
+                "x" to prop("integer", "0-1000 horizontal centre of the point to tap. Use instead of eid."),
+                "y" to prop("integer", "0-1000 vertical centre of the point to tap. Use instead of eid."),
             ),
         ),
         tool(

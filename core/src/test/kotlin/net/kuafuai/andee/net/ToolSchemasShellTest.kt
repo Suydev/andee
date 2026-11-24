@@ -59,4 +59,24 @@ class ToolSchemasShellTest {
         assertTrue(ToolSchemas.isLocalOnly("screen.drag"))
         assertFalse(ToolSchemas.isLocalOnly("screen.tap"))
     }
+
+    private fun schemaFor(name: String): org.json.JSONObject {
+        val all = ToolSchemas.all()
+        for (i in 0 until all.length()) {
+            val tool = all.getJSONObject(i)
+            if (tool.getString("name") == name) return tool
+        }
+        throw AssertionError("no schema for $name")
+    }
+
+    @Test
+    fun `screenshots need a reason and fast taps can take an e-number`() {
+        val shot = schemaFor("take_screenshot").getJSONObject("parameters")
+        assertEquals("reason", shot.getJSONArray("required").getString(0))
+        assertTrue(shot.getJSONObject("properties").has("reason"))
+
+        val tap = schemaFor("fast_tap").getJSONObject("parameters")
+        assertTrue(tap.getJSONObject("properties").has("eid"))
+        assertEquals(0, tap.getJSONArray("required").length())
+    }
 }

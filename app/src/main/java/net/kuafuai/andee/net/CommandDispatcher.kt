@@ -1479,10 +1479,26 @@ class CommandDispatcher(
             // zoom a target so the next call can aim at it, and there is no next
             // call without accessibility. A brain that wants a closer look can
             // crop the full shot itself.
-            "screen.screenshot" -> blankedForCapture {
-                screenOrNull()?.screenshot()
-                    ?: captureFallback("tool")
-                    ?: throw IllegalStateException(SCREEN_UNAVAILABLE)
+            "screen.screenshot" -> {
+                // Pixels are the last resort, not the first look. While the
+                // last dump produced a text map, a caller that cannot say why
+                // it needs the image gets the cheaper sense back instead.
+                val reason = params?.optString("reason")?.trim().orEmpty()
+                if (reason.isEmpty() && screenOrNull()?.hasUsableElements() == true) {
+                    JSONObject()
+                        .put("ok", false)
+                        .put("blocked", true)
+                        .put(
+                            "hint",
+                            "A readable element list is available — call get_screen_element and tap with " +
+                                "fast_tap(eid). If you really need pixels, call take_screenshot again with " +
+                                "reason='image content' / 'canvas with no elements' / 'visual judgement'.",
+                        )
+                } else blankedForCapture {
+                    screenOrNull()?.screenshot()
+                        ?: captureFallback("tool")
+                        ?: throw IllegalStateException(SCREEN_UNAVAILABLE)
+                }
             }
 
             "screen.look_region" -> blankedForCapture {
@@ -3196,9 +3212,23 @@ class CommandDispatcher(
     }
 
     private fun fastTap(params: JSONObject?): JSONObject {
-        val x = params?.optInt("x", -1) ?: -1
-        val y = params?.optInt("y", -1) ?: -1
-        require(x in 0..1000 && y in 0..1000) { "fast_tap needs x and y in 0..1000" }
+        val eid = params?.optString("eid")?.trim().orEmpty()
+        val x: Int
+        val y: Int
+        if (eid.isNotEmpty()) {
+            require(params?.has("x") != true && params?.has("y") != true) {
+                "fast_tap: use eid or x/y, not both"
+            }
+            val point = requireScreen().eidNorm(eid)
+            x = point[0]
+            y = point[1]
+        } else {
+            x = params?.optInt("x", -1) ?: -1
+            y = params?.optInt("y", -1) ?: -1
+        }
+        require(x in 0..1000 && y in 0..1000) {
+            "fast_tap needs x and y in 0..1000, or an eid from a fresh get_screen_element"
+        }
         val (w, h) = displayPixels()
         val px = toPixel(x, w)
         val py = toPixel(y, h)
@@ -3215,6 +3245,7 @@ class CommandDispatcher(
         if (!r.has("x")) r.put("x", px)
         if (!r.has("y")) r.put("y", py)
         if (!r.has("norm")) r.put("norm", "$x,$y")
+        if (eid.isNotEmpty()) r.put("eid", eid)
         if (flowRecorder.isActive() && r.optBoolean("ok")) {
             flowRecorder.noteTap(r, hold = false, w = w, h = h)
         }

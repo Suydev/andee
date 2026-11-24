@@ -1064,6 +1064,28 @@ class ScreenController(
     private val eidLock = Any()
     private val eidIndex = HashMap<Int, EidEntry>()
 
+    /** Whether the last non-verbose dump produced a usable text map. */
+    @Volatile private var treeHasElements = false
+
+    fun hasUsableElements(): Boolean = treeHasElements
+
+    /**
+     * The fast-input bridge: an e-number from the last text map, resolved to
+     * the element's current centre in the same 0-1000 space fast_tap uses.
+     * Live relocation is the same one tapEntry performs; a stale number still
+     * fails loudly rather than tapping where the element used to be.
+     */
+    fun eidNorm(eid: String): IntArray {
+        val entry = lookupEid(eid)
+        val live = findLiveNode(entry)
+        val px = if (live != null) intArrayOf((live[0] + live[2]) / 2, (live[1] + live[3]) / 2) else entry.px
+        val d = dims()
+        return intArrayOf(
+            if (d[0] > 0) px[0] * NORM_MAX / d[0] else 0,
+            if (d[1] > 0) px[1] * NORM_MAX / d[1] else 0,
+        )
+    }
+
     /** Fresh dump in progress — see [tapByEid] for why taps must wait. */
     private val dumpLock = Object()
 
@@ -3039,7 +3061,10 @@ class ScreenController(
         synchronized(eidLock) { eidIndex.clear() }
         val w = screenW
         val h = screenH
-        if (w <= 0 || h <= 0) return
+        if (w <= 0 || h <= 0) {
+            treeHasElements = false
+            return
+        }
 
         val nodes = ArrayList<Pair<Int, JSONObject>>()
         collectNodes(out, nodes, 0)
@@ -3107,6 +3132,7 @@ class ScreenController(
         )
         val rootKeys = ArrayList(out.keys().asSequence().toList())
         for (k in rootKeys) if (k !in keep) out.remove(k)
+        treeHasElements = lines.isNotEmpty()
         if (lines.isNotEmpty()) out.put("elements", lines.joinToString("\n"))
         if (dropped > 0) out.put("elements_dropped", dropped)
     }

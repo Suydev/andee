@@ -11,7 +11,7 @@ Sources studied (2026-11-24):
 Read the screen first, then act through the fast path. Never tap an avatar or contact card when you mean the chat row.
 
 1. `get_screen_element` (fresh e-numbers and bounds).
-2. `fast_tap` / `fast_swipe` / `fast_text` / `fast_key` for the action. They use Shizuku input and fall back to accessibility only when needed.
+2. `fast_tap {"eid": "e7"}` / `fast_swipe` / `fast_text` / `fast_key` for the action. `fast_tap` with an e-number from the fresh map resolves the live node on the device — no coordinate math; screenshots are last-resort and need a `reason`. They use Shizuku input and fall back to accessibility only when needed.
 3. Observe the result before the next step. `verified` is evidence, not a promise.
 
 ## Launch
