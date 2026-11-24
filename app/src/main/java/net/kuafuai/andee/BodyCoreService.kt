@@ -79,6 +79,20 @@ class BodyCoreService : Service() {
     private lateinit var recordChip: net.kuafuai.andee.ui.RecordChipUi
     private var settings: SettingsUi? = null
 
+    /** Body state: it outlives the accessibility half, like the mic and the ball. */
+    private var dropInbox: net.kuafuai.andee.config.DropInbox? = null
+
+    /** FileObserver is GC'd if held only in a local — this field is the lifetime. */
+    private var dropObserver: android.os.FileObserver? = null
+
+    /** Hashing a newly dropped file must never happen on the main thread. */
+    private val dropWorker = java.util.concurrent.Executors.newSingleThreadExecutor { t ->
+        Thread(t, "drop-inbox")
+    }
+    private val dropSettle = Runnable {
+        dropWorker.execute { runCatching { dropInbox?.scan() } }
+    }
+
     /**
      * The self-check card, when it is up. Separate from [settings] because both
      * can be on screen at once — see [openSelfCheck].
@@ -220,6 +234,27 @@ class BodyCoreService : Service() {
         // Before the notification, because the notification's own content is
         // built from what this service can currently do.
         capture = net.kuafuai.andee.screen.ScreenCapture(this)
+        // App-specific external storage: no permission, reachable by adb and by a
+        // file manager that can show Android/data. The first scan is bounded and
+        // runs off the UI thread.
+        dropInbox = net.kuafuai.andee.config.DropInbox.from(this).also { box ->
+            box.ensureDir()
+            dropWorker.execute { runCatching { box.scan() } }
+        }
+        val dropDir = java.io.File(getExternalFilesDir(null), "inbox")
+        dropObserver = object : android.os.FileObserver(
+            dropDir.absolutePath,
+            android.os.FileObserver.CLOSE_WRITE or android.os.FileObserver.MOVED_TO or
+                android.os.FileObserver.CREATE or android.os.FileObserver.DELETE or
+                android.os.FileObserver.DELETE_SELF,
+        ) {
+            override fun onEvent(event: Int, path: String?) {
+                // A write arrives as several events; debounce them into one scan.
+                ui.removeCallbacks(dropSettle)
+                ui.postDelayed(dropSettle, net.kuafuai.andee.config.DropInbox.SETTLE_MS)
+            }
+        }
+        dropObserver?.startWatching()
         // First, and within the ~5 s the system allows: `startForegroundService`
         // owes a notification. Ours is load-bearing twice over — it is what
         // keeps this process alive when the accessibility service is taken
@@ -835,6 +870,9 @@ class BodyCoreService : Service() {
             meeting,
             dogMotion,
             this,
+            dropInbox = {
+                dropInbox ?: throw IllegalStateException("drop inbox is not ready")
+            },
             forwardExternal = { method, params ->
                 // Unknown to the dispatcher → the market, then the call
                 // extension. Both are "tools that live somewhere else", and the
@@ -1891,6 +1929,10 @@ class BodyCoreService : Service() {
         // running — cancel the timers, send the stop, let go of the cable.
         if (::dogMotion.isInitialized) dogMotion.shutdown()
         if (::dogLink.isInitialized) dogLink.close()
+        dropObserver?.stopWatching()
+        dropObserver = null
+        dropInbox = null
+        dropWorker.shutdown()
         stopBrain()
         // No new tools after this point; release the privileged shell service
         // before the process goes. ShizukuDevice guards the unbind call.
