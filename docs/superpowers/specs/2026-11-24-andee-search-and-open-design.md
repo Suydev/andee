@@ -2,7 +2,7 @@
 
 > Status: requested by the user on 2026-11-24. Companion to the drop-inbox design; this is a separate capability.
 
-**Goal:** give Andee three explicit tools on the Android body: search the web with a key the user supplies, search Andee's own folders plus the device's storage for a file by name, and open a found file in the app Android considers best suited for its type.
+**Goal:** give Andee three explicit tools on the Android body: search the web with a key the user supplies, search Andee's own folders plus the device's storage for a file by name, and open a found file in the app Android considers best suited for its type. It can also edit and manage files the user has allowed it to see.
 
 **Choices already made by the user:** search results come from a search API key entered in Settings; storage search is a hybrid of Andee's own files and full device storage; Andee picks the app itself instead of showing its own chooser.
 
@@ -48,6 +48,24 @@ Hybrid scope:
 - "Andee picks" means: resolve `queryIntentActivities` for the MIME type, exclude our own package, prefer a non-default resolver whose package is a known viewer for that MIME family (PDF, image, audio, video, text/document), otherwise take the system's first match. The tool result names the app it chose and the file path, so the user can see what happened. If nothing can open the type, say so instead of opening a random app.
 - `file.open` is refused on untrusted turns in `TurnGuards`, beside `device.vault.*`, so a file or web page cannot talk Andee into launching an app on its own.
 
+## File editing and management
+
+Also requested: Andee may edit and manage files it is allowed to see. Five more `localOnly` tools, outside `screen.`:
+
+- `file.write` — create or overwrite a text file, using the same size cap as the drop inbox, written atomically through a temp file and rename.
+- `file.edit` — replace an exact string in a text file; refuses if the old text is absent, or ambiguous unless `replace_all` is set.
+- `file.mkdir` — create a directory inside the granted root.
+- `file.move` — rename or move a file or directory; refuses to overwrite unless `overwrite` is set.
+- `file.delete` — delete a file or empty directory; a non-empty directory requires `recursive` and `confirm`.
+
+Safety rules, all device-side:
+
+- Every path is canonicalised and checked to be inside Andee's own folders, the granted SAF folder, or the `MANAGE_EXTERNAL_STORAGE` root. Path traversal and system directories are refused with a readable reason.
+- All five are refused on `silent`, untrusted, or non-USER turns in `TurnGuards`, alongside `file.open` and `device.vault.*`. The user must have started the turn.
+- Overwrites keep a timestamped copy in app-private `files/file-backups/` before the atomic rename, so a bad edit is reversible.
+- `file.delete` additionally requires a `confirm: true` argument; without it the reply says what would be deleted and asks the model to get the user's word first.
+- A `file_edits` setting defaults to off, is listed leftmost in Settings, and gates all five tools. The tool replies say plainly when it is off.
+
 ## Settings and permissions
 
 - Web search key row (masked field, empty by default).
@@ -57,12 +75,12 @@ Hybrid scope:
 ## Testing
 
 - Host tests: query normalisation, extension filter, result cap, MIME fallback, path display, and timeout returning `partial: true`.
-- Core tests: the four schemas are local-only and outside `screen.`; `web.search` latches the turn untrusted; `file.open` is refused on an untrusted turn (`TurnGuardsTest`).
-- Device pass: set a Tavily key, ask a current question, get titled results with URLs; ask about a file by name, get its path; say open it, see the right app open with the right file; revoke storage access and confirm the card says the scope is limited to Andee's own files.
+- Core tests: the schemas are local-only and outside `screen.`; `web.search` latches the turn untrusted; `file.open` and all five write tools are refused on an untrusted turn and on non-USER turns (`TurnGuardsTest`).
+- Device pass: set a Tavily key, ask a current question, get titled results with URLs; ask about a file by name, get its path; say open it, see the right app open with the right file; revoke storage access and confirm the card says the scope is limited to Andee's own files; turn file edits on, ask Andee to create a file, edit it, move it, then delete it with confirmation, and check the backup exists after the overwrite.
 
 ## Out of scope
 
-Indexing database, OCR, web page fetch/read tool, editing files, deleting files, automatic opening on a search hit, Play Store compatibility work, and desktop mirroring.
+Indexing database, OCR, web page fetch/read tool, automatic opening on a search hit, Play Store compatibility work, and desktop mirroring.
 
 ## Sources
 
