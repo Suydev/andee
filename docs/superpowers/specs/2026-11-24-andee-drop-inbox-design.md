@@ -36,7 +36,7 @@ A watched-folder pattern needs bounded ingestion: size cap, per-cycle cap, a set
 
 ### Ingestion limits
 
-- File size cap is a user setting, not a fixed limit: `VoiceConfig.dropMaxBytes(context)` returns `drop_max_bytes` (options 2/10/50 MB), defaulting to 2 MB. `DropInbox` takes the cap as a `() -> Long` provider so a settings change takes effect on the next scan without a rebuild. Files above the cap are listed with status `too_large` and are never read.
+- File size cap is a user setting, not a fixed limit: `VoiceConfig.dropMaxBytes(context)` returns `drop_max_bytes` (options 2 MB / 10 MB / 100 MB / 1 GB), defaulting to 2 MB and bounded to 1 GiB. `DropInbox` takes the cap as a `() -> Long` provider so a settings change takes effect on the next scan without a rebuild. Files above the cap are listed with status `too_large` and are never read. Hashing streams the file in 64 KB chunks and reading takes at most `MAX_CHARS + 1` characters, so a 1 GB file never lands in memory.
 - 10 files per scan cycle; the rest are picked up on the next scan.
 - 1.5 s settle after a write event before reading bytes.
 - Hidden files (leading dot) and directories are ignored.
