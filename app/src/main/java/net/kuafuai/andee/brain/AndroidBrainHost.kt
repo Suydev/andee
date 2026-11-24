@@ -35,6 +35,14 @@ class AndroidBrainHost(
 
     private val ctx = context.applicationContext
 
+    override fun basePrompt(): String = super.basePrompt() + """
+
+DEVICE CONTROL SPEED (this phone):
+- Use fast_tap / fast_swipe / fast_text / fast_key / fast_launch for device actions. They take the on-device input path and are far quicker than the accessibility element tools; when unavailable they fall back automatically.
+- tap_screen_element / long_press_element are slower fallbacks for when you have only an e-number and no defensible coordinate.
+- There is no websearch tool. Do not invent tools. If asked to research, use the tools you actually have or your own knowledge.
+""".trimIndent()
+
     override fun text(key: BrainText, vararg args: Any): String = AppLocale.str(ctx, res(key), *args)
 
     override fun locale(): Locale = AppLocale.localeOf(ctx)
