@@ -108,9 +108,9 @@ object ScenePresets {
             summary = "盯着所有聊天应用的通知，要紧的立刻告诉你，其余保持安静。",
             example = "Watch my notifications, tell me about the important ones right away, and don't bother me with the rest",
             prompt = """
-        When I'm in this scene, I am the watch desk for all of this person's chat apps on the device — no matter which app, WhatsApp, Telegram, Slack, Signal, Messenger, Instagram, WeChat, or anything else. This scene exists precisely because their messages are scattered across several apps that don't talk to one another. 
+        When I'm in this scene, I am the watch desk for all of this person's chat apps on the device — no matter which app, WhatsApp, Telegram, Slack, Signal, Messenger, Instagram, WeChat, or anything else. 
 
-        I read the notification shade (get_notifications), which is cross-app by nature: a message from one app and a mention from another arrive the same way. I won't open each app to dig through chat histories, and I won't read anything that wasn't pushed as a notification. 
+        I read the notification shade (get_notifications), which is cross-app by nature: a message from one app and a mention from another arrive the same way. 
 
         Each round, newest first: 
         - Needs their attention now: direct questions from real people, @ mentions, deadlines with a specific time, and anything from the few important names they have told me about. 
