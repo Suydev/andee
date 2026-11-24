@@ -350,7 +350,7 @@ class LifeTools(
         val DEVICE_FIELDS = setOf(TASK_SOURCE, TASK_UNTRUSTED, TASK_SENT)
 
         /** What the model calls the user when it means them, in a wait. */
-        private val USER_WORDS = setOf("He", "She", "ta", "User", "Master", "Me", "user", "the user", "owner", "him", "her", "me")
+        private val USER_WORDS = setOf("he", "she", "ta", "user", "master", "me", "the user", "owner", "him", "her")
         val METHODS = setOf(
             "note.self", "note.cares", "note.diary", "note.person", "note.people", "note.task",
             "note.wiki_search", "note.wiki_read", "note.wiki_write", "note.wiki_status", "note.wiki_link", "note.wiki_share", "note.wiki_know",

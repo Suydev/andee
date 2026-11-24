@@ -138,7 +138,7 @@ object SpeechMood {
      * [isQuiet]; [parse] strips it like a face, including the Chinese spellings, which the lowercase rule in
      * [droppable] would otherwise leave in the text to be read out.
      */
-    private val QUIET = setOf("quiet", "silent", "shh", "Quiet", "Silent", "No sound", "Don't make a sound")
+    private val QUIET = setOf("quiet", "silent", "shh")
 
     /** The model asked for this turn to say nothing aloud. */
     fun isQuiet(raw: String): Boolean =

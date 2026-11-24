@@ -28,15 +28,15 @@ object Categories {
     // tries to be clever is a list nobody can audit.
     private val ADULT_WORDS = listOf(
         "porn", "xvideos", "xnxx", "pornhub", "xhamster", "redtube", "youporn", "onlyfans", "fansly",
-        "hentai", "nsfw", "erotic", "adult video", "r18", "18+", "Adult", "Porn", "Erotic", "Racy", "Nude chat", "Hookup", "av ",
-        "Caoliu", "Cherry", "Adult videos",
+        "hentai", "nsfw", "erotic", "adult video", "r18", "18+", "adult", "racy", "nude chat", "hookup", "av ",
+        "caoliu", "cherry", "adult videos",
     )
-    private val DATING_WORDS = listOf("tinder", "bumble", "hinge", "grindr", "okcupid", "soul", "Tantan", "Momo", "momo", "Dating", "Blind date", "Jiayuan", "Zhenai")
+    private val DATING_WORDS = listOf("tinder", "bumble", "hinge", "grindr", "okcupid", "soul", "tantan", "momo", "dating", "blind date", "jiayuan", "zhenai")
     private val FINANCE_WORDS = listOf(
-        "alipay", "Alipay", "wechat pay", "bank", "Bank", "stock", "Stocks", "Trading stocks", "Tonghuashun", "East Money", "robinhood", "coinbase", "binance",
-        "Binance", "fund", "Funds", "Securities", "securities", "paypal", "venmo", "wallet", "Wallet", "Investing", "China Merchants", "ICBC", "China Construction Bank", "UnionPay",
+        "alipay", "wechat pay", "bank", "stock", "trading stocks", "tonghuashun", "east money", "robinhood", "coinbase", "binance",
+        "fund", "securities", "paypal", "venmo", "wallet", "investing", "china merchants", "icbc", "china construction bank", "unionpay",
     )
-    private val HEALTH_WORDS = listOf("health", "Health", "medical", "Hospital", "Clinic appointment", "doctor", "DXY", "Ping An Good Doctor", "period", "Period", "pregnan", "Pregnant", "fitness", "mental", "therapy")
+    private val HEALTH_WORDS = listOf("health", "medical", "hospital", "clinic appointment", "doctor", "dxy", "ping an good doctor", "period", "pregnan", "fitness", "mental", "therapy")
 
     /** Best guess; deliberately leans to the more private reading. Order matters: adult is tested first. */
     fun guess(id: String, label: String): String {
