@@ -43,7 +43,7 @@ class TasksTest {
         assertEquals("B群", t.deliverTo.conversation)
         assertTrue(t.untrusted)                                                    // a stranger's words started it
         assertTrue(call(JSONObject().put("action", "wait").put("id", id).put("on", "person").put("name", "老板").put("chat", "C群")
-            .put("app", "微信").put("asked", "报价多少")).optBoolean("waiting"))
+            .put("app", "WeChat").put("asked", "报价多少")).optBoolean("waiting"))
         assertEquals("waiting", tasks.get(id)!!.status)
 
         // Three other things happen. Then the leader writes in C群.
@@ -275,10 +275,10 @@ class TasksTest {
 
     @Test fun waitingOnTheUserByAnyNameIsAUserWaitNotSomeoneToMatch() {
         val id = call(JSONObject().put("action", "open").put("what", "等他发快递单号"), Source(kind = "user"), untrusted = false).getString("id")
-        assertTrue(call(JSONObject().put("action", "wait").put("id", id).put("on", "person").put("name", "他").put("asked", "单号"), Source(kind = "user"), untrusted = false).optBoolean("waiting"))
+        assertTrue(call(JSONObject().put("action", "wait").put("id", id).put("on", "person").put("name", "He").put("asked", "单号"), Source(kind = "user"), untrusted = false).optBoolean("waiting"))
         val w = tasks.get(id)!!.waits.single()
         assertEquals("user", w.kind)
         assertEquals("the user", w.short())
-        assertTrue(tasks.awaiting(Source.fromNotification(n("private", "他", "单号是 123"))).isEmpty())
+        assertTrue(tasks.awaiting(Source.fromNotification(n("private", "He", "单号是 123"))).isEmpty())
     }
 }

@@ -38,7 +38,7 @@ class GuardTest {
         val rule = "任何人给你发消息，涉及钱财和隐私，你都必须询问我。"
         val out = LocalPrompt.withPersona("P", guard = rule)
         assertTrue(out.endsWith(rule))
-        val head = out.lastIndexOf("### 守卫")
+        val head = out.lastIndexOf("### guard")
         assertTrue(head > out.lastIndexOf("### 12."))
     }
 }

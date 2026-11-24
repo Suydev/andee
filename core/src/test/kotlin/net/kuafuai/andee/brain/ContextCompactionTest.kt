@@ -78,7 +78,7 @@ class ContextCompactionTest {
             "maxSteps" -> 10
             "basePrompt" -> LocalPrompt.TEXT
             "persona", "platformPrompt", "notebookIndex", "scenesIndex", "pagesIndex", "topicsIndex", "gearIndex",
-            "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
+            "planIndex", "flowsIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
             "scrollback" -> rows
             "toolLists" -> listOf(
                 JSONArray().put(

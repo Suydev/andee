@@ -105,7 +105,7 @@ class SelfhoodTest {
     @Test fun aDiaryThatReadsLikeAReportIsTurnedBack() {
         val list = "今天做的事：\n- 回复了三条社区里的消息\n- 写了一版运营方案的初稿\n- 调研了两个同类社区的做法\n- 整理了认识的人"
         assertTrue(me.writeDiary(list, listOf("t1"))!!.contains("list"))
-        assertTrue(me.writeDiary("今天完成了 5 项工作，一切顺利，没有遇到任何问题，明天继续推进下一阶段的计划与安排，预计本周内可以全部收尾。", listOf("t1"))!!.contains("status report"))
+        assertTrue(me.writeDiary("Completed 5 tasks today, everything went smoothly, no problems at all. We will move on to the next stage of the plan tomorrow and expect to wrap everything up by the end of this week.", listOf("t1"))!!.contains("status report"))
         assertTrue(me.writeDiary("太短了。", listOf("t1"))!!.contains("too short"))
         val ok = "社区今天很安静，我有点坐不住。老王上次那句话我还在想——他其实在犹豫要不要来，我不确定该不该再问。明天先看看新人有没有人接。"
         assertNull(me.writeDiary(ok, listOf("t1")))

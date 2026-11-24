@@ -64,8 +64,8 @@ class SpeechMoodTest {
     }
 
     @Test
-    fun `chinese names and lenticular brackets parse`() {
-        val s = SpeechMood.parse("【生气】真是的。【开心】算了。")
+    fun `names and lenticular brackets parse`() {
+        val s = SpeechMood.parse("【tense】真是的。【happy】算了。")
         assertEquals("真是的。算了。", s.text)
         assertEquals(
             listOf(SpeechMood.Cue(0, Mood.TENSE), SpeechMood.Cue(4, Mood.HAPPY)),
@@ -129,11 +129,11 @@ class SpeechMoodTest {
     @Test
     fun `the five gestures are reachable by name and by synonym`() {
         val cases = mapOf(
-            "wink" to Mood.WINK, "眨眼" to Mood.WINK,
-            "wave" to Mood.WAVE, "bye" to Mood.WAVE, "再见" to Mood.WAVE,
-            "protect" to Mood.PROTECT, "守护" to Mood.PROTECT,
-            "celebrate" to Mood.CELEBRATE, "yay" to Mood.CELEBRATE, "庆祝" to Mood.CELEBRATE,
-            "rest" to Mood.REST, "sleepy" to Mood.REST, "休息" to Mood.REST,
+            "wink" to Mood.WINK, "playful" to Mood.WINK,
+            "wave" to Mood.WAVE, "bye" to Mood.WAVE,
+            "protect" to Mood.PROTECT, "guard" to Mood.PROTECT,
+            "celebrate" to Mood.CELEBRATE, "yay" to Mood.CELEBRATE,
+            "rest" to Mood.REST, "sleepy" to Mood.REST,
         )
         for ((word, mood) in cases) {
             val s = SpeechMood.parse("[$word]好了。")

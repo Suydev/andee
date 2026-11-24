@@ -13,8 +13,8 @@ class RemoteProgressTextTest {
             todos = listOf("collect" to "completed", "write" to "in_progress", "check" to "pending"),
             recent = listOf("searched", "读网页 kafka.apache.org"), thought = "", zh = true,
         )
-        assertEquals("第 12 步 · 2:34 · 8k tok", l.where)
-        assertEquals("清单 1/3 · write", l.plan)
+        assertEquals("Step 12 · 2:34 · 8k tok", l.where)
+        assertEquals("Checklist 1/3 · write", l.plan)
         assertEquals("› 读网页 kafka.apache.org", l.doing)
         assertEquals(3, l.asList().size)
     }

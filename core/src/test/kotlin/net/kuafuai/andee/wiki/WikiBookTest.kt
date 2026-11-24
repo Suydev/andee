@@ -106,7 +106,7 @@ class WikiBookTest {
         val e = wiki.read(m.id).exceptionOrNull()!!
         assertTrue(e.message!!.contains("lost") && e.message!!.contains("do not rely"))
         assertEquals(Status.LOST, wiki.meta(m.id)!!.status)
-        assertTrue(wiki.contents().contains("失联"))
+        assertTrue(wiki.contents().contains("## Lost"))
         remote.docs["https://x/1"] = "又恢复了"
         wiki.read(m.id).getOrThrow()
         assertEquals(Status.ACTIVE, wiki.meta(m.id)!!.status)                          // it heals when it is reachable again
@@ -145,7 +145,7 @@ class WikiBookTest {
 
     @Test fun theContentsPageAndPromptLineSummariseWithoutBodies() {
         w("社区运营方案").getOrThrow()
-        assertTrue(wiki.contents().contains("# 目录") && wiki.contents().contains("社区运营方案"))
+        assertTrue(wiki.contents().contains("# Directory") && wiki.contents().contains("社区运营方案"))
         val line = wiki.indexForPrompt()
         assertTrue(line.contains("社区运营方案") && line.contains("wiki_search") && !line.contains("第二段"))
     }

@@ -51,7 +51,7 @@ class WorkStepTest {
             "maxSteps" -> 10
             "basePrompt" -> LocalPrompt.TEXT
             "persona", "platformPrompt", "notebookIndex", "scenesIndex", "pagesIndex", "topicsIndex",
-            "gearIndex", "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
+            "gearIndex", "flowsIndex", "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
             "scrollback" -> emptyList<ScrollRow>()
             "toolLists" -> listOf(JSONArray().put(JSONObject().put("name", "tap").put("method", "screen.tap").put("description", "tap")
                 .put("parameters", JSONObject().put("type", "object").put("properties", JSONObject()))))

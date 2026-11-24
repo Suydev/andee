@@ -58,7 +58,7 @@ class ContinueAfterStepLimitTest {
             "maxSteps" -> steps
             "basePrompt" -> LocalPrompt.TEXT
             "persona", "platformPrompt", "notebookIndex", "scenesIndex", "pagesIndex", "topicsIndex",
-            "gearIndex", "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
+            "gearIndex", "flowsIndex", "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
             "scrollback" -> emptyList<ScrollRow>()
             "toolLists" -> listOf(
                 JSONArray().put(

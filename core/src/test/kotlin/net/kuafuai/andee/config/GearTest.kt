@@ -164,7 +164,7 @@ class GearTest {
 
     @Test fun financeAndHealthAreGuessedButShownUntilTheUserHidesThem() {
         assertEquals(Categories.FINANCE, Categories.guess("com.eg.android.AlipayGphone", "支付宝"))
-        assertEquals(Categories.HEALTH, Categories.guess("x", "平安好医生"))
+        assertEquals(Categories.HEALTH, Categories.guess("x", "Ping An Health"))
         val g = gear()
         g.applyScan(listOf(item("com.eg.android.AlipayGphone", "支付宝", now, 9)))
         assertEquals(1, g.visible().size)

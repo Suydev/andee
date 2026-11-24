@@ -63,7 +63,7 @@ class AimHintsTest {
             "maxSteps" -> 10
             "basePrompt" -> LocalPrompt.TEXT
             "persona", "platformPrompt", "notebookIndex", "scenesIndex", "pagesIndex", "topicsIndex",
-            "gearIndex", "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
+            "gearIndex", "flowsIndex", "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
             "scrollback" -> emptyList<ScrollRow>()
             "toolLists" -> listOf(JSONArray().put(tool("tap_by_coordinates", "screen.tap")).apply {
                 if (withLocator) put(tool("tap_target", "screen.tap_target"))

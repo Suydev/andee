@@ -55,7 +55,7 @@ class WorkTurnTest {
             "maxSteps" -> 10
             "basePrompt" -> LocalPrompt.TEXT
             "persona", "platformPrompt", "notebookIndex", "scenesIndex", "pagesIndex", "topicsIndex",
-            "gearIndex", "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
+            "gearIndex", "flowsIndex", "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
             "scrollback" -> emptyList<ScrollRow>()
             "toolLists" -> listOf(JSONArray().put(tool("tap", "screen.tap")).put(tool("remember", "note.remember")))
             // A proxy intercepts default methods too, so answer this one the way the default would.

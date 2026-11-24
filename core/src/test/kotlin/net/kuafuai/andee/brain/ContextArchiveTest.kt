@@ -28,12 +28,12 @@ class ContextArchiveTest {
             { m -> if (m === pruned) "石头 P10 2999 元" else null },
             { it == "read_sms" },
         )
-        assertTrue(text.contains("[now 2026-11-11 Wed 10:00] 我：扫地机多少钱"))
+        assertTrue(text.contains("[now 2026-11-11 Wed 10:00] Me: 扫地机多少钱"))
         assertFalse("the index block is not the user's words", text.contains("(your plan"))
         assertTrue("a pruned result is archived from its original", text.contains("石头 P10 2999 元"))
-        assertTrue(text.contains("（调用 market_search"))
+        assertTrue(text.contains("(calling market_search"))
         assertFalse("a code read from a text message is never written down", text.contains("482913"))
-        assertTrue(text.contains("read_sms 的结果不留存"))
+        assertTrue(text.contains("read_sms — result not kept"))
     }
 
     @Test fun writeListReadAndPage() {

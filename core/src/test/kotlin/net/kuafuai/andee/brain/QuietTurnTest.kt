@@ -52,7 +52,7 @@ class QuietTurnTest {
             "maxSteps" -> 10
             "basePrompt" -> LocalPrompt.TEXT
             "persona", "platformPrompt", "notebookIndex", "scenesIndex", "pagesIndex", "topicsIndex",
-            "gearIndex", "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
+            "gearIndex", "flowsIndex", "planIndex", "friendsIndex", "agentIndex", "selfIndex", "stageIndex", "wikiIndex", "tasksIndex", "peopleIndex", "reviewRecord", "guard" -> ""
             "scrollback" -> emptyList<ScrollRow>()
             "toolLists" -> listOf(JSONArray().put(JSONObject().put("name", "tap").put("method", "screen.tap").put("description", "tap")
                 .put("parameters", JSONObject().put("type", "object").put("properties", JSONObject()))))
@@ -87,11 +87,11 @@ class QuietTurnTest {
         assertFalse(q[0].detail.contains("["))
     }
 
-    @Test fun theMarkerIsStrippedInBothLanguages() {
+    @Test fun theMarkerIsStrippedInBothBracketStyles() {
         assertTrue(SpeechMood.isQuiet("好的 [quiet]"))
-        assertTrue(SpeechMood.isQuiet("【安静】放好了"))
+        assertTrue(SpeechMood.isQuiet("【quiet】放好了"))
         assertFalse(SpeechMood.isQuiet("[happy]放好了 [END]"))
-        assertEquals("放好了", SpeechMood.strip("【安静】放好了"))
+        assertEquals("放好了", SpeechMood.strip("【quiet】放好了"))
         assertEquals("放好了", SpeechMood.strip("[quiet] 放好了"))
     }
 }

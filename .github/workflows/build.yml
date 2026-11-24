@@ -36,25 +36,6 @@ jobs:
       # model-facing prompt and tool schemas, and :core:test carries the
       # turn-kind guards that keep shell writes on a local user turn. A failure
       # here also skips the upload below, so no APK is published from a red build.
-      # TEMPORARY golden-fixture regeneration. Remove after copying artifacts.
-      - name: Regenerate golden fixtures (temporary)
-        run: |
-          cat > golden-update.init.gradle <<'EOF'
-          allprojects {
-            tasks.withType(org.gradle.api.tasks.testing.Test) {
-              systemProperty 'golden.update', 'true'
-            }
-          }
-          EOF
-          ./gradlew --no-daemon --init-script golden-update.init.gradle :app:testDebugUnitTest -Dgolden.update=true
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: golden-fixtures
-          path: app/src/test/resources/golden/
-          if-no-files-found: error
-
       - run: ./gradlew --no-daemon :app:testDebugUnitTest
       - run: ./gradlew --no-daemon :core:test
 

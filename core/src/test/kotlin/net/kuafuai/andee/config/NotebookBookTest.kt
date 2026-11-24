@@ -149,8 +149,16 @@ class NotebookBookTest {
         val id = b.todos("pending").single { it.cronExpr == NotebookBook.NIGHTLY_PICTURE_CRON }.id
         // Simulate a notebook seeded with the first wording.
         b.wipe()
-        val old = "每晚回顾：把今天的事过一遍（对话、做过的事、日记），据此画一张「你和我」的图，要有意境。" +
-            "画好放到屏幕上给用户看，再用一两句话说画的是什么。今天没什么事就画安静的一天，不要硬凑。"
+        val old = "Evening look-back: go over today (the conversation, what you did, your diary) and from it write a short " +
+            "story of the day — a few sentences, in your own voice, about you and him — and make a picture of " +
+            "\"you and me\" with some mood to it. If you have an image-generation tool (the market may have one), " +
+            "use it for the picture; if not, draw it in HTML. If you have a stage (set_stage), put the picture " +
+            "and the story there, the picture on top — an https image goes in as <img src>; it stays up until " +
+            "morning. If you have no stage, show them with show_html instead. Then a sentence or two about what " +
+            "it shows; whether to say it aloud is yours to judge (§10, [quiet]) — the picture is already where " +
+            "they will see it. Write in the language of your recent conversation with the user; only if there " +
+            "has been none, use the interface language. If nothing much happened today, tell a quiet day rather " +
+            "than inventing one."
         b.addTodo(Todo(id, old, "cron", 0L, NotebookBook.NIGHTLY_PICTURE_CRON, 1L, 0L, "", "", "active", 0L, false))
         b.seedDefaults()   // first pass on this book: sets the flags, rewrites, adds nothing beside it
         assertTrue(b.seedDefaults().isEmpty())

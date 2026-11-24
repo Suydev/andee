@@ -84,8 +84,8 @@ class PeopleTest {
 
     @Test fun theUsersRecordNeverGoesIntoSomeoneElseAndTheUsersWordsWin() {
         val owner = people.owner().id
-        assertTrue(add("用户本人", "me").startsWith(People.LOOKALIKES))            // looks like the user: it asks first
-        val x = people.upsert("用户本人", null, wx("me"), null, null, null, null, null, asNew = true)
+        assertTrue(add("User himself", "me").startsWith(People.LOOKALIKES))            // looks like the user: it asks first
+        val x = people.upsert("User himself", null, wx("me"), null, null, null, null, null, asNew = true)
         assertTrue(people.merge(owner, x, "same")!!.contains("user"))
         assertNull(people.merge(x, owner, "the model wrote a record of the user"))
         assertEquals(5, people.get(owner)!!.weight)
@@ -135,9 +135,9 @@ class PeopleTest {
         val id = add("小李")
         people.upsert("小李", null, wx("小李"), null, null, "爱聊技术" to "他 10-28 在群里说的", null, null)
         assertEquals(1, people.get(id)!!.impressions.size)
-        assertTrue(people.upsert("小李", null, wx("小李"), null, null, "他最近在看抑郁症的病" to "他说的", null, null).startsWith("error:"))
-        assertTrue(people.upsert("小李", null, wx("小李"), null, "住址在海淀某某路 5 号", null, null, null).startsWith("error:"))
-        assertTrue(people.log(id, "in", "wechat", "他的银行卡号 6222021234567890123")!!.contains("personal"))
+        assertTrue(people.upsert("小李", null, wx("小李"), null, null, "he is being treated for depression" to "he said so", null, null).startsWith("error:"))
+        assertTrue(people.upsert("小李", null, wx("小李"), null, "home address is 5 Haidian Road", null, null, null).startsWith("error:"))
+        assertTrue(people.log(id, "in", "wechat", "his bank card number 6222021234567890123")!!.contains("personal"))
         assertEquals(1, people.get(id)!!.impressions.size)
     }
 
