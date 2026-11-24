@@ -50,6 +50,13 @@
          failure blamed on the app being driven. -->
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
+    <!-- Screen brightness and screen-off timeout are Settings.System keys, not
+         Settings.Global/Secure: WRITE_SECURE_SETTINGS does not cover them. On
+         Android 14 this is a special access ("Modify system settings") and the
+         app must declare it before adb can grant the app-op
+         (`cmd appops set net.kuafuai.andee WRITE_SETTINGS allow`). -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
     <!-- The eye: -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
