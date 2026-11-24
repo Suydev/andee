@@ -27,6 +27,6 @@ object Upgrade {
         v.trim().removePrefix("v").removePrefix("V").substringBefore('-').substringBefore('+').split('.')
             .map { it.toIntOrNull() ?: return null }.takeIf { it.isNotEmpty() }
 
-    /** Where the upgrade button goes: CodeFlying's Chinese site for a Chinese interface, the international one otherwise. */
-    fun url(lang: String): String = if (lang.startsWith("zh")) "https://www.codeflying.net/andee" else "https://www.codeflying.app/andee"
+    /** Where the version row's button goes: this fork's releases on GitHub. */
+    fun url(lang: String): String = "https://github.com/Suydev/andee/releases"
 }

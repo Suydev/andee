@@ -3237,7 +3237,6 @@ class FloatingWindowUi(
         }
         communityRow.addView(tipsLine)
         communityRow.addView(communityLink(R.drawable.ic_github, GITHUB_URL, "GitHub"))
-        communityRow.addView(communityLink(R.drawable.ic_discord, DISCORD_URL, "Discord"))
         // WeChat is not a link: it opens Andee's QR code, to add it as a friend.
         communityRow.addView(communityGlyph(R.drawable.ic_wechat, "WeChat") { listeners.onWeChatClick() })
         // The input pill, always there on the full card like the Mac's composer. It is not a field: an overlay
@@ -3884,9 +3883,8 @@ class FloatingWindowUi(
         /** How much of the last message the stage's live line cycles through. */
         private const val LAST_SAID_MAX = 600
 
-        /** The project's public home, opened from the foot of the card. */
-        private const val GITHUB_URL = "https://github.com/kuafuai/andee"
-        private const val DISCORD_URL = "https://discord.gg/PYujCQyqu"
+        /** This fork's home, opened from the foot of the card. */
+        private const val GITHUB_URL = "https://github.com/Suydev/andee"
 
         /**
          * Taps in a row that mean "stop". The ball's whole vocabulary, in one

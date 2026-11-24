@@ -6,10 +6,7 @@
          reading cannot find: an error message about a policy rather than about
          anything the user did.
 
-         No host is listed today. The version service moved to
-         https://api.heyandee.com and CodeFlying to https://baas.kuafuai.net,
-         so both cleartext holes were deleted rather than left behind: an
-         exception for a host nobody calls only widens what the app will talk
-         to in the clear. A build pointed at a plain-HTTP backend has to name
+         No host is listed today. The old vendor version service is gone, so
+         nothing calls it; any build pointed at a plain-HTTP backend has to name
          that host here (and in the debug copy). -->
 </network-security-config>

@@ -208,9 +208,9 @@
     <string name="common_low">Low</string>
     <string name="common_default">Default</string>
     <string name="settings_brain_local_note">The device runs the agent loop itself, with no hub. Without a key it will not take over.</string>
-    <string name="settings_codeflying_get_key">No key? Sign up at the link below, then paste your key into the box underneath. New users get free credit.</string>
-    <string name="settings_codeflying_open_site">Open CodeFlying.app ›</string>
-    <string name="codeflying_url" translatable="false">https://www.codeflying.app/andee</string>
+    <string name="settings_codeflying_get_key">Need a key? Get one from your provider — the repository below has setup notes.</string>
+    <string name="settings_codeflying_open_site">Open project on GitHub ›</string>
+    <string name="codeflying_url" translatable="false">https://github.com/Suydev/andee</string>
     <string name="settings_no_key_use_codeflying">No key? Tap here to switch to CodeFlying</string>
     <string name="settings_codeflying_key">CodeFlying key</string>
     <string name="common_copy">Copy</string>
@@ -864,6 +864,7 @@
     <string name="check_title_typing_channel">Typing channel</string>
     <string name="check_title_adb_keyboard">ADB keyboard</string>
     <string name="check_title_secure_settings">Typing without root</string>
+    <string name="check_title_write_settings">Modify system settings</string>
     <string name="check_title_shizuku">Fast device control (Shizuku)</string>
     <string name="check_title_voice_key">Voice API key</string>
     <string name="check_title_voice_host">Voice service</string>
@@ -898,8 +899,9 @@
          move to and %2$s is always the build in hand; the two rows differ by a
          word, so do not swap the arguments between them. See SelfCheck.version. -->
     <string name="check_detail_version_current">%1$s is the current release.</string>
-    <string name="check_detail_version_stale">Out of date: the latest is %1$s, you are on %2$s. Upgrade from GitHub or CodeFlying.</string>
-    <string name="check_detail_version_forced">Please upgrade to %1$s — this build (%2$s) is no longer supported. Upgrade from GitHub or CodeFlying.</string>
+    <string name="check_detail_version_installed">You are on %1$s. Releases are on GitHub.</string>
+    <string name="check_detail_version_stale">Out of date: the latest is %1$s, you are on %2$s. Upgrade from GitHub.</string>
+    <string name="check_detail_version_forced">Please upgrade to %1$s — this build (%2$s) is no longer supported. Upgrade from GitHub.</string>
     <string name="check_detail_version_offline">Offline, so not tested. You are on %1$s.</string>
     <string name="check_detail_version_quota">Today\'s checks are used up; they reset tomorrow. You are on %1$s.</string>
     <string name="check_detail_version_unreachable">Could not be checked: %1$s. You are on %2$s.</string>
@@ -915,6 +917,8 @@
     <string name="check_detail_secure_on">Granted. Typing into other apps works.</string>
     <string name="check_detail_secure_missing">Not granted, so typing into other apps (type_text) is unavailable. There is no switch for this in Settings — it can only be given over adb with the cable plugged in.</string>
     <string name="check_detail_secure_spare">Not granted, and typing works anyway — it goes through the accessibility input method. This is only needed by the spare channel above.</string>
+    <string name="check_detail_write_settings_on">Allowed. Brightness and screen-timeout writes work.</string>
+    <string name="check_detail_write_settings_off">Not allowed. Brightness and screen-timeout changes are blocked. Use the button to allow Modify system settings.</string>
     <string name="check_detail_shizuku_ready">Ready. Fast tap, swipe, text, key and launch work even when accessibility is off.</string>
     <string name="check_detail_shizuku_missing">Shizuku is not installed, so fast device control is unavailable. The accessibility screen tools still work. Download it with the button below.</string>
     <string name="check_detail_shizuku_permission">Shizuku is installed but has not granted Andee access. Open it with the button below and allow Andee; until then fast device control is unavailable.</string>

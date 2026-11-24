@@ -17,7 +17,7 @@ class UpgradeTest {
     }
 
     @Test fun theLinkFollowsTheLanguage() {
-        assertEquals("https://www.codeflying.net/andee", Upgrade.url("zh"))
-        assertEquals("https://www.codeflying.app/andee", Upgrade.url("en"))
+        assertEquals("https://github.com/Suydev/andee/releases", Upgrade.url("zh"))
+        assertEquals("https://github.com/Suydev/andee/releases", Upgrade.url("en"))
     }
 }

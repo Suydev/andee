@@ -20,23 +20,20 @@ class SelfCheckMergeTest {
     private fun row(id: String, level: Level) = Finding(id = id, title = 0, level = level, detail = 0)
 
     @Test
-    fun `a local re-read keeps the three rows only a probe could answer`() {
+    fun `a local re-read keeps the two rows only a probe could answer`() {
         val previous = listOf(
             row("backend", Level.OK),
-            row("version", Level.NOTE),
             row("voice_host", Level.FAIL),
         )
-        // What a no-probe pass produces for those same three: placeholders.
+        // What a no-probe pass produces for those same two: placeholders.
         val fresh = listOf(
             row("backend", Level.NOTE),
-            row("version", Level.NOTE),
             row("voice_host", Level.NOTE),
         )
 
         val merged = SelfCheck.mergeLocal(fresh, previous)
 
         assertEquals(Level.OK, merged.first { it.id == "backend" }.level)
-        assertEquals(Level.NOTE, merged.first { it.id == "version" }.level)
         assertEquals(Level.FAIL, merged.first { it.id == "voice_host" }.level)
     }
 
