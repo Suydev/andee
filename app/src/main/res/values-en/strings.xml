@@ -230,6 +230,13 @@
     <string name="settings_wake_sens_note">Move right if it often fails to wake; move left if ordinary talk wakes it. “Very sensitive” is more easily woken by the TV or conversation. Takes effect at once — no need to re-record.</string>
     <string name="common_clear">Clear</string>
     <string name="common_delete">Delete</string>
+    <string name="settings_section_drop">Drop inbox</string>
+    <string name="settings_drop_note">Files you put here. Andee reads them only when you ask.</string>
+    <string name="settings_drop_cap_2">2 MB</string>
+    <string name="settings_drop_cap_10">10 MB</string>
+    <string name="settings_drop_cap_100">100 MB</string>
+    <string name="settings_drop_cap_1gb">1 GB</string>
+    <string name="settings_drop_open">Open inbox</string>
     <string name="settings_section_vault">Vault</string>
     <string name="settings_vault_empty_note">No accounts yet — once saved, Andee can log in as you when a task needs it</string>
     <string name="settings_vault_count_note">%1$d saved — the brain may read the phone and email, but only this device types the password</string>

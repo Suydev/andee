@@ -130,6 +130,7 @@ class SettingsUi(
 
     /** Open the friends (peers) card. Non-null = show a Friends row here; the Friends key left the control bar (issue #44). */
     private val onOpenFriends: (() -> Unit)? = null,
+    private val onOpenDropInbox: (() -> Unit)? = null,
 ) {
 
     private val wm: WindowManager =
@@ -392,6 +393,7 @@ class SettingsUi(
         driveSection(form)
         timelineSection(form)
         friendsSection(form)
+        dropSection(form)
         vaultSection(form)
         maxStepsSection(form)
 
@@ -1098,6 +1100,29 @@ class SettingsUi(
             rowParams(dp(10)),
         )
     }
+    private fun dropSection(form: LinearLayout) {
+        val open = onOpenDropInbox ?: return
+        val panel = group(form, lctx.getString(R.string.settings_section_drop))
+        panel.addView(TextView(context).apply {
+            text = lctx.getString(R.string.settings_drop_note)
+            textSize = Glass.Type.CAPTION
+            setTextColor(Color.parseColor(Glass.SECONDARY))
+            setLineSpacing(dp(3).toFloat(), 1f)
+        }, rowParams(0))
+        segmented(panel, "drop_max_bytes", listOf(
+            "2097152" to lctx.getString(R.string.settings_drop_cap_2),
+            "10485760" to lctx.getString(R.string.settings_drop_cap_10),
+            "104857600" to lctx.getString(R.string.settings_drop_cap_100),
+            "1073741824" to lctx.getString(R.string.settings_drop_cap_1gb),
+        ))
+        val row = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+        row.addView(button(lctx.getString(R.string.settings_drop_open), filled = false) {
+            hide()
+            open()
+        })
+        panel.addView(row, rowParams(dp(12)))
+    }
+
     private fun vaultSection(form: LinearLayout) {
         val panel = group(form, lctx.getString(R.string.settings_section_vault))
         fun summary(): String {

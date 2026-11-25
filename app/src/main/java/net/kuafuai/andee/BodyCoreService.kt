@@ -78,6 +78,7 @@ class BodyCoreService : Service() {
     private lateinit var marker: net.kuafuai.andee.ui.TapMarkerUi
     private lateinit var recordChip: net.kuafuai.andee.ui.RecordChipUi
     private var settings: SettingsUi? = null
+    private var dropUi: net.kuafuai.andee.ui.DropInboxUi? = null
 
     /** Body state: it outlives the accessibility half, like the mic and the ball. */
     private var dropInbox: net.kuafuai.andee.config.DropInbox? = null
@@ -1960,6 +1961,8 @@ class BodyCoreService : Service() {
         net.kuafuai.andee.screen.GroundingLog.shutdown()
         settings?.hide()
         settings = null
+        dropUi?.hide()
+        dropUi = null
         // Same treatment, and the extra call is the prober thread: the two
         // network probes run on their own executor and would otherwise hold a
         // thread for up to a connect timeout after the service is gone.
@@ -2255,6 +2258,20 @@ class BodyCoreService : Service() {
         if (asr.isActive() && !dispatcher.isTaskActive()) asr.stop()
     }
 
+    private fun openDropInbox() {
+        val box = dropInbox ?: return
+        if (dropUi != null) return
+        stopFollowUpListening()
+        val card = net.kuafuai.andee.ui.DropInboxUi(
+            context = this,
+            inbox = box,
+            onSubmit = { text -> ui.post { submitUserTurn(text, "drop") } },
+            onDismiss = { dropUi = null },
+        )
+        dropUi = card
+        card.show()
+    }
+
     private fun openSettings() {
         if (settings?.isShowing() == true) return
         stopFollowUpListening()
@@ -2316,6 +2333,7 @@ class BodyCoreService : Service() {
             // See FloatingWindowUi.onLocaleChanged.
             onLocaleChanged = { window.onLocaleChanged() },
             onOpenFriends = { if (::peers.isInitialized) net.kuafuai.andee.ui.PeersUi(this@BodyCoreService, peers).show() },
+            onOpenDropInbox = { openDropInbox() },
         )
         settings = s
         s.show()

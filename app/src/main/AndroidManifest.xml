@@ -283,6 +283,14 @@
             android:theme="@style/Theme.Body.Stage"
             android:exported="false"
             android:configChanges="orientation|screenSize|keyboardHidden" />
+        <!-- Picks a document for the drop inbox. No launcher entry: the service opens it. -->
+        <activity
+            android:name=".ui.DropPickerActivity"
+            android:theme="@style/Theme.Body.Stage.NoPreview"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:autoRemoveFromRecents="true"
+            android:taskAffinity="" />
         <!-- The ⌨ field a person types into. An Activity and not an overlay
              because on this ROM an overlay window cannot raise the soft
              keyboard — measured; see ui/TextInputActivity. Translucent so the
