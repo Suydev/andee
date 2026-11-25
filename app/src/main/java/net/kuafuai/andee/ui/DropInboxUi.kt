@@ -193,10 +193,15 @@ class DropInboxUi(
                     visibility = View.GONE
                 }
                 detail.addView(button("让 Andee 看", filled = true) {
-                    // The name is a file's, not something the user said. The
-                    // fence is a request to the model; BodyCoreService's
-                    // untrusted submit is the half that holds if it is ignored.
-                    onSubmit("看看收件箱里的 ${DropFence.wrap(item.name)}（文件 id：${item.id}）")
+                    // Both values carry the file's own words: the id is
+                    // "<sha>:<name>". Fence them together, or a hostile name
+                    // leaks through the id into the hub's copy of this turn.
+                    // The latch in BodyCoreService is the half that holds if
+                    // the model is talked out of the fence.
+                    val data = "文件名：${item.name}\n文件 id：${item.id}"
+                        .replace(DropFence.OPEN, "")
+                        .replace(DropFence.CLOSE, "")
+                    onSubmit("看看收件箱里的 ${DropFence.wrap(data)}")
                     hide()
                 })
                 row.addView(detail)

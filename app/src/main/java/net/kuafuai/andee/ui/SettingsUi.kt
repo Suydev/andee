@@ -318,11 +318,11 @@ class SettingsUi(
 
     fun hide() {
         val v = root ?: return
-        // A segmented picker is never blank, so VoiceConfig.save always writes
-        // it. Do this on every way out — ✕, 取消 and the drop-inbox door all
-        // leave through here, and none of them is a press on 保存. Only the
-        // pickers are persisted here; text fields keep their explicit Save.
-        persistPicks()
+        // The drop cap is the one picker whose change must survive a door that
+        // is not 保存 (the open-inbox door, ✕, 取消). Every other picker still
+        // waits for 保存: writing `brain` on dismiss would restart the brain
+        // and throw the conversation away even when the user cancelled.
+        persistDropCap()
         root = null
         aside?.let { StandAside.unregister(it) }; aside = null
         closing = v
@@ -2009,10 +2009,13 @@ class SettingsUi(
         return out
     }
 
-    /** Pickers are written through the same path as text fields, on every exit. */
-    private fun persistPicks() {
-        if (picks.isEmpty()) return
-        VoiceConfig.save(context, picks.mapValues { (_, read) -> read() })
+    /**
+     * Only the drop cap is committed on exit. Its value is never blank, so
+     * VoiceConfig.save always writes it; no other picker is touched here.
+     */
+    private fun persistDropCap() {
+        val read = picks["drop_max_bytes"] ?: return
+        VoiceConfig.save(context, mapOf("drop_max_bytes" to read()))
     }
 
     private fun saveAndHide() {
@@ -2028,9 +2031,10 @@ class SettingsUi(
                 updates[k] = v
             }
         }
-        // Pickers go through VoiceConfig.save in hide() below: their value is
-        // never blank, which is what lets a setting actually be turned back
-        // off. Doing it there as well would be a second write of the same keys.
+        // Pickers go in unconditionally: their value is never blank, which is
+        // what lets a setting actually be turned back off. Only 保存 writes
+        // them; hide() commits the drop cap alone for its non-Save doors.
+        for ((k, read) in picks) updates[k] = read()
         if (updates.isNotEmpty()) VoiceConfig.save(context, updates)
         notifyRuleField?.let { net.kuafuai.andee.config.Notebook.notifyRule(context).set(it.text?.toString().orEmpty()) }
         hide()
