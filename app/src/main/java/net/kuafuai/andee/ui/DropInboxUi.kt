@@ -65,6 +65,7 @@ class DropInboxUi(
     }
 
     private fun refresh() {
+        if (root == null) return
         io.execute {
             val found = runCatching { inbox.scan() }.getOrDefault(emptyList())
             ui.post {
