@@ -1232,9 +1232,16 @@ class BodyCoreService : Service() {
      * brain. Two copies of it would drift, and the hub event in particular is
      * easy to forget — its failure mode is a device that answers nothing.
      *
-     * [how] is only for the log line.
+     * [how] is only for the log line. [untrusted] is for a turn the person
+     * started but did not write — the drop card's file name is in the text —
+     * so the local brain carries the subject matter at a stranger's standing.
      */
-    private fun submitUserTurn(text: String, how: String, images: List<String> = emptyList()) {
+    private fun submitUserTurn(
+        text: String,
+        how: String,
+        images: List<String> = emptyList(),
+        untrusted: Boolean = false,
+    ) {
         if (exitRequested) return
         val said = text.trim()
         if (said.isEmpty() && images.isEmpty()) return
@@ -1274,6 +1281,14 @@ class BodyCoreService : Service() {
         val taskId = pendingTask
         pendingTask = null
         val task = taskId?.let { net.kuafuai.andee.config.Notebook.tasks(this).get(it) }
+        // The fence is for the model, not for the person's scrollback: they
+        // tapped a row named after a file, they did not type marker tokens.
+        val visible = if (untrusted) {
+            said.replace(net.kuafuai.andee.net.DropFence.OPEN, "")
+                .replace(net.kuafuai.andee.net.DropFence.CLOSE, "")
+                .replace('\n', ' ')
+                .trim()
+        } else said
         // Tell the dispatcher which artifact this turn is about, before the
         // brain can call `show_html` inside it. The panel's Revise is the one
         // turn that starts out already knowing, and without this the revised
@@ -1285,7 +1300,7 @@ class BodyCoreService : Service() {
             editing != null -> AppLocale.str(this, R.string.artifacts_edit_said, editing.text, said)
             continuing != null -> AppLocale.str(this, R.string.topic_continue_said, continuing.title, said)
             task != null -> AppLocale.str(this, R.string.tasks_said, task.what, said)
-            else -> said
+            else -> visible
         }
         // The brain's message opens with the row's own words: a later topic fold
         // finds this turn's row by matching that opening line, and a brain text
@@ -1308,8 +1323,13 @@ class BodyCoreService : Service() {
         wsServer?.broadcastEvent("asr.final", payload)
         // Same turn, different brain. The local one takes the text directly —
         // there is no socket in between, and no event kind it would have to be
-        // taught (see the meeting callback).
-        localBrain?.submit(forBrain, images)
+        // taught (see the meeting callback). A name from the drop inbox is not
+        // the user's own words, so it enters as an untrusted user turn: the
+        // vault guard is a device fact, not a request the model can be talked
+        // out of.
+        localBrain?.let { brain ->
+            if (untrusted) brain.submitUntrusted(forBrain, images) else brain.submit(forBrain, images)
+        }
         // Task start, and deliberately at the request rather than at the
         // reply: from here the device is being worked on, whether that reaches
         // us as a tool call or as thirty seconds of thinking. Nobody listening
@@ -2265,7 +2285,7 @@ class BodyCoreService : Service() {
         val card = net.kuafuai.andee.ui.DropInboxUi(
             context = this,
             inbox = box,
-            onSubmit = { text -> ui.post { submitUserTurn(text, "drop") } },
+            onSubmit = { text -> ui.post { submitUserTurn(text, "drop", untrusted = true) } },
             onDismiss = { dropUi = null },
         )
         dropUi = card

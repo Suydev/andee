@@ -428,7 +428,22 @@ class LocalBrain(
     private val photoMessages = mutableListOf<JSONObject>()
 
     /** [images] are base64 JPEGs; with any of them, [userText] may be empty. */
-    fun submit(userText: String, images: List<String> = emptyList()) {
+    fun submit(userText: String, images: List<String> = emptyList()) =
+        submitTurn(userText, images, untrusted = false)
+
+    /**
+     * A turn the person started but did not write: they asked to have a file in
+     * their drop inbox read, so its name (and whatever it contains) arrived in
+     * the same message as their request. It is still their turn — it bumps the
+     * generation and is answered normally — but the subject matter carries the
+     * standing of a stranger's words, so [TurnGuards] closes the vault and the
+     * other owner-only tools for it. A prompt fence is a request; this is the
+     * half that holds when the model is talked out of the fence.
+     */
+    fun submitUntrusted(userText: String, images: List<String> = emptyList()) =
+        submitTurn(userText, images, untrusted = true)
+
+    private fun submitTurn(userText: String, images: List<String>, untrusted: Boolean) {
         val text = userText.trim()
         if (text.isEmpty() && images.isEmpty()) return
         if (cfg.apiKey.isEmpty()) {
@@ -442,7 +457,7 @@ class LocalBrain(
         // must not look like the user spoke, or it would keep pushing its own
         // trigger out.
         host.touchActivity()
-        launch(text, TurnKind.USER, images)
+        launch(text, TurnKind.USER, images, untrusted = untrusted)
     }
 
     /**

@@ -43,9 +43,18 @@ class DropPickerActivity : Activity() {
         val app = applicationContext
         COPY.execute {
             val copied = runCatching { copy(app, uri) }.isSuccess
-            Handler(Looper.getMainLooper()).post {
+            val main = Handler(Looper.getMainLooper())
+            main.post {
                 if (!copied) Toast.makeText(app, "添加文件失败", Toast.LENGTH_SHORT).show()
-                done?.invoke()
+                if (copied) {
+                    // The card is still open and refreshes as soon as we call
+                    // back, but DropInbox.scan skips files younger than its
+                    // settle window. Wait that long so the first refresh sees
+                    // the copy instead of only the observer's later scan.
+                    main.postDelayed({ done?.invoke() }, DropInbox.SETTLE_MS)
+                } else {
+                    done?.invoke()
+                }
                 finish()
             }
         }

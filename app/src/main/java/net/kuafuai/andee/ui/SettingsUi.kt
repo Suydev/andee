@@ -318,6 +318,11 @@ class SettingsUi(
 
     fun hide() {
         val v = root ?: return
+        // A segmented picker is never blank, so VoiceConfig.save always writes
+        // it. Do this on every way out — ✕, 取消 and the drop-inbox door all
+        // leave through here, and none of them is a press on 保存. Only the
+        // pickers are persisted here; text fields keep their explicit Save.
+        persistPicks()
         root = null
         aside?.let { StandAside.unregister(it) }; aside = null
         closing = v
@@ -2004,6 +2009,12 @@ class SettingsUi(
         return out
     }
 
+    /** Pickers are written through the same path as text fields, on every exit. */
+    private fun persistPicks() {
+        if (picks.isEmpty()) return
+        VoiceConfig.save(context, picks.mapValues { (_, read) -> read() })
+    }
+
     private fun saveAndHide() {
         val updates = mutableMapOf<String, String>()
         for ((k, et) in fields) {
@@ -2017,10 +2028,9 @@ class SettingsUi(
                 updates[k] = v
             }
         }
-        // Pickers go in unconditionally: their value is never blank, which is
-        // what lets a setting actually be turned back off — VoiceConfig.save()
-        // drops blank values, so a text field never could.
-        for ((k, read) in picks) updates[k] = read()
+        // Pickers go through VoiceConfig.save in hide() below: their value is
+        // never blank, which is what lets a setting actually be turned back
+        // off. Doing it there as well would be a second write of the same keys.
         if (updates.isNotEmpty()) VoiceConfig.save(context, updates)
         notifyRuleField?.let { net.kuafuai.andee.config.Notebook.notifyRule(context).set(it.text?.toString().orEmpty()) }
         hide()

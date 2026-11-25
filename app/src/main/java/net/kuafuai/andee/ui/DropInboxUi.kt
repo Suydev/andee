@@ -14,6 +14,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import net.kuafuai.andee.compat.WindowMetricsCompat
 import net.kuafuai.andee.config.DropInbox
+import net.kuafuai.andee.net.DropFence
 import java.util.concurrent.Executors
 
 class DropInboxUi(
@@ -192,7 +193,10 @@ class DropInboxUi(
                     visibility = View.GONE
                 }
                 detail.addView(button("让 Andee 看", filled = true) {
-                    onSubmit("看看收件箱里的 ${item.name}（文件 id：${item.id}）")
+                    // The name is a file's, not something the user said. The
+                    // fence is a request to the model; BodyCoreService's
+                    // untrusted submit is the half that holds if it is ignored.
+                    onSubmit("看看收件箱里的 ${DropFence.wrap(item.name)}（文件 id：${item.id}）")
                     hide()
                 })
                 row.addView(detail)
