@@ -90,7 +90,11 @@ class BodyCoreService : Service() {
         Thread(t, "drop-inbox")
     }
     private val dropSettle = Runnable {
-        dropWorker.execute { runCatching { dropInbox?.scan() } }
+        // A settle posted just before teardown can still land after shutdown();
+        // execute() on a dead executor throws on the main thread that runs ui.
+        if (!dropWorker.isShutdown) {
+            dropWorker.execute { runCatching { dropInbox?.scan() } }
+        }
     }
 
     /**
@@ -1930,6 +1934,9 @@ class BodyCoreService : Service() {
         if (::dogMotion.isInitialized) dogMotion.shutdown()
         if (::dogLink.isInitialized) dogLink.close()
         dropObserver?.stopWatching()
+        // Same convention as planTickRunnable: a settle still queued on ui would
+        // otherwise fire after shutdown() and throw RejectedExecutionException.
+        ui.removeCallbacks(dropSettle)
         dropObserver = null
         dropInbox = null
         dropWorker.shutdown()
